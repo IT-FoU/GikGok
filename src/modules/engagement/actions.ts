@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import type { Database, Json } from "@/lib/supabase/types";
+import type { Database } from "@/lib/supabase/types";
 import type { ActionResult } from "@/modules/player/auth-shared";
 
 type TicketCategory = Database["public"]["Enums"]["ticket_category"];

@@ -119,17 +119,17 @@
 
 ## Phase 9 — Player experience and engagement
 
-- [ ] Build Home: balance, daily reward, three game cards, announcements, activity, mission progress, leaderboard preview, achievement preview, support, and settings shortcuts.
-- [ ] Build filterable full bet history with receipt details and random/controlled-demo state.
-- [ ] Implement announcements with targeting, scheduling, read state, and safe dismissal.
-- [ ] Build notifications for verification, rewards, credit requests, tickets, achievements, and announcements.
-- [ ] Implement configurable optional Daily Missions that never require playing every game.
-- [ ] Implement data-driven Achievement/Badge system and player collection view.
-- [ ] Implement leaderboard with tabs for highest credit, cumulative winnings, and most wins; expose nickname/avatar only.
-- [ ] Implement friends/invite privacy-safe flows, blocks/removal, and feature flag control.
-- [ ] Build player Support Tickets, messages, attachment limits, statuses, and satisfaction feedback.
-- [ ] Add responsible-play controls: session-break reminder, owner-configurable limits, voluntary temporary pause, and demo-credit notice.
-- [ ] Test all player pages, empty/error states, notifications, language switching, and mobile accessibility.
+- [x] Build Home: balance, daily reward, three game cards, announcements, activity, mission progress, leaderboard preview, achievement preview, support, and settings shortcuts.
+- [x] Build filterable full bet history with receipt details and random/controlled-demo state.
+- [x] Implement announcements with targeting, scheduling, read state, and safe dismissal.
+- [x] Build notifications for verification, rewards, credit requests, tickets, achievements, and announcements.
+- [x] Implement configurable optional Daily Missions that never require playing every game.
+- [x] Implement data-driven Achievement/Badge system and player collection view.
+- [x] Implement leaderboard with tabs for highest credit, cumulative winnings, and most wins; expose nickname/avatar only.
+- [x] Implement friends/invite privacy-safe flows, blocks/removal, and feature flag control.
+- [x] Build player Support Tickets, messages, attachment limits, statuses, and satisfaction feedback.
+- [x] Add responsible-play controls: session-break reminder, owner-configurable limits, voluntary temporary pause, and demo-credit notice.
+- [x] Test all player pages, empty/error states, notifications, language switching, and mobile accessibility.
 
 ## Phase 10 — Admin Console and real-time operations
 

@@ -74,6 +74,7 @@ Game engine details: [docs/phase-5-game-engine.md](docs/phase-5-game-engine.md).
 Fish–Prawn–Crab details: [docs/phase-6-fish-prawn-crab.md](docs/phase-6-fish-prawn-crab.md).
 High–Low details: [docs/phase-7-high-low.md](docs/phase-7-high-low.md).
 Spinning Plate details: [docs/phase-8-spinning-plate.md](docs/phase-8-spinning-plate.md).
+Player experience: [docs/phase-9-player-experience.md](docs/phase-9-player-experience.md).
 
 Product requirements: [requirements.md](requirements.md).  
 Task plan: [tasks.md](tasks.md).

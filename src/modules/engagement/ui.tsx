@@ -1,7 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useEffect, useState, useTransition } from "react";
+import {
+  useActionState,
+  useEffect,
+  useMemo,
+  useState,
+  useTransition,
+} from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -381,12 +387,16 @@ export function ResponsiblePlaySection({
 }) {
   const [pending, startTransition] = useTransition();
   const [message, setMessage] = useState<ActionResult | null>(null);
+  const [nowMs] = useState(() => Date.now());
+  const now = useMemo(() => new Date(nowMs), [nowMs]);
   const breakDue = sessionBreakDue(
     sessionStartedAt,
     config.session_break_minutes,
+    now,
   );
   const paused =
-    playPausedUntil !== null && new Date(playPausedUntil).getTime() > Date.now();
+    playPausedUntil !== null &&
+    new Date(playPausedUntil).getTime() > nowMs;
 
   const pause = (days: number | 0) => {
     startTransition(async () => {
@@ -400,7 +410,7 @@ export function ResponsiblePlaySection({
       <p className="text-sm text-[var(--brand-muted)]">{config.demo_notice}</p>
       {sessionStartedAt ? (
         <p className="text-sm">
-          Session: {formatSessionDuration(sessionStartedAt)}
+          Session: {formatSessionDuration(sessionStartedAt, now)}
           {breakDue ? (
             <span className="ml-2 text-amber-200">
               — consider taking a break
