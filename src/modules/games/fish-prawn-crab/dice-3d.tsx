@@ -60,14 +60,10 @@ function Scene({
   const [settle, setSettle] = useState(reducedMotion);
 
   useEffect(() => {
-    if (reducedMotion) {
-      setSettle(true);
-      return;
-    }
-    setSettle(false);
+    if (reducedMotion) return;
     const timer = window.setTimeout(() => setSettle(true), 1000);
     return () => window.clearTimeout(timer);
-  }, [dice, reducedMotion]);
+  }, [reducedMotion]);
 
   return (
     <>
@@ -106,6 +102,7 @@ function Scene({
 /**
  * Lazy-loaded 3D reveal of an already-settled server result.
  * Physics/animation never calculate outcomes.
+ * Remount via `key` when dice change so settle state resets cleanly.
  */
 export function DiceReveal3D({
   dice,
@@ -122,7 +119,11 @@ export function DiceReveal3D({
     >
       <Canvas camera={{ position: [0, 2.8, 5], fov: 40 }} shadows>
         <Suspense fallback={null}>
-          <Scene dice={dice} reducedMotion={reducedMotion} />
+          <Scene
+            key={`${dice.join("-")}-${reducedMotion ? "rm" : "full"}`}
+            dice={dice}
+            reducedMotion={reducedMotion}
+          />
         </Suspense>
       </Canvas>
     </div>

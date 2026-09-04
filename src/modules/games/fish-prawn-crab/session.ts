@@ -48,7 +48,7 @@ export function parsePlaceBetPayload(
 
   return {
     betId: String(data.bet_id ?? ""),
-    receiptId: String(data.receipt_id ?? data.receipt?.id ?? ""),
+    receiptId: String(data.receipt_id ?? ""),
     stake: Number(data.stake ?? 0),
     selection,
     result,
@@ -72,29 +72,30 @@ export function parseReplayReceipt(
   fallbackSelection: FpcSelection,
 ): FpcReceiptView | null {
   if (!data?.replay) return null;
-  const receipt = data.receipt as Record<string, unknown> | null | undefined;
-  if (!receipt) {
+  const receipt = data.receipt;
+  if (!receipt || typeof receipt !== "object") {
     return parsePlaceBetPayload(data, fallbackSelection);
   }
-  const result = parseFpcServerResult(receipt.result_payload);
+  const row = receipt as Record<string, unknown>;
+  const result = parseFpcServerResult(row.result_payload);
   if (!result) return null;
   return {
-    betId: String(data.bet_id ?? receipt.bet_id ?? ""),
-    receiptId: String(receipt.id ?? ""),
-    stake: Number(receipt.stake ?? 0),
+    betId: String(data.bet_id ?? row.bet_id ?? ""),
+    receiptId: String(row.id ?? ""),
+    stake: Number(row.stake ?? 0),
     selection: fallbackSelection,
     result,
-    totalReturnMultiplier: Number(receipt.total_return_multiplier ?? 0),
-    payoutAmount: Number(receipt.payout_amount ?? 0),
-    isWin: Boolean(receipt.is_win),
-    balanceAfter: Number(receipt.balance_after ?? 0),
+    totalReturnMultiplier: Number(row.total_return_multiplier ?? 0),
+    payoutAmount: Number(row.payout_amount ?? 0),
+    isWin: Boolean(row.is_win),
+    balanceAfter: Number(row.balance_after ?? 0),
     settlementMode:
-      receipt.settlement_mode === "controlled_demo"
+      row.settlement_mode === "controlled_demo"
         ? "controlled_demo"
         : "random",
-    gameVersionId: String(receipt.game_version_id ?? ""),
+    gameVersionId: String(row.game_version_id ?? ""),
     replay: true,
-    createdAt: String(receipt.created_at ?? new Date().toISOString()),
+    createdAt: String(row.created_at ?? new Date().toISOString()),
   };
 }
 

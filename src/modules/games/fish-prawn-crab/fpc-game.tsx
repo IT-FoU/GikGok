@@ -5,7 +5,6 @@ import Link from "next/link";
 import {
   startTransition,
   useEffect,
-  useEffectEvent,
   useState,
   useTransition,
 } from "react";
@@ -36,6 +35,20 @@ import {
   resolveGraphicsMode,
   saveFpcSession,
 } from "./session";
+
+function readInitialSession() {
+  const session = loadFpcSession();
+  return {
+    receipt: session?.receipt ?? null,
+    idempotencyKey: session?.idempotencyKey ?? null,
+    sessionPending: Boolean(session?.pending),
+  };
+}
+
+function readPrefersReducedMotion() {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
 
 const DiceReveal3D = dynamic(
   () => import("./dice-3d").then((mod) => mod.DiceReveal3D),
@@ -72,6 +85,8 @@ export function FpcGameClient({
 }) {
   const t = useTranslations();
   const sound = useSound();
+  const [initialSession] = useState(readInitialSession);
+  const [initialReduced] = useState(readPrefersReducedMotion);
   const [kind, setKind] = useState<"single_symbol" | "special_pair">(
     "single_symbol",
   );
@@ -80,44 +95,36 @@ export function FpcGameClient({
   const [locked, setLocked] = useState(false);
   const [revealing, setRevealing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [receipt, setReceipt] = useState<FpcReceiptView | null>(null);
-  const [idempotencyKey, setIdempotencyKey] = useState<string | null>(null);
-  const [sessionPending, setSessionPending] = useState(false);
-  const [reducedMotion, setReducedMotion] = useState(false);
-  const [renderer, setRenderer] = useState<"2d" | "3d">("2d");
+  const [receipt, setReceipt] = useState<FpcReceiptView | null>(
+    initialSession.receipt,
+  );
+  const [idempotencyKey, setIdempotencyKey] = useState<string | null>(
+    initialSession.idempotencyKey,
+  );
+  const [sessionPending, setSessionPending] = useState(
+    initialSession.sessionPending,
+  );
+  const [reducedMotion, setReducedMotion] = useState(initialReduced);
+  const [renderer, setRenderer] = useState<"2d" | "3d">(() =>
+    resolveGraphicsMode(graphicsMode, initialReduced),
+  );
   const [pending, startSubmit] = useTransition();
-  const [localBalance, setLocalBalance] = useState(balance);
-
-  useEffect(() => {
-    setLocalBalance(balance);
-  }, [balance]);
+  const [optimisticBalance, setOptimisticBalance] = useState<number | null>(
+    null,
+  );
+  const localBalance = optimisticBalance ?? balance;
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const sync = () => {
-      setReducedMotion(media.matches);
-      setRenderer(resolveGraphicsMode(graphicsMode, media.matches));
+    const onChange = () => {
+      startTransition(() => {
+        setReducedMotion(media.matches);
+        setRenderer(resolveGraphicsMode(graphicsMode, media.matches));
+      });
     };
-    sync();
-    media.addEventListener("change", sync);
-    return () => media.removeEventListener("change", sync);
+    media.addEventListener("change", onChange);
+    return () => media.removeEventListener("change", onChange);
   }, [graphicsMode]);
-
-  const recoverSession = useEffectEvent(() => {
-    const session = loadFpcSession();
-    if (!session) return;
-    setIdempotencyKey(session.idempotencyKey);
-    setSessionPending(Boolean(session.pending));
-    if (session.receipt) {
-      setReceipt(session.receipt);
-      setLocked(false);
-      setRevealing(false);
-    }
-  });
-
-  useEffect(() => {
-    recoverSession();
-  }, [recoverSession]);
 
   function toggleSymbol(symbol: FpcSymbol) {
     if (locked || pending) return;
@@ -220,7 +227,7 @@ export function FpcGameClient({
           setRevealing(false);
           setLocked(false);
           setSessionPending(false);
-          setLocalBalance(view.balanceAfter);
+          setOptimisticBalance(view.balanceAfter);
           setIdempotencyKey(newIdempotencyKey());
           saveFpcSession({
             idempotencyKey: key,
