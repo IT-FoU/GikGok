@@ -39,13 +39,24 @@ export default function GuidePage() {
         </Card>
       </section>
 
-      <div id="games" className="grid gap-3">
+      <section id="high-low" className="scroll-mt-24 space-y-3">
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">{t("guide.highlow").split(" — ")[0]}</CardTitle>
-            <CardDescription>{t("guide.highlow")}</CardDescription>
+            <CardTitle>{t("guide.highlowTitle")}</CardTitle>
+            <CardDescription>{t("guide.highlowBody")}</CardDescription>
           </CardHeader>
+          <div className="px-6 pb-6">
+            <Link
+              href="/play/high-low"
+              className="text-sm text-[var(--brand-accent)] underline-offset-4 hover:underline"
+            >
+              {t("highlow.name")} →
+            </Link>
+          </div>
         </Card>
+      </section>
+
+      <div id="games" className="grid gap-3">
         <Card>
           <CardHeader>
             <CardTitle className="text-base">{t("guide.plate").split(" — ")[0]}</CardTitle>

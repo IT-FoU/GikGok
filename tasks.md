@@ -98,13 +98,13 @@
 
 ## Phase 7 — High–Low Dice
 
-- [ ] Add versioned High–Low configuration and bilingual Game Guide.
-- [ ] Implement server settlement for Low 3–10 and High 11–18, Total Return x2.
-- [ ] Implement triple override: any triple loses both High and Low.
-- [ ] Build 2D UI, stake controls, locked state, dice/total/triple result explanation, receipt, and history representation.
-- [ ] Build lazy-loaded 3D three-dice physics animation revealing settled result.
-- [ ] Add sound, reduced-motion, graphics quality, and recovery behavior.
-- [ ] Test all totals, all triples, selected side, payout, retries, and disconnected/reconnected flows.
+- [x] Add versioned High–Low configuration and bilingual Game Guide.
+- [x] Implement server settlement for Low 3–10 and High 11–18, Total Return x2.
+- [x] Implement triple override: any triple loses both High and Low.
+- [x] Build 2D UI, stake controls, locked state, dice/total/triple result explanation, receipt, and history representation.
+- [x] Build lazy-loaded 3D three-dice physics animation revealing settled result.
+- [x] Add sound, reduced-motion, graphics quality, and recovery behavior.
+- [x] Test all totals, all triples, selected side, payout, retries, and disconnected/reconnected flows.
 
 ## Phase 8 — Spinning Plate
 
