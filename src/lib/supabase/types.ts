@@ -1,0 +1,1518 @@
+/**
+ * Generated-style Database types for GIKGOK.
+ * Source of truth: supabase/migrations/*.sql
+ * Regenerate with `npm run db:types` when a linked Supabase project / Docker is available.
+ */
+
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[];
+
+export type PlayerStatus = "active" | "suspended" | "banned";
+export type AppLocale = "lo" | "en";
+export type GraphicsMode = "auto" | "2d" | "3d";
+export type GraphicsQuality = "low" | "medium" | "high";
+export type SoundPack = "classic_casino" | "arcade" | "silent";
+export type ColorMode = "system" | "light" | "dark";
+export type AdminAccountStatus = "active" | "disabled";
+export type LedgerEntryType =
+  | "welcome_credit"
+  | "daily_reward"
+  | "mission_reward"
+  | "achievement_reward"
+  | "demo_credit_grant"
+  | "simulation_fee"
+  | "bet_debit"
+  | "game_payout"
+  | "admin_adjustment"
+  | "reset_demo_data";
+export type CreditRequestStatus =
+  | "pending"
+  | "approved"
+  | "rejected"
+  | "cancelled";
+export type FeeMode = "percent" | "amount";
+export type GameLifecycleStatus =
+  | "draft"
+  | "qa"
+  | "owner_approved"
+  | "scheduled"
+  | "live"
+  | "disabled";
+export type SettlementMode = "random" | "controlled_demo";
+export type RoundStatus =
+  | "open"
+  | "locked"
+  | "settling"
+  | "settled"
+  | "cancelled";
+export type BetStatus = "pending" | "locked" | "settled" | "cancelled";
+export type AnnouncementStatus =
+  | "draft"
+  | "scheduled"
+  | "published"
+  | "archived";
+export type NotificationKind =
+  | "verification"
+  | "reward"
+  | "credit_request"
+  | "ticket"
+  | "achievement"
+  | "announcement"
+  | "system";
+export type TicketStatus =
+  | "open"
+  | "in_progress"
+  | "waiting_for_player"
+  | "resolved"
+  | "closed";
+export type TicketCategory =
+  | "account"
+  | "credits"
+  | "gameplay"
+  | "technical"
+  | "other";
+export type FriendshipStatus = "pending" | "accepted" | "blocked" | "removed";
+export type LeaderboardMetric =
+  | "highest_credit"
+  | "cumulative_winnings"
+  | "most_wins";
+export type AuditResult = "success" | "failure" | "denied";
+export type AccentTheme = "green" | "red_white" | "blue_white" | "yellow_gray";
+export type HealthSeverity = "info" | "warning" | "error" | "critical";
+export type AssetKind =
+  | "avatar_preset"
+  | "game_icon"
+  | "game_model"
+  | "texture"
+  | "sound"
+  | "other";
+
+type Timestamps = {
+  created_at: string;
+  updated_at: string;
+};
+
+export type Database = {
+  public: {
+    Tables: {
+      profiles: {
+        Row: {
+          id: string;
+          nickname: string;
+          avatar_preset_id: string | null;
+          avatar_path: string | null;
+          avatar_mime_type: string | null;
+          avatar_byte_size: number | null;
+          email: string | null;
+          phone: string | null;
+          email_verified_at: string | null;
+          phone_verified_at: string | null;
+          status: PlayerStatus;
+          last_activity_at: string | null;
+          last_seen_page: string | null;
+          welcome_credit_granted_at: string | null;
+          deletion_requested_at: string | null;
+          deleted_at: string | null;
+          play_paused_until: string | null;
+          session_started_at: string | null;
+        } & Timestamps;
+        Insert: {
+          id: string;
+          nickname: string;
+          avatar_preset_id?: string | null;
+          avatar_path?: string | null;
+          avatar_mime_type?: string | null;
+          avatar_byte_size?: number | null;
+          email?: string | null;
+          phone?: string | null;
+          email_verified_at?: string | null;
+          phone_verified_at?: string | null;
+          status?: PlayerStatus;
+          last_activity_at?: string | null;
+          last_seen_page?: string | null;
+          welcome_credit_granted_at?: string | null;
+          deletion_requested_at?: string | null;
+          deleted_at?: string | null;
+          play_paused_until?: string | null;
+          session_started_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["profiles"]["Insert"]>;
+        Relationships: [];
+      };
+      user_settings: {
+        Row: {
+          user_id: string;
+          locale: AppLocale;
+          color_mode: ColorMode;
+          graphics_mode: GraphicsMode;
+          graphics_quality: GraphicsQuality;
+          fps_cap: number;
+          shadows_enabled: boolean;
+          effects_enabled: boolean;
+          reduce_motion: boolean;
+          sound_pack: SoundPack;
+          sound_volume: number;
+          muted: boolean;
+        } & Timestamps;
+        Insert: {
+          user_id: string;
+          locale?: AppLocale;
+          color_mode?: ColorMode;
+          graphics_mode?: GraphicsMode;
+          graphics_quality?: GraphicsQuality;
+          fps_cap?: number;
+          shadows_enabled?: boolean;
+          effects_enabled?: boolean;
+          reduce_motion?: boolean;
+          sound_pack?: SoundPack;
+          sound_volume?: number;
+          muted?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["user_settings"]["Insert"]>;
+        Relationships: [];
+      };
+      admin_permissions: {
+        Row: {
+          code: string;
+          description: string;
+          created_at: string;
+        };
+        Insert: {
+          code: string;
+          description: string;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["admin_permissions"]["Insert"]>;
+        Relationships: [];
+      };
+      admin_roles: {
+        Row: {
+          id: string;
+          code: string;
+          name: string;
+          description: string | null;
+          is_system: boolean;
+          deleted_at: string | null;
+        } & Timestamps;
+        Insert: {
+          id?: string;
+          code: string;
+          name: string;
+          description?: string | null;
+          is_system?: boolean;
+          deleted_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["admin_roles"]["Insert"]>;
+        Relationships: [];
+      };
+      admin_profiles: {
+        Row: {
+          user_id: string;
+          display_name: string;
+          status: AdminAccountStatus;
+          is_owner: boolean;
+          pin_hash: string | null;
+          pin_updated_at: string | null;
+          totp_secret_encrypted: string | null;
+          totp_enabled_at: string | null;
+          require_2fa: boolean;
+          large_adjustment_limit: number;
+          requires_second_approver_above: number;
+          last_admin_login_at: string | null;
+          deleted_at: string | null;
+        } & Timestamps;
+        Insert: {
+          user_id: string;
+          display_name: string;
+          status?: AdminAccountStatus;
+          is_owner?: boolean;
+          pin_hash?: string | null;
+          pin_updated_at?: string | null;
+          totp_secret_encrypted?: string | null;
+          totp_enabled_at?: string | null;
+          require_2fa?: boolean;
+          large_adjustment_limit?: number;
+          requires_second_approver_above?: number;
+          last_admin_login_at?: string | null;
+          deleted_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["admin_profiles"]["Insert"]>;
+        Relationships: [];
+      };
+      admin_role_permissions: {
+        Row: {
+          role_id: string;
+          permission_code: string;
+        };
+        Insert: {
+          role_id: string;
+          permission_code: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["admin_role_permissions"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      admin_role_assignments: {
+        Row: {
+          id: string;
+          admin_user_id: string;
+          role_id: string;
+          assigned_by: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          admin_user_id: string;
+          role_id: string;
+          assigned_by?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["admin_role_assignments"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      admin_permission_overrides: {
+        Row: {
+          id: string;
+          admin_user_id: string;
+          permission_code: string;
+          granted: boolean;
+          assigned_by: string | null;
+          reason: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          admin_user_id: string;
+          permission_code: string;
+          granted: boolean;
+          assigned_by?: string | null;
+          reason?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["admin_permission_overrides"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      ledger_entries: {
+        Row: {
+          id: string;
+          player_id: string;
+          entry_type: LedgerEntryType;
+          amount: number;
+          balance_after: number;
+          source_type: string | null;
+          source_id: string | null;
+          actor_id: string | null;
+          reason: string | null;
+          metadata: Json;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          player_id: string;
+          entry_type: LedgerEntryType;
+          amount: number;
+          balance_after?: number;
+          source_type?: string | null;
+          source_id?: string | null;
+          actor_id?: string | null;
+          reason?: string | null;
+          metadata?: Json;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["ledger_entries"]["Insert"]>;
+        Relationships: [];
+      };
+      player_balances: {
+        Row: {
+          player_id: string;
+          balance: number;
+          updated_at: string;
+        };
+        Insert: {
+          player_id: string;
+          balance?: number;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["player_balances"]["Insert"]>;
+        Relationships: [];
+      };
+      credit_requests: {
+        Row: {
+          id: string;
+          player_id: string;
+          status: CreditRequestStatus;
+          requested_amount: number;
+          player_note: string | null;
+          cancelled_at: string | null;
+        } & Timestamps;
+        Insert: {
+          id?: string;
+          player_id: string;
+          status?: CreditRequestStatus;
+          requested_amount: number;
+          player_note?: string | null;
+          cancelled_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["credit_requests"]["Insert"]>;
+        Relationships: [];
+      };
+      credit_request_reviews: {
+        Row: {
+          id: string;
+          credit_request_id: string;
+          reviewer_id: string;
+          decision: CreditRequestStatus;
+          gross_amount: number | null;
+          fee_mode: "percent" | "amount" | null;
+          fee_value: number | null;
+          bonus_amount: number;
+          net_amount: number | null;
+          reason: string;
+          requires_second_approver: boolean;
+          second_approver_id: string | null;
+          second_approved_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          credit_request_id: string;
+          reviewer_id: string;
+          decision: CreditRequestStatus;
+          gross_amount?: number | null;
+          fee_mode?: "percent" | "amount" | null;
+          fee_value?: number | null;
+          bonus_amount?: number;
+          net_amount?: number | null;
+          reason: string;
+          requires_second_approver?: boolean;
+          second_approver_id?: string | null;
+          second_approved_at?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["credit_request_reviews"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      daily_reward_state: {
+        Row: {
+          player_id: string;
+          streak_day: number;
+          last_claim_date: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          player_id: string;
+          streak_day?: number;
+          last_claim_date?: string | null;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["daily_reward_state"]["Insert"]>;
+        Relationships: [];
+      };
+      notifications: {
+        Row: {
+          id: string;
+          player_id: string;
+          kind: string;
+          title_key: string;
+          body_key: string | null;
+          payload: Json;
+          read_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          player_id: string;
+          kind: string;
+          title_key: string;
+          body_key?: string | null;
+          payload?: Json;
+          read_at?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["notifications"]["Insert"]>;
+        Relationships: [];
+      };
+      announcements: {
+        Row: {
+          id: string;
+          title_i18n: Json;
+          body_i18n: Json;
+          status: AnnouncementStatus;
+          target_all_players: boolean;
+          scheduled_at: string | null;
+          published_at: string | null;
+          created_by: string | null;
+          deleted_at: string | null;
+        } & Timestamps;
+        Insert: {
+          id?: string;
+          title_i18n: Json;
+          body_i18n: Json;
+          status?: AnnouncementStatus;
+          target_all_players?: boolean;
+          scheduled_at?: string | null;
+          published_at?: string | null;
+          created_by?: string | null;
+          deleted_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["announcements"]["Insert"]>;
+        Relationships: [];
+      };
+      announcement_reads: {
+        Row: {
+          announcement_id: string;
+          player_id: string;
+          read_at: string;
+          dismissed_at: string | null;
+        };
+        Insert: {
+          announcement_id: string;
+          player_id: string;
+          read_at?: string;
+          dismissed_at?: string | null;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["announcement_reads"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      missions: {
+        Row: {
+          id: string;
+          code: string;
+          title_i18n: Json;
+          description_i18n: Json;
+          game_id: string | null;
+          target_count: number;
+          reward_amount: number;
+          is_enabled: boolean;
+          deleted_at: string | null;
+        } & Timestamps;
+        Insert: {
+          id?: string;
+          code: string;
+          title_i18n: Json;
+          description_i18n: Json;
+          game_id?: string | null;
+          target_count?: number;
+          reward_amount?: number;
+          is_enabled?: boolean;
+          deleted_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["missions"]["Insert"]>;
+        Relationships: [];
+      };
+      player_mission_progress: {
+        Row: {
+          player_id: string;
+          mission_id: string;
+          progress_count: number;
+          completed_at: string | null;
+          claimed_at: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          player_id: string;
+          mission_id: string;
+          progress_count?: number;
+          completed_at?: string | null;
+          claimed_at?: string | null;
+          updated_at?: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["player_mission_progress"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      achievements: {
+        Row: {
+          id: string;
+          code: string;
+          title_i18n: Json;
+          description_i18n: Json;
+          badge_asset_key: string | null;
+          is_enabled: boolean;
+          deleted_at: string | null;
+        } & Timestamps;
+        Insert: {
+          id?: string;
+          code: string;
+          title_i18n: Json;
+          description_i18n: Json;
+          badge_asset_key?: string | null;
+          is_enabled?: boolean;
+          deleted_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["achievements"]["Insert"]>;
+        Relationships: [];
+      };
+      player_achievements: {
+        Row: {
+          player_id: string;
+          achievement_id: string;
+          unlocked_at: string;
+        };
+        Insert: {
+          player_id: string;
+          achievement_id: string;
+          unlocked_at?: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["player_achievements"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      leaderboard_projections: {
+        Row: {
+          player_id: string;
+          metric: LeaderboardMetric;
+          score: number;
+          rank: number | null;
+          updated_at: string;
+        };
+        Insert: {
+          player_id: string;
+          metric: LeaderboardMetric;
+          score?: number;
+          rank?: number | null;
+          updated_at?: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["leaderboard_projections"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      friendships: {
+        Row: {
+          id: string;
+          requester_id: string;
+          addressee_id: string;
+          status: FriendshipStatus;
+        } & Timestamps;
+        Insert: {
+          id?: string;
+          requester_id: string;
+          addressee_id: string;
+          status?: FriendshipStatus;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["friendships"]["Insert"]>;
+        Relationships: [];
+      };
+      invites: {
+        Row: {
+          id: string;
+          inviter_id: string;
+          code: string;
+          accepted_by: string | null;
+          accepted_at: string | null;
+          expires_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          inviter_id: string;
+          code: string;
+          accepted_by?: string | null;
+          accepted_at?: string | null;
+          expires_at?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["invites"]["Insert"]>;
+        Relationships: [];
+      };
+      support_tickets: {
+        Row: {
+          id: string;
+          player_id: string;
+          category: TicketCategory;
+          subject: string;
+          status: TicketStatus;
+          assigned_admin_id: string | null;
+          satisfaction_score: number | null;
+          satisfaction_comment: string | null;
+          closed_at: string | null;
+        } & Timestamps;
+        Insert: {
+          id?: string;
+          player_id: string;
+          category?: TicketCategory;
+          subject: string;
+          status?: TicketStatus;
+          assigned_admin_id?: string | null;
+          satisfaction_score?: number | null;
+          satisfaction_comment?: string | null;
+          closed_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["support_tickets"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      support_ticket_messages: {
+        Row: {
+          id: string;
+          ticket_id: string;
+          author_id: string;
+          body: string;
+          is_staff: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          ticket_id: string;
+          author_id: string;
+          body: string;
+          is_staff?: boolean;
+          created_at?: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["support_ticket_messages"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      games: {
+        Row: {
+          id: string;
+          display_name_key: string;
+          description_key: string | null;
+          lifecycle_status: GameLifecycleStatus;
+          is_enabled: boolean;
+          scheduled_launch_at: string | null;
+          maintenance_close_started_at: string | null;
+          maintenance_announcement_key: string | null;
+          min_stake: number;
+          max_stake: number;
+          quick_stakes: number[];
+          sound_pack: SoundPack;
+          deleted_at: string | null;
+        } & Timestamps;
+        Insert: {
+          id: string;
+          display_name_key: string;
+          description_key?: string | null;
+          lifecycle_status?: GameLifecycleStatus;
+          is_enabled?: boolean;
+          scheduled_launch_at?: string | null;
+          maintenance_close_started_at?: string | null;
+          maintenance_announcement_key?: string | null;
+          min_stake?: number;
+          max_stake?: number;
+          quick_stakes?: number[];
+          sound_pack?: SoundPack;
+          deleted_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["games"]["Insert"]>;
+        Relationships: [];
+      };
+      game_versions: {
+        Row: {
+          id: string;
+          game_id: string;
+          version: number;
+          config: Json;
+          guide_i18n: Json;
+          created_by: string | null;
+          approved_by: string | null;
+          approved_at: string | null;
+          is_active: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          game_id: string;
+          version: number;
+          config?: Json;
+          guide_i18n?: Json;
+          created_by?: string | null;
+          approved_by?: string | null;
+          approved_at?: string | null;
+          is_active?: boolean;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["game_versions"]["Insert"]>;
+        Relationships: [];
+      };
+      game_rounds: {
+        Row: {
+          id: string;
+          game_id: string;
+          game_version_id: string;
+          status: RoundStatus;
+          settlement_mode: SettlementMode;
+          controlled_demo_payload: Json | null;
+          opened_at: string;
+          locked_at: string | null;
+          settled_at: string | null;
+          created_by: string | null;
+          metadata: Json;
+        };
+        Insert: {
+          id?: string;
+          game_id: string;
+          game_version_id: string;
+          status?: RoundStatus;
+          settlement_mode?: SettlementMode;
+          controlled_demo_payload?: Json | null;
+          opened_at?: string;
+          locked_at?: string | null;
+          settled_at?: string | null;
+          created_by?: string | null;
+          metadata?: Json;
+        };
+        Update: Partial<Database["public"]["Tables"]["game_rounds"]["Insert"]>;
+        Relationships: [];
+      };
+      feature_flags: {
+        Row: {
+          key: string;
+          description: string;
+          enabled: boolean;
+          payload: Json;
+          updated_by: string | null;
+        } & Timestamps;
+        Insert: {
+          key: string;
+          description: string;
+          enabled?: boolean;
+          payload?: Json;
+          updated_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["feature_flags"]["Insert"]>;
+        Relationships: [];
+      };
+      bets: {
+        Row: {
+          id: string;
+          round_id: string;
+          player_id: string;
+          game_id: string;
+          game_version_id: string;
+          status: BetStatus;
+          stake: number;
+          selection: Json;
+          idempotency_key: string;
+          debit_ledger_entry_id: string | null;
+          payout_ledger_entry_id: string | null;
+          locked_at: string | null;
+          settled_at: string | null;
+        } & Timestamps;
+        Insert: {
+          id?: string;
+          round_id: string;
+          player_id: string;
+          game_id: string;
+          game_version_id: string;
+          status?: BetStatus;
+          stake: number;
+          selection: Json;
+          idempotency_key: string;
+          debit_ledger_entry_id?: string | null;
+          payout_ledger_entry_id?: string | null;
+          locked_at?: string | null;
+          settled_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["bets"]["Insert"]>;
+        Relationships: [];
+      };
+      bet_receipts: {
+        Row: {
+          id: string;
+          bet_id: string;
+          player_id: string;
+          game_id: string;
+          game_version_id: string;
+          settlement_mode: SettlementMode;
+          stake: number;
+          selection: Json;
+          result_payload: Json;
+          total_return_multiplier: number;
+          payout_amount: number;
+          balance_after: number;
+          is_win: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          bet_id: string;
+          player_id: string;
+          game_id: string;
+          game_version_id: string;
+          settlement_mode: SettlementMode;
+          stake: number;
+          selection: Json;
+          result_payload: Json;
+          total_return_multiplier: number;
+          payout_amount: number;
+          balance_after: number;
+          is_win: boolean;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["bet_receipts"]["Insert"]>;
+        Relationships: [];
+      };
+      system_settings: {
+        Row: {
+          key: string;
+          value: Json;
+          description: string | null;
+          updated_by: string | null;
+        } & Timestamps;
+        Insert: {
+          key: string;
+          value: Json;
+          description?: string | null;
+          updated_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["system_settings"]["Insert"]>;
+        Relationships: [];
+      };
+      audit_log: {
+        Row: {
+          id: string;
+          actor_id: string | null;
+          actor_role: string | null;
+          action_type: string;
+          target_type: string | null;
+          target_id: string | null;
+          before_values: Json | null;
+          after_values: Json | null;
+          reason: string | null;
+          approval_chain: Json;
+          request_metadata: Json;
+          result: AuditResult;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          actor_id?: string | null;
+          actor_role?: string | null;
+          action_type: string;
+          target_type?: string | null;
+          target_id?: string | null;
+          before_values?: Json | null;
+          after_values?: Json | null;
+          reason?: string | null;
+          approval_chain?: Json;
+          request_metadata?: Json;
+          result?: AuditResult;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["audit_log"]["Insert"]>;
+        Relationships: [];
+      };
+      maintenance_state: {
+        Row: {
+          id: boolean;
+          is_active: boolean;
+          message_i18n: Json;
+          started_at: string | null;
+          estimated_end_at: string | null;
+          updated_by: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          id?: boolean;
+          is_active?: boolean;
+          message_i18n?: Json;
+          started_at?: string | null;
+          estimated_end_at?: string | null;
+          updated_by?: string | null;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["maintenance_state"]["Insert"]>;
+        Relationships: [];
+      };
+      asset_metadata: {
+        Row: {
+          id: string;
+          key: string;
+          kind: string;
+          storage_path: string | null;
+          mime_type: string | null;
+          byte_size: number | null;
+          checksum: string | null;
+          rights_cleared: boolean;
+          metadata: Json;
+          deleted_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          key: string;
+          kind: string;
+          storage_path?: string | null;
+          mime_type?: string | null;
+          byte_size?: number | null;
+          checksum?: string | null;
+          rights_cleared?: boolean;
+          metadata?: Json;
+          deleted_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["asset_metadata"]["Insert"]>;
+        Relationships: [];
+      };
+      qa_accounts: {
+        Row: {
+          player_id: string;
+          label: string;
+          notes: string | null;
+          isolated_from_analytics: boolean;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          player_id: string;
+          label: string;
+          notes?: string | null;
+          isolated_from_analytics?: boolean;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["qa_accounts"]["Insert"]>;
+        Relationships: [];
+      };
+      operational_health_events: {
+        Row: {
+          id: string;
+          source: string;
+          severity: string;
+          code: string;
+          message: string;
+          details: Json;
+          resolved_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          source: string;
+          severity?: string;
+          code: string;
+          message: string;
+          details?: Json;
+          resolved_at?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["operational_health_events"]["Insert"]
+        >;
+        Relationships: [];
+      };
+    };
+    Views: Record<string, never>;
+    Functions: {
+      is_player_verified: {
+        Args: { p_user_id: string };
+        Returns: boolean;
+      };
+      is_active_admin: {
+        Args: { p_user_id?: string };
+        Returns: boolean;
+      };
+      admin_has_permission: {
+        Args: { p_permission: string; p_user_id?: string };
+        Returns: boolean;
+      };
+      ensure_player_profile: {
+        Args: {
+          p_user_id: string;
+          p_nickname: string;
+          p_email?: string | null;
+          p_phone?: string | null;
+          p_avatar_preset_id?: string | null;
+        };
+        Returns: Database["public"]["Tables"]["profiles"]["Row"];
+      };
+      mark_contact_verified: {
+        Args: { p_channel: string; p_user_id?: string };
+        Returns: Database["public"]["Tables"]["profiles"]["Row"];
+      };
+      grant_welcome_credit: {
+        Args: { p_user_id?: string };
+        Returns: Json;
+      };
+      get_credit_config: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
+      claim_daily_reward: {
+        Args: { p_user_id?: string; p_today?: string };
+        Returns: Json;
+      };
+      create_credit_request: {
+        Args: {
+          p_amount: number;
+          p_note?: string | null;
+          p_user_id?: string;
+        };
+        Returns: Database["public"]["Tables"]["credit_requests"]["Row"];
+      };
+      cancel_credit_request: {
+        Args: { p_request_id: string; p_user_id?: string };
+        Returns: Database["public"]["Tables"]["credit_requests"]["Row"];
+      };
+      review_credit_request: {
+        Args: {
+          p_request_id: string;
+          p_decision: string;
+          p_reason: string;
+          p_gross_amount?: number | null;
+          p_fee_mode?: string | null;
+          p_fee_value?: number | null;
+          p_bonus_amount?: number | null;
+          p_reviewer_id?: string;
+        };
+        Returns: Json;
+      };
+      second_approve_credit_request: {
+        Args: { p_review_id: string; p_approver_id?: string };
+        Returns: Json;
+      };
+      reconcile_player_balance: {
+        Args: { p_player_id: string };
+        Returns: Json;
+      };
+      place_and_settle_bet: {
+        Args: {
+          p_game_id: string;
+          p_stake: number;
+          p_selection: Json;
+          p_idempotency_key: string;
+          p_player_id?: string;
+        };
+        Returns: Json;
+      };
+      open_game_round: {
+        Args: {
+          p_game_id: string;
+          p_settlement_mode?: SettlementMode;
+          p_controlled_demo_payload?: Json | null;
+          p_admin_id?: string;
+        };
+        Returns: Json;
+      };
+      ensure_player_round: {
+        Args: { p_game_id: string };
+        Returns: Json;
+      };
+      start_smooth_maintenance_close: {
+        Args: {
+          p_game_id: string;
+          p_announcement_key?: string;
+          p_admin_id?: string;
+        };
+        Returns: Json;
+      };
+      set_game_availability: {
+        Args: {
+          p_game_id: string;
+          p_enabled: boolean;
+          p_lifecycle?: GameLifecycleStatus | string | null;
+          p_admin_id?: string;
+        };
+        Returns: Json;
+      };
+      request_account_deletion: {
+        Args: { p_reason?: string | null; p_user_id?: string };
+        Returns: Database["public"]["Tables"]["profiles"]["Row"];
+      };
+      get_player_access_state: {
+        Args: { p_user_id?: string };
+        Returns: Json;
+      };
+      mark_announcement_read: {
+        Args: {
+          p_announcement_id: string;
+          p_dismiss?: boolean;
+          p_player_id?: string;
+        };
+        Returns: undefined;
+      };
+      mark_notification_read: {
+        Args: { p_notification_id: string; p_player_id?: string };
+        Returns: undefined;
+      };
+      mark_all_notifications_read: {
+        Args: { p_player_id?: string };
+        Returns: number;
+      };
+      record_mission_progress: {
+        Args: { p_game_id: string; p_player_id?: string };
+        Returns: undefined;
+      };
+      claim_mission_reward: {
+        Args: { p_mission_id: string; p_player_id?: string };
+        Returns: Json;
+      };
+      unlock_achievement: {
+        Args: { p_code: string; p_player_id?: string };
+        Returns: boolean;
+      };
+      refresh_leaderboard_projections: {
+        Args: Record<string, never>;
+        Returns: undefined;
+      };
+      request_friend: {
+        Args: { p_nickname: string; p_player_id?: string };
+        Returns: Database["public"]["Tables"]["friendships"]["Row"];
+      };
+      respond_friendship: {
+        Args: {
+          p_friendship_id: string;
+          p_action: string;
+          p_player_id?: string;
+        };
+        Returns: Database["public"]["Tables"]["friendships"]["Row"];
+      };
+      create_invite_code: {
+        Args: { p_player_id?: string };
+        Returns: Database["public"]["Tables"]["invites"]["Row"];
+      };
+      create_support_ticket: {
+        Args: {
+          p_category: TicketCategory;
+          p_subject: string;
+          p_message: string;
+          p_player_id?: string;
+        };
+        Returns: Database["public"]["Tables"]["support_tickets"]["Row"];
+      };
+      reply_support_ticket: {
+        Args: {
+          p_ticket_id: string;
+          p_message: string;
+          p_player_id?: string;
+        };
+        Returns: Database["public"]["Tables"]["support_ticket_messages"]["Row"];
+      };
+      submit_ticket_satisfaction: {
+        Args: {
+          p_ticket_id: string;
+          p_score: number;
+          p_comment?: string | null;
+          p_player_id?: string;
+        };
+        Returns: Database["public"]["Tables"]["support_tickets"]["Row"];
+      };
+      set_play_pause: {
+        Args: { p_days: number; p_player_id?: string };
+        Returns: Database["public"]["Tables"]["profiles"]["Row"];
+      };
+      touch_play_session: {
+        Args: { p_player_id?: string };
+        Returns: string;
+      };
+      assert_play_allowed: {
+        Args: { p_player_id?: string };
+        Returns: undefined;
+      };
+      get_responsible_play_config: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
+      get_admin_session_state: {
+        Args: { p_user_id?: string };
+        Returns: Json;
+      };
+      touch_admin_login: {
+        Args: { p_user_id?: string };
+        Returns: undefined;
+      };
+      set_admin_pin: {
+        Args: { p_pin: string; p_user_id?: string };
+        Returns: Json;
+      };
+      verify_admin_pin: {
+        Args: { p_pin: string; p_user_id?: string };
+        Returns: boolean;
+      };
+      set_admin_2fa: {
+        Args: { p_enabled: boolean; p_secret?: string | null; p_user_id?: string };
+        Returns: Json;
+      };
+      verify_admin_2fa: {
+        Args: { p_code: string; p_user_id?: string };
+        Returns: boolean;
+      };
+      assert_admin_sensitive: {
+        Args: {
+          p_permission: string;
+          p_pin?: string | null;
+          p_otp?: string | null;
+          p_user_id?: string;
+        };
+        Returns: undefined;
+      };
+      create_admin_account: {
+        Args: {
+          p_user_id: string;
+          p_display_name: string;
+          p_role_code?: string;
+          p_is_owner?: boolean;
+          p_actor_id?: string;
+          p_pin?: string | null;
+          p_otp?: string | null;
+        };
+        Returns: Database["public"]["Tables"]["admin_profiles"]["Row"];
+      };
+      set_admin_status: {
+        Args: {
+          p_target_admin_id: string;
+          p_status: "active" | "disabled";
+          p_actor_id?: string;
+          p_pin?: string | null;
+          p_otp?: string | null;
+        };
+        Returns: Database["public"]["Tables"]["admin_profiles"]["Row"];
+      };
+      assign_admin_role: {
+        Args: {
+          p_target_admin_id: string;
+          p_role_code: string;
+          p_actor_id?: string;
+          p_pin?: string | null;
+          p_otp?: string | null;
+        };
+        Returns: undefined;
+      };
+      set_admin_permission_override: {
+        Args: {
+          p_target_admin_id: string;
+          p_permission: string;
+          p_granted: boolean;
+          p_reason?: string | null;
+          p_actor_id?: string;
+          p_pin?: string | null;
+          p_otp?: string | null;
+        };
+        Returns: undefined;
+      };
+      set_player_status_admin: {
+        Args: {
+          p_player_id: string;
+          p_status: PlayerStatus;
+          p_reason: string;
+          p_actor_id?: string;
+          p_pin?: string | null;
+          p_otp?: string | null;
+        };
+        Returns: Database["public"]["Tables"]["profiles"]["Row"];
+      };
+      get_admin_dashboard: {
+        Args: { p_user_id?: string };
+        Returns: Json;
+      };
+      upsert_announcement_admin: {
+        Args: {
+          p_title_i18n: Json;
+          p_body_i18n: Json;
+          p_status?: AnnouncementStatus | string;
+          p_id?: string | null;
+          p_scheduled_at?: string | null;
+          p_actor_id?: string;
+        };
+        Returns: Database["public"]["Tables"]["announcements"]["Row"];
+      };
+      update_ticket_status_admin: {
+        Args: {
+          p_ticket_id: string;
+          p_status: TicketStatus | string;
+          p_reply?: string | null;
+          p_actor_id?: string;
+        };
+        Returns: Database["public"]["Tables"]["support_tickets"]["Row"];
+      };
+      upsert_mission_admin: {
+        Args: {
+          p_code: string;
+          p_title_i18n: Json;
+          p_description_i18n: Json;
+          p_target_count: number;
+          p_reward_amount: number;
+          p_is_enabled?: boolean;
+          p_id?: string | null;
+          p_actor_id?: string;
+        };
+        Returns: Database["public"]["Tables"]["missions"]["Row"];
+      };
+      upsert_achievement_admin: {
+        Args: {
+          p_code: string;
+          p_title_i18n: Json;
+          p_description_i18n: Json;
+          p_is_enabled?: boolean;
+          p_badge_asset_key?: string | null;
+          p_actor_id?: string;
+        };
+        Returns: Database["public"]["Tables"]["achievements"]["Row"];
+      };
+      set_feature_flag_admin: {
+        Args: {
+          p_key: string;
+          p_enabled: boolean;
+          p_payload?: Json;
+          p_description?: string | null;
+          p_actor_id?: string;
+        };
+        Returns: Database["public"]["Tables"]["feature_flags"]["Row"];
+      };
+      set_system_setting_admin: {
+        Args: { p_key: string; p_value: Json; p_actor_id?: string };
+        Returns: Database["public"]["Tables"]["system_settings"]["Row"];
+      };
+      set_maintenance_admin: {
+        Args: {
+          p_is_active: boolean;
+          p_message_i18n?: Json;
+          p_estimated_end_at?: string | null;
+          p_actor_id?: string;
+          p_pin?: string | null;
+          p_otp?: string | null;
+        };
+        Returns: Database["public"]["Tables"]["maintenance_state"]["Row"];
+      };
+      create_game_version_admin: {
+        Args: {
+          p_game_id: string;
+          p_config: Json;
+          p_guide_i18n?: Json;
+          p_activate?: boolean;
+          p_actor_id?: string;
+        };
+        Returns: Database["public"]["Tables"]["game_versions"]["Row"];
+      };
+      advance_game_release: {
+        Args: {
+          p_game_id: string;
+          p_to_status: GameLifecycleStatus | string;
+          p_actor_id?: string;
+          p_pin?: string | null;
+          p_otp?: string | null;
+          p_scheduled_launch_at?: string | null;
+        };
+        Returns: Database["public"]["Tables"]["games"]["Row"];
+      };
+      upsert_asset_metadata_admin: {
+        Args: {
+          p_key: string;
+          p_kind: string;
+          p_storage_path?: string | null;
+          p_mime_type?: string | null;
+          p_byte_size?: number | null;
+          p_rights_cleared?: boolean;
+          p_metadata?: Json;
+          p_actor_id?: string;
+        };
+        Returns: Database["public"]["Tables"]["asset_metadata"]["Row"];
+      };
+      register_qa_account: {
+        Args: {
+          p_player_id: string;
+          p_label: string;
+          p_notes?: string | null;
+          p_actor_id?: string;
+          p_pin?: string | null;
+          p_otp?: string | null;
+        };
+        Returns: Database["public"]["Tables"]["qa_accounts"]["Row"];
+      };
+      search_audit_log: {
+        Args: {
+          p_actor_id_filter?: string | null;
+          p_action_type?: string | null;
+          p_target_type?: string | null;
+          p_from?: string | null;
+          p_to?: string | null;
+          p_limit?: number;
+          p_user_id?: string;
+        };
+        Returns: Database["public"]["Tables"]["audit_log"]["Row"][];
+      };
+      export_admin_report: {
+        Args: { p_report_type: string; p_actor_id?: string };
+        Returns: Json;
+      };
+      search_players_admin: {
+        Args: {
+          p_query?: string | null;
+          p_status?: PlayerStatus | null;
+          p_limit?: number;
+          p_user_id?: string;
+        };
+        Returns: {
+          id: string;
+          nickname: string;
+          email: string | null;
+          phone: string | null;
+          status: PlayerStatus;
+          last_activity_at: string | null;
+          balance: number;
+          is_qa: boolean;
+        }[];
+      };
+    };
+    Enums: {
+      player_status: PlayerStatus;
+      app_locale: AppLocale;
+      ledger_entry_type: LedgerEntryType;
+      credit_request_status: CreditRequestStatus;
+      game_lifecycle_status: GameLifecycleStatus;
+      settlement_mode: SettlementMode;
+      announcement_status: AnnouncementStatus;
+      notification_kind: NotificationKind;
+      ticket_status: TicketStatus;
+      ticket_category: TicketCategory;
+      friendship_status: FriendshipStatus;
+      leaderboard_metric: LeaderboardMetric;
+      audit_result: AuditResult;
+    };
+    CompositeTypes: Record<string, never>;
+  };
+};
+
+export type Tables<T extends keyof Database["public"]["Tables"]> =
+  Database["public"]["Tables"][T]["Row"];

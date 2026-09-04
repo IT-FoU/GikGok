@@ -1,0 +1,25 @@
+{
+  "name": "GIKGOK",
+  "short_name": "GIKGOK",
+  "description": "Demo GIK credit games only — no real money.",
+  "start_url": "/home",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#071912",
+  "theme_color": "#0b3d2e",
+  "lang": "lo",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
