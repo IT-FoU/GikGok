@@ -63,7 +63,9 @@
     "fpcTitle": "Fish–Prawn–Crab",
     "fpcBody": "Three dice show Fish, Prawn, Crab, Gourd, Rooster, or Deer. Single Symbol: pick one — if it appears on any die, Total Return is x2. Special Pair: pick two different symbols — both must appear for Total Return x10. Outcomes are settled on the server; visuals only reveal the result.",
     "highlowTitle": "High–Low Dice",
-    "highlowBody": "Roll three six-sided dice. Total 3–10 is Low; 11–18 is High. Any triple loses both sides. Pick High or Low for Total Return x2 when correct and non-triple. Settlement is server-authoritative; visuals only reveal."
+    "highlowBody": "Roll three six-sided dice. Total 3–10 is Low; 11–18 is High. Any triple loses both sides. Pick High or Low for Total Return x2 when correct and non-triple. Settlement is server-authoritative; visuals only reveal.",
+    "plateTitle": "Spinning Plate",
+    "plateBody": "Twelve slots sit under a fixed top pointer. Pick exactly one slot. Exact land only wins. Returns: 1–4 x2, 5–7 x3, 8–9 x4, 10 x5, 11 x7, 12 x10. Icons: Clover through Jackpot. Settlement is server-authoritative; visuals only reveal."
   },
   "admin": {
     "title": "Admin console",
@@ -201,6 +203,50 @@
     },
     "error": {
       "side": "Choose High or Low.",
+      "stake": "Enter a positive whole-number stake.",
+      "insufficient": "Stake exceeds your settled balance.",
+      "unexpected": "Settlement response was incomplete. Try Resume if a pending key exists."
+    }
+  },
+  "plate": {
+    "name": "Spinning Plate",
+    "tagline": "Pick one of twelve slots. Exact land only. Server settles Total Return.",
+    "balance": "Balance: {amount}",
+    "configVersion": "Rules config v{version}",
+    "guideLink": "Game Guide",
+    "selectSlot": "Select a slot",
+    "pointerHint": "Fixed pointer at the top of the wheel",
+    "wheelLabel": "Spinning plate wheel",
+    "stake": "Stake",
+    "stakeManual": "Manual stake (whole GIK)",
+    "placeBet": "Confirm bet",
+    "locking": "Locked — settling…",
+    "resume": "Resume pending bet",
+    "reveal": "Plate reveal",
+    "reducedMotion": "Reduced motion",
+    "fpsFallback": "Switched to 2D (low FPS)",
+    "historyTitle": "Recent Spinning Plate receipts",
+    "a11yResult": "Selected slot {selected}, landed slot {landed}, slot multiplier x{multiplier}",
+    "result": {
+      "win": "You won",
+      "lose": "No win",
+      "selected": "Selected",
+      "landed": "Landed",
+      "totalReturn": "Total Return"
+    },
+    "receipt": {
+      "stake": "Stake",
+      "payout": "Payout",
+      "balanceAfter": "Balance after",
+      "betId": "Bet ID",
+      "version": "Game version",
+      "random": "Random mode",
+      "controlledDemo": "Controlled demo",
+      "replay": "Recovered via idempotency replay",
+      "viewHistory": "Open full ledger history"
+    },
+    "error": {
+      "slot": "Select exactly one slot from 1 to 12.",
       "stake": "Enter a positive whole-number stake.",
       "insufficient": "Stake exceeds your settled balance.",
       "unexpected": "Settlement response was incomplete. Try Resume if a pending key exists."
