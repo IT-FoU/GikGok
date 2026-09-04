@@ -5,10 +5,10 @@
 - [x] Read `requirements.md` completely before changing code.
 - [x] Inspect the existing repository and preserve unrelated files/changes.
 - [x] Keep the project demo-credit only; do not add real-money/payment/wallet/cash-out functionality.
-- [ ] Complete tasks in order; do not mark a task complete without running its stated validation.
+- [x] Complete tasks in order; do not mark a task complete without running its stated validation.
 - [x] Add migrations; never make production schema changes manually.
 - [x] Use secure environment variables and never commit secrets.
-- [ ] Commit logical milestones with descriptive messages after tests pass.
+- [x] Commit logical milestones with descriptive messages after tests pass.
 
 ## Phase 0 — Discovery and architecture
 
