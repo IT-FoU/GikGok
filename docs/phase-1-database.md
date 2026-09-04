@@ -17,12 +17,23 @@ The script:
 
 ## Results
 
-Recorded after Phase 1 implementation:
+Recorded after Phase 1 implementation (2026-09-04):
 
-- Migrations apply cleanly
-- RLS tests prove player ledger isolation
-- RLS tests prove credit_manager vs support_viewer least privilege
-- Credit-request row isolation between players
+| Check | Result |
+|-------|--------|
+| `npm run lint` | pass |
+| `npm run typecheck` | pass |
+| `npm test` | pass (10 tests) |
+| `npm run build` | pass |
+| `npm run db:validate` | pass — migrations apply; RLS isolation + least-privilege tests pass |
+
+RLS coverage in `supabase/tests/rls_policies.test.sql`:
+
+- Player A sees only own ledger/balance rows
+- Players cannot insert ledger entries directly
+- `credit_manager` has `credits.view` / `credits.adjust`, not `tickets.manage`
+- `support_viewer` cannot read ledger
+- Credit requests are isolated between players
 
 ## Type generation
 
