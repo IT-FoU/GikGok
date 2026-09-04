@@ -6,7 +6,7 @@
 - [x] Inspect the existing repository and preserve unrelated files/changes.
 - [x] Keep the project demo-credit only; do not add real-money/payment/wallet/cash-out functionality.
 - [ ] Complete tasks in order; do not mark a task complete without running its stated validation.
-- [ ] Add migrations; never make production schema changes manually.
+- [x] Add migrations; never make production schema changes manually.
 - [x] Use secure environment variables and never commit secrets.
 - [ ] Commit logical milestones with descriptive messages after tests pass.
 
@@ -22,18 +22,18 @@
 
 ## Phase 1 — Database and Supabase foundation
 
-- [ ] Create Supabase project configuration and typed client helpers for browser, server, and admin-safe server routes.
-- [ ] Create migrations for profiles, verified contact fields, avatar metadata, user settings, status, and last-activity data.
-- [ ] Create migrations for admin roles, granular permissions, role assignments, admin PIN/2FA metadata, and approval limits.
-- [ ] Create immutable ledger, balance projection, credit request, credit request review, and daily reward/streak tables.
-- [ ] Create migrations for games, game versions/configurations, game release lifecycle, feature flags, rounds, bets, outcomes, and receipts.
-- [ ] Create migrations for announcements, notifications, tickets/messages/attachments, missions, achievements, leaderboard projections, friends/invites, and QA accounts.
-- [ ] Create migrations for audit log, system settings, asset metadata, maintenance state, and operational health events.
-- [ ] Add indexes, foreign keys, check constraints, enum/status constraints, timestamps, and soft-delete policy where appropriate.
-- [ ] Implement Row Level Security for every table and Storage bucket.
-- [ ] Add Storage policies for avatar, ticket attachment, and game asset buckets.
-- [ ] Generate database types and verify migration up/down or local reset succeeds.
-- [ ] Write RLS tests proving player isolation and least-privilege administrator access.
+- [x] Create Supabase project configuration and typed client helpers for browser, server, and admin-safe server routes.
+- [x] Create migrations for profiles, verified contact fields, avatar metadata, user settings, status, and last-activity data.
+- [x] Create migrations for admin roles, granular permissions, role assignments, admin PIN/2FA metadata, and approval limits.
+- [x] Create immutable ledger, balance projection, credit request, credit request review, and daily reward/streak tables.
+- [x] Create migrations for games, game versions/configurations, game release lifecycle, feature flags, rounds, bets, outcomes, and receipts.
+- [x] Create migrations for announcements, notifications, tickets/messages/attachments, missions, achievements, leaderboard projections, friends/invites, and QA accounts.
+- [x] Create migrations for audit log, system settings, asset metadata, maintenance state, and operational health events.
+- [x] Add indexes, foreign keys, check constraints, enum/status constraints, timestamps, and soft-delete policy where appropriate.
+- [x] Implement Row Level Security for every table and Storage bucket.
+- [x] Add Storage policies for avatar, ticket attachment, and game asset buckets.
+- [x] Generate database types and verify migration up/down or local reset succeeds.
+- [x] Write RLS tests proving player isolation and least-privilege administrator access.
 
 ## Phase 2 — Authentication and account lifecycle
 

@@ -51,6 +51,8 @@ Validation lives in `src/lib/env/client.ts` (public) and `src/lib/env/server.ts`
 | `npm test` | Vitest unit tests |
 | `npm run test:e2e` | Playwright E2E (later phases) |
 | `npm run format` | Prettier write |
+| `npm run db:validate` | Apply migrations + RLS tests on local Postgres |
+| `npm run db:types` | Generate DB types (requires Supabase local/Docker) |
 
 ## Architecture
 
@@ -64,6 +66,8 @@ See [docs/architecture.md](docs/architecture.md) for module boundaries:
 - **Database** — `supabase/migrations`, `src/lib/supabase`
 - **Localization** — `src/modules/localization`
 
+Database foundation details: [docs/phase-1-database.md](docs/phase-1-database.md).
+
 Product requirements: [requirements.md](requirements.md).  
 Task plan: [tasks.md](tasks.md).
 
@@ -72,3 +76,4 @@ Task plan: [tasks.md](tasks.md).
 - Demo credits only — no real-money or payment features.
 - Server-authoritative settlement and ledger; browser never decides balances/outcomes.
 - No service-role key in frontend or repository.
+- Balance is derived from immutable `ledger_entries`; never edit balances directly.

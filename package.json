@@ -11,7 +11,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "db:validate": "bash scripts/db-validate.sh",
+    "db:types": "supabase gen types typescript --local -o src/lib/supabase/types.ts"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.3.3",
@@ -49,6 +51,7 @@
     "eslint-config-prettier": "^10.1.8",
     "jsdom": "^29.1.1",
     "prettier": "^3.9.6",
+    "supabase": "^2.116.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^3.2.7"
