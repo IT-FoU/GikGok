@@ -59,7 +59,9 @@
     "body": "Browse without signing in. Playing requires a verified account. GIK credits are demo credits only and have no cash value.",
     "fpc": "Fish–Prawn–Crab — symbol dice with Single Symbol and Special Pair bets",
     "highlow": "High–Low Dice — predict high or low; triples lose both sides",
-    "plate": "Spinning Plate — pick one of twelve slots and land exactly"
+    "plate": "Spinning Plate — pick one of twelve slots and land exactly",
+    "fpcTitle": "Fish–Prawn–Crab",
+    "fpcBody": "Three dice show Fish, Prawn, Crab, Gourd, Rooster, or Deer. Single Symbol: pick one — if it appears on any die, Total Return is x2. Special Pair: pick two different symbols — both must appear for Total Return x10. Outcomes are settled on the server; visuals only reveal the result."
   },
   "admin": {
     "title": "Admin console",
@@ -96,5 +98,63 @@
     "arcade": "Arcade",
     "silent": "Silent",
     "muted": "Muted"
+  },
+  "fpc": {
+    "name": "Fish–Prawn–Crab",
+    "tagline": "Pick a symbol or special pair. Server settles Total Return — visuals only reveal.",
+    "balance": "Balance: {amount}",
+    "configVersion": "Rules config v{version}",
+    "guideLink": "Game Guide",
+    "betType": "Bet type",
+    "kind": {
+      "single": "Single Symbol",
+      "pair": "Special Pair",
+      "singleHelp": "Choose exactly one symbol. At least one matching die wins Total Return x2.",
+      "pairHelp": "Choose two different symbols. Both must appear across the three dice for Total Return x10."
+    },
+    "selectSymbols": "Select symbols",
+    "stake": "Stake",
+    "stakeManual": "Manual stake (whole GIK)",
+    "placeBet": "Confirm bet",
+    "locking": "Locked — settling…",
+    "resume": "Resume pending bet",
+    "reveal": "Dice reveal",
+    "reducedMotion": "Reduced motion",
+    "historyTitle": "Recent Fish–Prawn–Crab receipts",
+    "dice": {
+      "waiting": "Waiting for result"
+    },
+    "result": {
+      "win": "You won",
+      "lose": "No win",
+      "dice": "Settled dice",
+      "totalReturn": "Total Return"
+    },
+    "receipt": {
+      "stake": "Stake",
+      "payout": "Payout",
+      "balanceAfter": "Balance after",
+      "betId": "Bet ID",
+      "selection": "Selection",
+      "version": "Game version",
+      "random": "Random mode",
+      "controlledDemo": "Controlled demo",
+      "replay": "Recovered via idempotency replay",
+      "viewHistory": "Open full ledger history"
+    },
+    "symbol": {
+      "fish": "Fish",
+      "prawn": "Prawn",
+      "crab": "Crab",
+      "gourd": "Gourd",
+      "rooster": "Rooster",
+      "deer": "Deer"
+    },
+    "error": {
+      "pairDistinct": "Special Pair needs two different symbols.",
+      "stake": "Enter a positive whole-number stake.",
+      "insufficient": "Stake exceeds your settled balance.",
+      "unexpected": "Settlement response was incomplete. Try Resume if a pending key exists."
+    }
   }
 }

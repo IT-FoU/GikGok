@@ -26,3 +26,13 @@ NEXT_PUBLIC_SUPABASE_URL=https://example.supabase.co \
 NEXT_PUBLIC_SUPABASE_ANON_KEY=public-anon-key npm run build
 npm run db:validate
 ```
+
+## Results (2026-09-04)
+
+| Command | Result |
+|---------|--------|
+| `npm run lint` | pass |
+| `npm run typecheck` | pass |
+| `npm test` | pass (38 tests) |
+| `npm run build` | pass |
+| `npm run db:validate` | pass (settlement, idempotency, controlled demo, maintenance) |

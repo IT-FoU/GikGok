@@ -88,13 +88,13 @@
 
 ## Phase 6 — Fish–Prawn–Crab
 
-- [ ] Add versioned Fish–Prawn–Crab game configuration and Lao/English Guide.
-- [ ] Implement server settlement for Single Symbol: one selection, at least one matching die, Total Return x2.
-- [ ] Implement server settlement for Special Pair: two distinct symbols, both must occur, Total Return x10.
-- [ ] Build 2D dice symbols, selection controls, stake input/quick stakes, locked state, result, receipt, and history representation.
-- [ ] Build lazy-loaded optional 3D dice with physics-based visual reveal of the settled server result.
-- [ ] Add Classic Casino/Arcade sound cues and reduce-motion fallback.
-- [ ] Test all winning/losing combinations, invalid pair selections, insufficient balance, double submission, and refresh recovery.
+- [x] Add versioned Fish–Prawn–Crab game configuration and Lao/English Guide.
+- [x] Implement server settlement for Single Symbol: one selection, at least one matching die, Total Return x2.
+- [x] Implement server settlement for Special Pair: two distinct symbols, both must occur, Total Return x10.
+- [x] Build 2D dice symbols, selection controls, stake input/quick stakes, locked state, result, receipt, and history representation.
+- [x] Build lazy-loaded optional 3D dice with physics-based visual reveal of the settled server result.
+- [x] Add Classic Casino/Arcade sound cues and reduce-motion fallback.
+- [x] Test all winning/losing combinations, invalid pair selections, insufficient balance, double submission, and refresh recovery.
 
 ## Phase 7 — High–Low Dice
 

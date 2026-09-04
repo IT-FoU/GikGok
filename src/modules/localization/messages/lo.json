@@ -59,7 +59,9 @@
     "body": "ເບິ່ງໄດ້ໂດຍບໍ່ຕ້ອງເຂົ້າສູ່ລະບົບ ການຫຼິ້ນຕ້ອງມີບັນຊີທີ່ຢືນຢັນແລ້ວ.",
     "fpc": "ປາ–ກຸ້ງ–ປູ — ໂທ່າສັນຍາລັກ Single Symbol ແລະ Special Pair",
     "highlow": "ສູງ–ຕ່ຳ — ທາຍສູງ ຫຼື ຕ່ຳ; ເລກຊ້ຳສາມໜ້າແພ້ທັງຄູ່",
-    "plate": "ຈານຫມຸນ — ເລືອກ 1 ໃນ 12 ຊ່ອງ ແລະ ຕ້ອງຕົກກົງກັນ"
+    "plate": "ຈານຫມຸນ — ເລືອກ 1 ໃນ 12 ຊ່ອງ ແລະ ຕ້ອງຕົກກົງກັນ",
+    "fpcTitle": "ປາ–ກຸ້ງ–ປູ",
+    "fpcBody": "ລູກເຕົ່າສາມລູກໃຊ້ສັນຍາລັກ ປາ, ກຸ້ງ, ປູ, ນ້ຳເຕົ້າ, ໄກ່ແຮງ, ກວາງ. Single Symbol: ເລືອກ 1 — ຖ້າອອກຢ່າງນ້ອຍ 1 ໜ້າ Total Return x2. Special Pair: ເລືອກ 2 ສັນຍາລັກຕ່າງກັນ — ຕ້ອງອອກທັງສອງເພື່ອ x10. ຜົນເກມຕັດສິນທີ່ເຊີບເວີ; ພາບເປີດເຜີຍຜົນເທົ່ານັ້ນ."
   },
   "admin": {
     "title": "ຄອນໂຊລແອດມິນ",
@@ -96,5 +98,63 @@
     "arcade": "Arcade",
     "silent": "ງຽບ",
     "muted": "ປິດສຽງ"
+  },
+  "fpc": {
+    "name": "ປາ–ກຸ້ງ–ປູ",
+    "tagline": "ເລືອກສັນຍາລັກ ຫຼື ຄູ່ພິເສດ. ເຊີບເວີຕັດສິນ Total Return — ພາບເປີດເຜີຍຜົນເທົ່ານັ້ນ.",
+    "balance": "ຍອດ: {amount}",
+    "configVersion": "ກົດກະທູ້ v{version}",
+    "guideLink": "ຄູ່ມືເກມ",
+    "betType": "ປະເພດໂທ່າ",
+    "kind": {
+      "single": "Single Symbol",
+      "pair": "Special Pair",
+      "singleHelp": "ເລືອກ 1 ສັນຍາລັກ. ຖ້າອອກຢ່າງນ້ອຍ 1 ໜ້າ Total Return x2.",
+      "pairHelp": "ເລືອກ 2 ສັນຍາລັກຕ່າງກັນ. ຕ້ອງອອກທັງສອງໃນ 3 ລູກເຕົ່າເພື່ອ Total Return x10."
+    },
+    "selectSymbols": "ເລືອກສັນຍາລັກ",
+    "stake": "ໂທ່າ",
+    "stakeManual": "ໃສ່ໂທ່າເອງ (GIK ຈຳນວນເຕັມ)",
+    "placeBet": "ຢືນຢັນໂທ່າ",
+    "locking": "ລັອກແລ້ວ — ກຳລັງຕັດສິນ…",
+    "resume": "ສືບຕໍ່ໂທ່າຄ້າງ",
+    "reveal": "ເປີດລູກເຕົ່າ",
+    "reducedMotion": "ຫຼຸດການເຄື່ອນໄຫວ",
+    "historyTitle": "ໃບຮັບປາ–ກຸ້ງ–ປູລ່າສຸດ",
+    "dice": {
+      "waiting": "ລໍຖ້າຜົນ"
+    },
+    "result": {
+      "win": "ຊະນະ",
+      "lose": "ບໍ່ຊະນະ",
+      "dice": "ລູກເຕົ່າທີ່ຕັດສິນແລ້ວ",
+      "totalReturn": "Total Return"
+    },
+    "receipt": {
+      "stake": "ໂທ່າ",
+      "payout": "ຈ່າຍອອກ",
+      "balanceAfter": "ຍອດຫຼັງຕັດສິນ",
+      "betId": "ລະຫັດໂທ່າ",
+      "selection": "ການເລືອກ",
+      "version": "ເວີຊັນເກມ",
+      "random": "ໂໝດສຸ່ມ",
+      "controlledDemo": "Controlled demo",
+      "replay": "ກູ້ຄືນດ້ວຍ idempotency",
+      "viewHistory": "ເປີດປະຫວັດ ledger"
+    },
+    "symbol": {
+      "fish": "ປາ",
+      "prawn": "ກຸ້ງ",
+      "crab": "ປູ",
+      "gourd": "ນ້ຳເຕົ້າ",
+      "rooster": "ໄກ່ແຮງ",
+      "deer": "ກວາງ"
+    },
+    "error": {
+      "pairDistinct": "Special Pair ຕ້ອງເປັນສັນຍາລັກຕ່າງກັນ.",
+      "stake": "ໃສ່ໂທ່າເປັນຈຳນວນເຕັມບວກ.",
+      "insufficient": "ໂທ່າເກີນຍອດທີ່ຕັດສິນແລ້ວ.",
+      "unexpected": "ຂໍ້ມູນຜົນບໍ່ຄົບ. ລອງ Resume ຖ້າມີຄີຄ້າງ."
+    }
   }
 }

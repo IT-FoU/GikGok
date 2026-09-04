@@ -71,6 +71,7 @@ Auth lifecycle details: [docs/phase-2-auth.md](docs/phase-2-auth.md).
 Design system details: [docs/phase-3-design.md](docs/phase-3-design.md).
 Ledger/credits details: [docs/phase-4-ledger.md](docs/phase-4-ledger.md).
 Game engine details: [docs/phase-5-game-engine.md](docs/phase-5-game-engine.md).
+Fish–Prawn–Crab details: [docs/phase-6-fish-prawn-crab.md](docs/phase-6-fish-prawn-crab.md).
 
 Product requirements: [requirements.md](requirements.md).  
 Task plan: [tasks.md](tasks.md).

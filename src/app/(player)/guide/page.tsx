@@ -21,15 +21,37 @@ export default function GuidePage() {
         </h1>
         <p className="text-[var(--brand-muted)]">{t("guide.body")}</p>
       </div>
+
+      <section id="fpc" className="scroll-mt-24 space-y-3">
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("guide.fpcTitle")}</CardTitle>
+            <CardDescription>{t("guide.fpcBody")}</CardDescription>
+          </CardHeader>
+          <div className="px-6 pb-6">
+            <Link
+              href="/play/fish-prawn-crab"
+              className="text-sm text-[var(--brand-accent)] underline-offset-4 hover:underline"
+            >
+              {t("fpc.name")} →
+            </Link>
+          </div>
+        </Card>
+      </section>
+
       <div id="games" className="grid gap-3">
-        {[t("guide.fpc"), t("guide.highlow"), t("guide.plate")].map((item) => (
-          <Card key={item}>
-            <CardHeader>
-              <CardTitle className="text-base">{item.split(" — ")[0]}</CardTitle>
-              <CardDescription>{item}</CardDescription>
-            </CardHeader>
-          </Card>
-        ))}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">{t("guide.highlow").split(" — ")[0]}</CardTitle>
+            <CardDescription>{t("guide.highlow")}</CardDescription>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">{t("guide.plate").split(" — ")[0]}</CardTitle>
+            <CardDescription>{t("guide.plate")}</CardDescription>
+          </CardHeader>
+        </Card>
       </div>
     </main>
   );
