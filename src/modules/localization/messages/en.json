@@ -1,0 +1,209 @@
+{
+  "app": {
+    "name": "GIKGOK",
+    "tagline": "Demo-credit game platform",
+    "demoNotice": "GIK credits are demo credits only. They have no cash value."
+  },
+  "nav": {
+    "home": "Home",
+    "games": "Games",
+    "history": "History",
+    "profile": "Profile",
+    "guide": "Guide",
+    "admin": "Admin",
+    "dashboard": "Dashboard",
+    "players": "Players",
+    "credits": "Credits",
+    "tickets": "Tickets",
+    "settings": "Settings",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "createAccount": "Create account"
+  },
+  "welcome": {
+    "eyebrow": "Demo credits only",
+    "headline": "GIKGOK",
+    "body": "A private, mobile-first game platform using GIK demo credits. No real-money deposits, cash-out, or wallets — ever.",
+    "deleted": "Account deletion requested. Ledger and audit records are preserved."
+  },
+  "auth": {
+    "createAccount": "Create account",
+    "signIn": "Sign in",
+    "verifyTitle": "Verify contact",
+    "verifyBody": "Enter the OTP sent to your contact. At least one verified contact is required before playing.",
+    "forgotTitle": "Reset password",
+    "resetTitle": "Choose a new password",
+    "email": "Email",
+    "phone": "Phone",
+    "password": "Password",
+    "nickname": "Nickname",
+    "otp": "6-digit code"
+  },
+  "home": {
+    "greeting": "Welcome, {name}",
+    "balance": "Balance: {amount} GIK (demo credits only)",
+    "verifyHint": "Verify your contact to unlock play and welcome credit."
+  },
+  "profile": {
+    "title": "Profile & settings",
+    "preferences": "Preferences",
+    "avatarUpload": "Avatar upload",
+    "dangerZone": "Danger zone",
+    "language": "Language",
+    "soundPack": "Sound pack",
+    "graphics": "Graphics",
+    "quality": "Quality"
+  },
+  "guide": {
+    "title": "Game Guide",
+    "body": "Browse without signing in. Playing requires a verified account. GIK credits are demo credits only and have no cash value.",
+    "fpc": "Fish–Prawn–Crab — symbol dice with Single Symbol and Special Pair bets",
+    "highlow": "High–Low Dice — predict high or low; triples lose both sides",
+    "plate": "Spinning Plate — pick one of twelve slots and land exactly",
+    "fpcTitle": "Fish–Prawn–Crab",
+    "fpcBody": "Three dice show Fish, Prawn, Crab, Gourd, Rooster, or Deer. Single Symbol: pick one — if it appears on any die, Total Return is x2. Special Pair: pick two different symbols — both must appear for Total Return x10. Outcomes are settled on the server; visuals only reveal the result.",
+    "highlowTitle": "High–Low Dice",
+    "highlowBody": "Roll three six-sided dice. Total 3–10 is Low; 11–18 is High. Any triple loses both sides. Pick High or Low for Total Return x2 when correct and non-triple. Settlement is server-authoritative; visuals only reveal."
+  },
+  "admin": {
+    "title": "Admin console",
+    "body": "Secure admin routing, permissions, and operational modules continue in later phases. This shell reserves the /admin boundary.",
+    "desktopHint": "Desktop-first data layouts for operations."
+  },
+  "status": {
+    "suspendedTitle": "Account suspended",
+    "bannedTitle": "Account banned",
+    "deletionTitle": "Deletion requested"
+  },
+  "common": {
+    "loading": "Loading…",
+    "error": "Something went wrong",
+    "empty": "Nothing here yet",
+    "retry": "Try again",
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "noResults": "No results found"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Enter a valid email",
+    "invalidPhone": "Use E.164 phone format",
+    "nicknameTaken": "That nickname is already taken"
+  },
+  "sound": {
+    "classic": "Classic Casino",
+    "arcade": "Arcade",
+    "silent": "Silent",
+    "muted": "Muted"
+  },
+  "fpc": {
+    "name": "Fish–Prawn–Crab",
+    "tagline": "Pick a symbol or special pair. Server settles Total Return — visuals only reveal.",
+    "balance": "Balance: {amount}",
+    "configVersion": "Rules config v{version}",
+    "guideLink": "Game Guide",
+    "betType": "Bet type",
+    "kind": {
+      "single": "Single Symbol",
+      "pair": "Special Pair",
+      "singleHelp": "Choose exactly one symbol. At least one matching die wins Total Return x2.",
+      "pairHelp": "Choose two different symbols. Both must appear across the three dice for Total Return x10."
+    },
+    "selectSymbols": "Select symbols",
+    "stake": "Stake",
+    "stakeManual": "Manual stake (whole GIK)",
+    "placeBet": "Confirm bet",
+    "locking": "Locked — settling…",
+    "resume": "Resume pending bet",
+    "reveal": "Dice reveal",
+    "reducedMotion": "Reduced motion",
+    "historyTitle": "Recent Fish–Prawn–Crab receipts",
+    "dice": {
+      "waiting": "Waiting for result"
+    },
+    "result": {
+      "win": "You won",
+      "lose": "No win",
+      "dice": "Settled dice",
+      "totalReturn": "Total Return"
+    },
+    "receipt": {
+      "stake": "Stake",
+      "payout": "Payout",
+      "balanceAfter": "Balance after",
+      "betId": "Bet ID",
+      "selection": "Selection",
+      "version": "Game version",
+      "random": "Random mode",
+      "controlledDemo": "Controlled demo",
+      "replay": "Recovered via idempotency replay",
+      "viewHistory": "Open full ledger history"
+    },
+    "symbol": {
+      "fish": "Fish",
+      "prawn": "Prawn",
+      "crab": "Crab",
+      "gourd": "Gourd",
+      "rooster": "Rooster",
+      "deer": "Deer"
+    },
+    "error": {
+      "pairDistinct": "Special Pair needs two different symbols.",
+      "stake": "Enter a positive whole-number stake.",
+      "insufficient": "Stake exceeds your settled balance.",
+      "unexpected": "Settlement response was incomplete. Try Resume if a pending key exists."
+    }
+  },
+  "highlow": {
+    "name": "High–Low Dice",
+    "tagline": "Predict High or Low. Triples lose both sides. Server settles Total Return.",
+    "balance": "Balance: {amount}",
+    "configVersion": "Rules config v{version}",
+    "guideLink": "Game Guide",
+    "side": "Your side",
+    "sideHigh": "High",
+    "sideLow": "Low",
+    "sideHighHelp": "Totals 11–18 (no triple)",
+    "sideLowHelp": "Totals 3–10 (no triple)",
+    "stake": "Stake",
+    "stakeManual": "Manual stake (whole GIK)",
+    "placeBet": "Confirm bet",
+    "locking": "Locked — settling…",
+    "resume": "Resume pending bet",
+    "reveal": "Dice reveal",
+    "reducedMotion": "Reduced motion",
+    "historyTitle": "Recent High–Low receipts",
+    "result": {
+      "win": "You won",
+      "lose": "No win",
+      "dice": "Settled dice",
+      "total": "Total",
+      "triple": "Triple — both sides lose",
+      "actualSide": "Actual side",
+      "totalReturn": "Total Return"
+    },
+    "receipt": {
+      "stake": "Stake",
+      "payout": "Payout",
+      "balanceAfter": "Balance after",
+      "betId": "Bet ID",
+      "selection": "Selection",
+      "version": "Game version",
+      "random": "Random mode",
+      "controlledDemo": "Controlled demo",
+      "replay": "Recovered via idempotency replay",
+      "viewHistory": "Open full ledger history"
+    },
+    "error": {
+      "side": "Choose High or Low.",
+      "stake": "Enter a positive whole-number stake.",
+      "insufficient": "Stake exceeds your settled balance.",
+      "unexpected": "Settlement response was incomplete. Try Resume if a pending key exists."
+    }
+  }
+}

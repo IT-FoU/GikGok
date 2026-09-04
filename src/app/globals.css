@@ -1,0 +1,98 @@
+@import "tailwindcss";
+@import "../styles/tokens.css";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+}
+
+* {
+  border-color: var(--brand-border);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  background:
+    radial-gradient(
+      ellipse at top,
+      color-mix(in oklab, var(--brand-accent) 16%, transparent),
+      transparent 55%
+    ),
+    linear-gradient(180deg, var(--brand-base), var(--brand-background));
+  color: var(--foreground);
+  font-family: var(--font-body);
+  min-height: 100vh;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--brand-accent) 45%, transparent);
+  color: var(--brand-foreground);
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.surface {
+  background: color-mix(in oklab, var(--brand-surface) 92%, transparent);
+  border: 1px solid var(--brand-border);
+  border-radius: var(--radius-xl);
+}
+
+.touch-target {
+  min-height: var(--touch-min);
+  min-width: var(--touch-min);
+}
+
+@keyframes gg-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes gg-pulse-soft {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-fade-up {
+  animation: gg-fade-up var(--motion-slow) var(--ease-out) both;
+}
+
+.animate-pulse-soft {
+  animation: gg-pulse-soft 1.6s ease-in-out infinite;
+}
