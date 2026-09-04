@@ -2,134 +2,134 @@
 
 ## Execution rules
 
-- [ ] Read `requirements.md` completely before changing code.
-- [ ] Inspect the existing repository and preserve unrelated files/changes.
-- [ ] Keep the project demo-credit only; do not add real-money/payment/wallet/cash-out functionality.
-- [ ] Complete tasks in order; do not mark a task complete without running its stated validation.
-- [ ] Add migrations; never make production schema changes manually.
-- [ ] Use secure environment variables and never commit secrets.
-- [ ] Commit logical milestones with descriptive messages after tests pass.
+- [x] Read `requirements.md` completely before changing code.
+- [x] Inspect the existing repository and preserve unrelated files/changes.
+- [x] Keep the project demo-credit only; do not add real-money/payment/wallet/cash-out functionality.
+- [x] Complete tasks in order; do not mark a task complete without running its stated validation.
+- [x] Add migrations; never make production schema changes manually.
+- [x] Use secure environment variables and never commit secrets.
+- [x] Commit logical milestones with descriptive messages after tests pass.
 
 ## Phase 0 — Discovery and architecture
 
-- [ ] Inspect repository, package manager, existing app, environment files, lint/typecheck/test scripts, and git status.
-- [ ] Write/refresh README with local setup, required environment variables, commands, and architecture summary.
-- [ ] Confirm Next.js + TypeScript strict mode baseline or scaffold it without overwriting unrelated work.
-- [ ] Install only required dependencies: Tailwind, shadcn/ui, Supabase clients, validation library, state/query tooling, testing tools, React Three Fiber/Three.js/Rapier, and i18n tooling.
-- [ ] Define module boundaries for player app, admin app, shared UI, game engine, ledger, database, and localization.
-- [ ] Create environment schema validation; include public Supabase URL/anon key only and server-only variables separately.
-- [ ] Run lint, typecheck, tests, and production build; record baseline failures before proceeding.
+- [x] Inspect repository, package manager, existing app, environment files, lint/typecheck/test scripts, and git status.
+- [x] Write/refresh README with local setup, required environment variables, commands, and architecture summary.
+- [x] Confirm Next.js + TypeScript strict mode baseline or scaffold it without overwriting unrelated work.
+- [x] Install only required dependencies: Tailwind, shadcn/ui, Supabase clients, validation library, state/query tooling, testing tools, React Three Fiber/Three.js/Rapier, and i18n tooling.
+- [x] Define module boundaries for player app, admin app, shared UI, game engine, ledger, database, and localization.
+- [x] Create environment schema validation; include public Supabase URL/anon key only and server-only variables separately.
+- [x] Run lint, typecheck, tests, and production build; record baseline failures before proceeding.
 
 ## Phase 1 — Database and Supabase foundation
 
-- [ ] Create Supabase project configuration and typed client helpers for browser, server, and admin-safe server routes.
-- [ ] Create migrations for profiles, verified contact fields, avatar metadata, user settings, status, and last-activity data.
-- [ ] Create migrations for admin roles, granular permissions, role assignments, admin PIN/2FA metadata, and approval limits.
-- [ ] Create immutable ledger, balance projection, credit request, credit request review, and daily reward/streak tables.
-- [ ] Create migrations for games, game versions/configurations, game release lifecycle, feature flags, rounds, bets, outcomes, and receipts.
-- [ ] Create migrations for announcements, notifications, tickets/messages/attachments, missions, achievements, leaderboard projections, friends/invites, and QA accounts.
-- [ ] Create migrations for audit log, system settings, asset metadata, maintenance state, and operational health events.
-- [ ] Add indexes, foreign keys, check constraints, enum/status constraints, timestamps, and soft-delete policy where appropriate.
-- [ ] Implement Row Level Security for every table and Storage bucket.
-- [ ] Add Storage policies for avatar, ticket attachment, and game asset buckets.
-- [ ] Generate database types and verify migration up/down or local reset succeeds.
-- [ ] Write RLS tests proving player isolation and least-privilege administrator access.
+- [x] Create Supabase project configuration and typed client helpers for browser, server, and admin-safe server routes.
+- [x] Create migrations for profiles, verified contact fields, avatar metadata, user settings, status, and last-activity data.
+- [x] Create migrations for admin roles, granular permissions, role assignments, admin PIN/2FA metadata, and approval limits.
+- [x] Create immutable ledger, balance projection, credit request, credit request review, and daily reward/streak tables.
+- [x] Create migrations for games, game versions/configurations, game release lifecycle, feature flags, rounds, bets, outcomes, and receipts.
+- [x] Create migrations for announcements, notifications, tickets/messages/attachments, missions, achievements, leaderboard projections, friends/invites, and QA accounts.
+- [x] Create migrations for audit log, system settings, asset metadata, maintenance state, and operational health events.
+- [x] Add indexes, foreign keys, check constraints, enum/status constraints, timestamps, and soft-delete policy where appropriate.
+- [x] Implement Row Level Security for every table and Storage bucket.
+- [x] Add Storage policies for avatar, ticket attachment, and game asset buckets.
+- [x] Generate database types and verify migration up/down or local reset succeeds.
+- [x] Write RLS tests proving player isolation and least-privilege administrator access.
 
 ## Phase 2 — Authentication and account lifecycle
 
-- [ ] Build Welcome, registration, login, logout, password reset, and session-expiry flows.
-- [ ] Support email and phone registration/login with OTP verification of at least one contact before play.
-- [ ] Build nickname validation, preset avatar selection, safe avatar upload/crop/validation, and fallback avatar.
-- [ ] Enforce one account per verified email/phone and explain conflicts clearly.
-- [ ] Create verified-player welcome-credit ledger flow that runs exactly once.
-- [ ] Build Profile/Settings page with language, sound volume/pack, graphics settings, and account controls.
-- [ ] Add self-service account deletion request flow that preserves required ledger/audit records.
-- [ ] Add player status enforcement for active, suspended, and banned accounts.
-- [ ] Test login, OTP, reset, profile, avatar, suspension, and account deletion paths.
+- [x] Build Welcome, registration, login, logout, password reset, and session-expiry flows.
+- [x] Support email and phone registration/login with OTP verification of at least one contact before play.
+- [x] Build nickname validation, preset avatar selection, safe avatar upload/crop/validation, and fallback avatar.
+- [x] Enforce one account per verified email/phone and explain conflicts clearly.
+- [x] Create verified-player welcome-credit ledger flow that runs exactly once.
+- [x] Build Profile/Settings page with language, sound volume/pack, graphics settings, and account controls.
+- [x] Add self-service account deletion request flow that preserves required ledger/audit records.
+- [x] Add player status enforcement for active, suspended, and banned accounts.
+- [x] Test login, OTP, reset, profile, avatar, suspension, and account deletion paths.
 
 ## Phase 3 — Design system, responsive shell, and localization
 
-- [ ] Create GIKGOK brand tokens: deep green base, lime accent, rounded surfaces, typography, spacing, elevation, states, and chart/status colors.
-- [ ] Implement Light and Dark mode preserving green brand identity.
-- [ ] Implement Owner-controlled system accent theme (red/white, blue/white, yellow/gray); prevent player theme changes.
-- [ ] Build responsive player shell: phone bottom navigation, tablet compact navigation, desktop layout.
-- [ ] Build responsive admin shell with secure `/admin` route and desktop-first data layouts.
-- [ ] Implement Lao and English translation catalogs for all user-facing text, validation, empty states, and admin UI.
-- [ ] Structure localization so Thai can be added without refactoring.
-- [ ] Build accessible shared components: buttons, inputs, dialogs, cards, tables, filters, toasts, loading/error states, and pagination.
-- [ ] Implement reduced motion, keyboard navigation, touch targets, focus management, and contrast checks.
-- [ ] Build sound manager with Classic Casino, Arcade, Silent, volume, preload/lazy-load strategy, and mute behavior.
-- [ ] Validate layouts at phone, tablet, and desktop breakpoints in both languages and both modes.
+- [x] Create GIKGOK brand tokens: deep green base, lime accent, rounded surfaces, typography, spacing, elevation, states, and chart/status colors.
+- [x] Implement Light and Dark mode preserving green brand identity.
+- [x] Implement Owner-controlled system accent theme (red/white, blue/white, yellow/gray); prevent player theme changes.
+- [x] Build responsive player shell: phone bottom navigation, tablet compact navigation, desktop layout.
+- [x] Build responsive admin shell with secure `/admin` route and desktop-first data layouts.
+- [x] Implement Lao and English translation catalogs for all user-facing text, validation, empty states, and admin UI.
+- [x] Structure localization so Thai can be added without refactoring.
+- [x] Build accessible shared components: buttons, inputs, dialogs, cards, tables, filters, toasts, loading/error states, and pagination.
+- [x] Implement reduced motion, keyboard navigation, touch targets, focus management, and contrast checks.
+- [x] Build sound manager with Classic Casino, Arcade, Silent, volume, preload/lazy-load strategy, and mute behavior.
+- [x] Validate layouts at phone, tablet, and desktop breakpoints in both languages and both modes.
 
 ## Phase 4 — Ledger, rewards, and credit requests
 
-- [ ] Implement append-only ledger domain layer; prohibit direct client balance mutation.
-- [ ] Implement atomic balance projection and ledger consistency checks.
-- [ ] Implement daily check-in: 5,000 GIK, Day 3 +2,000, Day 7 +10,000, reset streak after missed day, block above 200,000 GIK.
-- [ ] Move all reward values/limits into Owner-editable system configuration.
-- [ ] Build player daily check-in UI with countdown, streak calendar, result receipt, and duplicate-click protection.
-- [ ] Build player demo-credit request UI, validation, history, cancellation rules, and notification updates.
-- [ ] Build admin credit-request review: approve/reject, gross GIK, per-request simulated fee, optional bonus, net GIK, required reason.
-- [ ] Create separate ledger entries for grant, simulated fee, bonus, and adjustments.
-- [ ] Implement configurable two-person approval threshold for large credit adjustments.
-- [ ] Build player ledger/history view with filters and receipt details.
-- [ ] Test concurrent reward/credit-request actions, idempotency, rejected actions, and ledger reconciliation.
+- [x] Implement append-only ledger domain layer; prohibit direct client balance mutation.
+- [x] Implement atomic balance projection and ledger consistency checks.
+- [x] Implement daily check-in: 5,000 GIK, Day 3 +2,000, Day 7 +10,000, reset streak after missed day, block above 200,000 GIK.
+- [x] Move all reward values/limits into Owner-editable system configuration.
+- [x] Build player daily check-in UI with countdown, streak calendar, result receipt, and duplicate-click protection.
+- [x] Build player demo-credit request UI, validation, history, cancellation rules, and notification updates.
+- [x] Build admin credit-request review: approve/reject, gross GIK, per-request simulated fee, optional bonus, net GIK, required reason.
+- [x] Create separate ledger entries for grant, simulated fee, bonus, and adjustments.
+- [x] Implement configurable two-person approval threshold for large credit adjustments.
+- [x] Build player ledger/history view with filters and receipt details.
+- [x] Test concurrent reward/credit-request actions, idempotency, rejected actions, and ledger reconciliation.
 
 ## Phase 5 — Server-authoritative game engine
 
-- [ ] Create central game-definition/configuration interface reusable by current and future games.
-- [ ] Create shared bet validation, idempotency-key, atomic debit/settle, receipt, game-version, and audit services.
-- [ ] Implement secure server/Edge Function settlement; browser must not calculate outcomes, credit, or payouts.
-- [ ] Implement Random Mode default and explicit auditable Controlled Demo Mode selected before a round.
-- [ ] Ensure controlled-demo state appears in admin records and player receipt; never silently alter locked normal rounds.
-- [ ] Implement game availability, feature flags, limits, smooth maintenance closure, and release lifecycle.
-- [ ] Add rate limiting and replay protection for every game endpoint.
-- [ ] Write exhaustive unit tests for validation, settlement, negative balance prevention, duplicate requests, and config version retention.
+- [x] Create central game-definition/configuration interface reusable by current and future games.
+- [x] Create shared bet validation, idempotency-key, atomic debit/settle, receipt, game-version, and audit services.
+- [x] Implement secure server/Edge Function settlement; browser must not calculate outcomes, credit, or payouts.
+- [x] Implement Random Mode default and explicit auditable Controlled Demo Mode selected before a round.
+- [x] Ensure controlled-demo state appears in admin records and player receipt; never silently alter locked normal rounds.
+- [x] Implement game availability, feature flags, limits, smooth maintenance closure, and release lifecycle.
+- [x] Add rate limiting and replay protection for every game endpoint.
+- [x] Write exhaustive unit tests for validation, settlement, negative balance prevention, duplicate requests, and config version retention.
 
 ## Phase 6 — Fish–Prawn–Crab
 
-- [ ] Add versioned Fish–Prawn–Crab game configuration and Lao/English Guide.
-- [ ] Implement server settlement for Single Symbol: one selection, at least one matching die, Total Return x2.
-- [ ] Implement server settlement for Special Pair: two distinct symbols, both must occur, Total Return x10.
-- [ ] Build 2D dice symbols, selection controls, stake input/quick stakes, locked state, result, receipt, and history representation.
-- [ ] Build lazy-loaded optional 3D dice with physics-based visual reveal of the settled server result.
-- [ ] Add Classic Casino/Arcade sound cues and reduce-motion fallback.
-- [ ] Test all winning/losing combinations, invalid pair selections, insufficient balance, double submission, and refresh recovery.
+- [x] Add versioned Fish–Prawn–Crab game configuration and Lao/English Guide.
+- [x] Implement server settlement for Single Symbol: one selection, at least one matching die, Total Return x2.
+- [x] Implement server settlement for Special Pair: two distinct symbols, both must occur, Total Return x10.
+- [x] Build 2D dice symbols, selection controls, stake input/quick stakes, locked state, result, receipt, and history representation.
+- [x] Build lazy-loaded optional 3D dice with physics-based visual reveal of the settled server result.
+- [x] Add Classic Casino/Arcade sound cues and reduce-motion fallback.
+- [x] Test all winning/losing combinations, invalid pair selections, insufficient balance, double submission, and refresh recovery.
 
 ## Phase 7 — High–Low Dice
 
-- [ ] Add versioned High–Low configuration and bilingual Game Guide.
-- [ ] Implement server settlement for Low 3–10 and High 11–18, Total Return x2.
-- [ ] Implement triple override: any triple loses both High and Low.
-- [ ] Build 2D UI, stake controls, locked state, dice/total/triple result explanation, receipt, and history representation.
-- [ ] Build lazy-loaded 3D three-dice physics animation revealing settled result.
-- [ ] Add sound, reduced-motion, graphics quality, and recovery behavior.
-- [ ] Test all totals, all triples, selected side, payout, retries, and disconnected/reconnected flows.
+- [x] Add versioned High–Low configuration and bilingual Game Guide.
+- [x] Implement server settlement for Low 3–10 and High 11–18, Total Return x2.
+- [x] Implement triple override: any triple loses both High and Low.
+- [x] Build 2D UI, stake controls, locked state, dice/total/triple result explanation, receipt, and history representation.
+- [x] Build lazy-loaded 3D three-dice physics animation revealing settled result.
+- [x] Add sound, reduced-motion, graphics quality, and recovery behavior.
+- [x] Test all totals, all triples, selected side, payout, retries, and disconnected/reconnected flows.
 
 ## Phase 8 — Spinning Plate
 
-- [ ] Add versioned 12-slot spinning-plate configuration and bilingual Game Guide.
-- [ ] Configure initial slots/icons and returns: slots 1–4 x2, 5–7 x3, 8–9 x4, 10 x5, 11 x7, 12 x10.
-- [ ] Implement server settlement: exactly one selected slot and exact-match-only win.
-- [ ] Build 2D circular wheel with fixed pointer, selection states, multiplier labels, locked state, and selected/landed highlight.
-- [ ] Build lazy-loaded 3D spinning plate using physics-inspired animation that lands on server-settled slot.
-- [ ] Implement Graphics Auto/2D/3D setting, WebGL detection, low-FPS fallback, and quality controls.
-- [ ] Add sound, reduced-motion, accessibility textual result, and receipt/history display.
-- [ ] Test all 12 slots, multipliers, loss cases, retry/idempotency, fallback renderer, and refresh recovery.
+- [x] Add versioned 12-slot spinning-plate configuration and bilingual Game Guide.
+- [x] Configure initial slots/icons and returns: slots 1–4 x2, 5–7 x3, 8–9 x4, 10 x5, 11 x7, 12 x10.
+- [x] Implement server settlement: exactly one selected slot and exact-match-only win.
+- [x] Build 2D circular wheel with fixed pointer, selection states, multiplier labels, locked state, and selected/landed highlight.
+- [x] Build lazy-loaded 3D spinning plate using physics-inspired animation that lands on server-settled slot.
+- [x] Implement Graphics Auto/2D/3D setting, WebGL detection, low-FPS fallback, and quality controls.
+- [x] Add sound, reduced-motion, accessibility textual result, and receipt/history display.
+- [x] Test all 12 slots, multipliers, loss cases, retry/idempotency, fallback renderer, and refresh recovery.
 
 ## Phase 9 — Player experience and engagement
 
-- [ ] Build Home: balance, daily reward, three game cards, announcements, activity, mission progress, leaderboard preview, achievement preview, support, and settings shortcuts.
-- [ ] Build filterable full bet history with receipt details and random/controlled-demo state.
-- [ ] Implement announcements with targeting, scheduling, read state, and safe dismissal.
-- [ ] Build notifications for verification, rewards, credit requests, tickets, achievements, and announcements.
-- [ ] Implement configurable optional Daily Missions that never require playing every game.
-- [ ] Implement data-driven Achievement/Badge system and player collection view.
-- [ ] Implement leaderboard with tabs for highest credit, cumulative winnings, and most wins; expose nickname/avatar only.
-- [ ] Implement friends/invite privacy-safe flows, blocks/removal, and feature flag control.
-- [ ] Build player Support Tickets, messages, attachment limits, statuses, and satisfaction feedback.
-- [ ] Add responsible-play controls: session-break reminder, owner-configurable limits, voluntary temporary pause, and demo-credit notice.
-- [ ] Test all player pages, empty/error states, notifications, language switching, and mobile accessibility.
+- [x] Build Home: balance, daily reward, three game cards, announcements, activity, mission progress, leaderboard preview, achievement preview, support, and settings shortcuts.
+- [x] Build filterable full bet history with receipt details and random/controlled-demo state.
+- [x] Implement announcements with targeting, scheduling, read state, and safe dismissal.
+- [x] Build notifications for verification, rewards, credit requests, tickets, achievements, and announcements.
+- [x] Implement configurable optional Daily Missions that never require playing every game.
+- [x] Implement data-driven Achievement/Badge system and player collection view.
+- [x] Implement leaderboard with tabs for highest credit, cumulative winnings, and most wins; expose nickname/avatar only.
+- [x] Implement friends/invite privacy-safe flows, blocks/removal, and feature flag control.
+- [x] Build player Support Tickets, messages, attachment limits, statuses, and satisfaction feedback.
+- [x] Add responsible-play controls: session-break reminder, owner-configurable limits, voluntary temporary pause, and demo-credit notice.
+- [x] Test all player pages, empty/error states, notifications, language switching, and mobile accessibility.
 
 ## Phase 10 — Admin Console and real-time operations
 
