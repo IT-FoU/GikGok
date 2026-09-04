@@ -314,6 +314,84 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["credit_requests"]["Insert"]>;
         Relationships: [];
       };
+      credit_request_reviews: {
+        Row: {
+          id: string;
+          credit_request_id: string;
+          reviewer_id: string;
+          decision: CreditRequestStatus;
+          gross_amount: number | null;
+          fee_mode: "percent" | "amount" | null;
+          fee_value: number | null;
+          bonus_amount: number;
+          net_amount: number | null;
+          reason: string;
+          requires_second_approver: boolean;
+          second_approver_id: string | null;
+          second_approved_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          credit_request_id: string;
+          reviewer_id: string;
+          decision: CreditRequestStatus;
+          gross_amount?: number | null;
+          fee_mode?: "percent" | "amount" | null;
+          fee_value?: number | null;
+          bonus_amount?: number;
+          net_amount?: number | null;
+          reason: string;
+          requires_second_approver?: boolean;
+          second_approver_id?: string | null;
+          second_approved_at?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["credit_request_reviews"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      daily_reward_state: {
+        Row: {
+          player_id: string;
+          streak_day: number;
+          last_claim_date: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          player_id: string;
+          streak_day?: number;
+          last_claim_date?: string | null;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["daily_reward_state"]["Insert"]>;
+        Relationships: [];
+      };
+      notifications: {
+        Row: {
+          id: string;
+          player_id: string;
+          kind: string;
+          title_key: string;
+          body_key: string | null;
+          payload: Json;
+          read_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          player_id: string;
+          kind: string;
+          title_key: string;
+          body_key?: string | null;
+          payload?: Json;
+          read_at?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["notifications"]["Insert"]>;
+        Relationships: [];
+      };
       games: {
         Row: {
           id: string;
@@ -505,6 +583,47 @@ export type Database = {
       };
       grant_welcome_credit: {
         Args: { p_user_id?: string };
+        Returns: Json;
+      };
+      get_credit_config: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
+      claim_daily_reward: {
+        Args: { p_user_id?: string; p_today?: string };
+        Returns: Json;
+      };
+      create_credit_request: {
+        Args: {
+          p_amount: number;
+          p_note?: string | null;
+          p_user_id?: string;
+        };
+        Returns: Database["public"]["Tables"]["credit_requests"]["Row"];
+      };
+      cancel_credit_request: {
+        Args: { p_request_id: string; p_user_id?: string };
+        Returns: Database["public"]["Tables"]["credit_requests"]["Row"];
+      };
+      review_credit_request: {
+        Args: {
+          p_request_id: string;
+          p_decision: string;
+          p_reason: string;
+          p_gross_amount?: number | null;
+          p_fee_mode?: string | null;
+          p_fee_value?: number | null;
+          p_bonus_amount?: number | null;
+          p_reviewer_id?: string;
+        };
+        Returns: Json;
+      };
+      second_approve_credit_request: {
+        Args: { p_review_id: string; p_approver_id?: string };
+        Returns: Json;
+      };
+      reconcile_player_balance: {
+        Args: { p_player_id: string };
         Returns: Json;
       };
       request_account_deletion: {

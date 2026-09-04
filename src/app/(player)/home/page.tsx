@@ -94,13 +94,16 @@ export default async function PlayerHomePage() {
 
       <div className="flex flex-wrap gap-3">
         <Button asChild>
-          <Link href="/profile">Profile & settings</Link>
+          <Link href="/credits">Credits & rewards</Link>
         </Button>
         <Button asChild variant="secondary">
-          <Link href="/guide">Game Guide</Link>
+          <Link href="/ledger">Ledger</Link>
         </Button>
         <Button asChild variant="outline">
-          <Link href="/verify">Verify contact</Link>
+          <Link href="/profile">Profile & settings</Link>
+        </Button>
+        <Button asChild variant="ghost">
+          <Link href="/guide">Game Guide</Link>
         </Button>
       </div>
     </main>

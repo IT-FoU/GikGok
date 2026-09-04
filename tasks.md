@@ -63,17 +63,17 @@
 
 ## Phase 4 — Ledger, rewards, and credit requests
 
-- [ ] Implement append-only ledger domain layer; prohibit direct client balance mutation.
-- [ ] Implement atomic balance projection and ledger consistency checks.
-- [ ] Implement daily check-in: 5,000 GIK, Day 3 +2,000, Day 7 +10,000, reset streak after missed day, block above 200,000 GIK.
-- [ ] Move all reward values/limits into Owner-editable system configuration.
-- [ ] Build player daily check-in UI with countdown, streak calendar, result receipt, and duplicate-click protection.
-- [ ] Build player demo-credit request UI, validation, history, cancellation rules, and notification updates.
-- [ ] Build admin credit-request review: approve/reject, gross GIK, per-request simulated fee, optional bonus, net GIK, required reason.
-- [ ] Create separate ledger entries for grant, simulated fee, bonus, and adjustments.
-- [ ] Implement configurable two-person approval threshold for large credit adjustments.
-- [ ] Build player ledger/history view with filters and receipt details.
-- [ ] Test concurrent reward/credit-request actions, idempotency, rejected actions, and ledger reconciliation.
+- [x] Implement append-only ledger domain layer; prohibit direct client balance mutation.
+- [x] Implement atomic balance projection and ledger consistency checks.
+- [x] Implement daily check-in: 5,000 GIK, Day 3 +2,000, Day 7 +10,000, reset streak after missed day, block above 200,000 GIK.
+- [x] Move all reward values/limits into Owner-editable system configuration.
+- [x] Build player daily check-in UI with countdown, streak calendar, result receipt, and duplicate-click protection.
+- [x] Build player demo-credit request UI, validation, history, cancellation rules, and notification updates.
+- [x] Build admin credit-request review: approve/reject, gross GIK, per-request simulated fee, optional bonus, net GIK, required reason.
+- [x] Create separate ledger entries for grant, simulated fee, bonus, and adjustments.
+- [x] Implement configurable two-person approval threshold for large credit adjustments.
+- [x] Build player ledger/history view with filters and receipt details.
+- [x] Test concurrent reward/credit-request actions, idempotency, rejected actions, and ledger reconciliation.
 
 ## Phase 5 — Server-authoritative game engine
 

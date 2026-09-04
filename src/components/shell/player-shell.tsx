@@ -4,10 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   BookOpen,
-  Gamepad2,
   History,
   Home,
   UserRound,
+  Wallet,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -16,10 +16,10 @@ import { useSound } from "@/modules/sound/sound-provider";
 
 const PLAYER_LINKS = [
   { href: "/home", key: "nav.home", icon: Home },
+  { href: "/credits", key: "nav.credits", icon: Wallet },
   { href: "/guide", key: "nav.guide", icon: BookOpen },
-  { href: "/guide#games", key: "nav.games", icon: Gamepad2 },
+  { href: "/ledger", key: "nav.history", icon: History },
   { href: "/profile", key: "nav.profile", icon: UserRound },
-  { href: "/profile#history", key: "nav.history", icon: History },
 ] as const;
 
 const AUTH_PATHS = new Set([
