@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import "./globals.css";
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
     "Private multi-account demo-credit game platform. GIK credits have no cash value.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"

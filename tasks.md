@@ -2,12 +2,12 @@
 
 ## Execution rules
 
-- [ ] Read `requirements.md` completely before changing code.
-- [ ] Inspect the existing repository and preserve unrelated files/changes.
-- [ ] Keep the project demo-credit only; do not add real-money/payment/wallet/cash-out functionality.
+- [x] Read `requirements.md` completely before changing code.
+- [x] Inspect the existing repository and preserve unrelated files/changes.
+- [x] Keep the project demo-credit only; do not add real-money/payment/wallet/cash-out functionality.
 - [ ] Complete tasks in order; do not mark a task complete without running its stated validation.
 - [ ] Add migrations; never make production schema changes manually.
-- [ ] Use secure environment variables and never commit secrets.
+- [x] Use secure environment variables and never commit secrets.
 - [ ] Commit logical milestones with descriptive messages after tests pass.
 
 ## Phase 0 — Discovery and architecture
@@ -18,7 +18,7 @@
 - [x] Install only required dependencies: Tailwind, shadcn/ui, Supabase clients, validation library, state/query tooling, testing tools, React Three Fiber/Three.js/Rapier, and i18n tooling.
 - [x] Define module boundaries for player app, admin app, shared UI, game engine, ledger, database, and localization.
 - [x] Create environment schema validation; include public Supabase URL/anon key only and server-only variables separately.
-- [ ] Run lint, typecheck, tests, and production build; record baseline failures before proceeding.
+- [x] Run lint, typecheck, tests, and production build; record baseline failures before proceeding.
 
 ## Phase 1 — Database and Supabase foundation
 
