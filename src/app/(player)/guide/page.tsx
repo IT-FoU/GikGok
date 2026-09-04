@@ -56,14 +56,22 @@ export default function GuidePage() {
         </Card>
       </section>
 
-      <div id="games" className="grid gap-3">
+      <section id="spinning-plate" className="scroll-mt-24 space-y-3">
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">{t("guide.plate").split(" — ")[0]}</CardTitle>
-            <CardDescription>{t("guide.plate")}</CardDescription>
+            <CardTitle>{t("guide.plateTitle")}</CardTitle>
+            <CardDescription>{t("guide.plateBody")}</CardDescription>
           </CardHeader>
+          <div className="px-6 pb-6">
+            <Link
+              href="/play/spinning-plate"
+              className="text-sm text-[var(--brand-accent)] underline-offset-4 hover:underline"
+            >
+              {t("plate.name")} →
+            </Link>
+          </div>
         </Card>
-      </div>
+      </section>
     </main>
   );
 }

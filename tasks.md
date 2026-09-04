@@ -108,14 +108,14 @@
 
 ## Phase 8 — Spinning Plate
 
-- [ ] Add versioned 12-slot spinning-plate configuration and bilingual Game Guide.
-- [ ] Configure initial slots/icons and returns: slots 1–4 x2, 5–7 x3, 8–9 x4, 10 x5, 11 x7, 12 x10.
-- [ ] Implement server settlement: exactly one selected slot and exact-match-only win.
-- [ ] Build 2D circular wheel with fixed pointer, selection states, multiplier labels, locked state, and selected/landed highlight.
-- [ ] Build lazy-loaded 3D spinning plate using physics-inspired animation that lands on server-settled slot.
-- [ ] Implement Graphics Auto/2D/3D setting, WebGL detection, low-FPS fallback, and quality controls.
-- [ ] Add sound, reduced-motion, accessibility textual result, and receipt/history display.
-- [ ] Test all 12 slots, multipliers, loss cases, retry/idempotency, fallback renderer, and refresh recovery.
+- [x] Add versioned 12-slot spinning-plate configuration and bilingual Game Guide.
+- [x] Configure initial slots/icons and returns: slots 1–4 x2, 5–7 x3, 8–9 x4, 10 x5, 11 x7, 12 x10.
+- [x] Implement server settlement: exactly one selected slot and exact-match-only win.
+- [x] Build 2D circular wheel with fixed pointer, selection states, multiplier labels, locked state, and selected/landed highlight.
+- [x] Build lazy-loaded 3D spinning plate using physics-inspired animation that lands on server-settled slot.
+- [x] Implement Graphics Auto/2D/3D setting, WebGL detection, low-FPS fallback, and quality controls.
+- [x] Add sound, reduced-motion, accessibility textual result, and receipt/history display.
+- [x] Test all 12 slots, multipliers, loss cases, retry/idempotency, fallback renderer, and refresh recovery.
 
 ## Phase 9 — Player experience and engagement
 
