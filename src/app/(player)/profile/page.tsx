@@ -7,6 +7,8 @@ import {
   ProfileForm,
   SettingsForm,
 } from "@/modules/player/profile-forms";
+import { ResponsiblePlaySection } from "@/modules/engagement/ui";
+import { parseResponsiblePlayConfig } from "@/modules/engagement/helpers";
 import {
   logoutAction,
   requestDeletionAction,
@@ -30,18 +32,22 @@ export default async function ProfilePage() {
     redirect("/login");
   }
 
-  const [{ data: profile }, { data: settings }] = await Promise.all([
-    supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
-    supabase
-      .from("user_settings")
-      .select("*")
-      .eq("user_id", user.id)
-      .maybeSingle(),
-  ]);
+  const [{ data: profile }, { data: settings }, { data: responsibleRaw }] =
+    await Promise.all([
+      supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
+      supabase
+        .from("user_settings")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle(),
+      supabase.rpc("get_responsible_play_config"),
+    ]);
 
   if (!profile) {
     redirect("/register");
   }
+
+  const responsible = parseResponsiblePlayConfig(responsibleRaw);
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-8">
@@ -103,6 +109,12 @@ export default async function ProfilePage() {
           }}
         />
       </section>
+
+      <ResponsiblePlaySection
+        config={responsible}
+        sessionStartedAt={profile.session_started_at}
+        playPausedUntil={profile.play_paused_until}
+      />
 
       <section className="space-y-3">
         <h2 className="text-xl font-medium text-red-300">Danger zone</h2>

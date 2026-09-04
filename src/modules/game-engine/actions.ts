@@ -82,6 +82,11 @@ export async function placeBetAction(input: {
     return { ok: false, message: validation.message };
   }
 
+  const { error: playError } = await supabase.rpc("assert_play_allowed");
+  if (playError) {
+    return { ok: false, message: asMessage(playError) };
+  }
+
   const { data, error } = await supabase.rpc("place_and_settle_bet", {
     p_game_id: gameId,
     p_stake: input.stake,
@@ -93,9 +98,22 @@ export async function placeBetAction(input: {
     return { ok: false, message: asMessage(error) };
   }
 
+  const payload = (data ?? {}) as { replay?: boolean };
+  if (!payload.replay) {
+    try {
+      await supabase.rpc("record_mission_progress", { p_game_id: gameId });
+      await supabase.rpc("unlock_achievement", { p_code: "first_bet" });
+    } catch {
+      // Mission/achievement side effects must not fail the bet.
+    }
+  }
+
   revalidatePath("/home");
   revalidatePath("/credits");
   revalidatePath("/ledger");
+  revalidatePath("/history");
+  revalidatePath("/missions");
+  revalidatePath("/achievements");
   revalidatePath(`/play/${gameId}`);
 
   return {

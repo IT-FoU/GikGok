@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  BookOpen,
+  Bell,
   History,
   Home,
   UserRound,
@@ -16,9 +16,9 @@ import { useSound } from "@/modules/sound/sound-provider";
 
 const PLAYER_LINKS = [
   { href: "/home", key: "nav.home", icon: Home },
+  { href: "/history", key: "nav.history", icon: History },
   { href: "/credits", key: "nav.credits", icon: Wallet },
-  { href: "/guide", key: "nav.guide", icon: BookOpen },
-  { href: "/ledger", key: "nav.history", icon: History },
+  { href: "/notifications", key: "nav.notifications", icon: Bell },
   { href: "/profile", key: "nav.profile", icon: UserRound },
 ] as const;
 
