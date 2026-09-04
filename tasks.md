@@ -12,12 +12,12 @@
 
 ## Phase 0 — Discovery and architecture
 
-- [ ] Inspect repository, package manager, existing app, environment files, lint/typecheck/test scripts, and git status.
-- [ ] Write/refresh README with local setup, required environment variables, commands, and architecture summary.
-- [ ] Confirm Next.js + TypeScript strict mode baseline or scaffold it without overwriting unrelated work.
-- [ ] Install only required dependencies: Tailwind, shadcn/ui, Supabase clients, validation library, state/query tooling, testing tools, React Three Fiber/Three.js/Rapier, and i18n tooling.
-- [ ] Define module boundaries for player app, admin app, shared UI, game engine, ledger, database, and localization.
-- [ ] Create environment schema validation; include public Supabase URL/anon key only and server-only variables separately.
+- [x] Inspect repository, package manager, existing app, environment files, lint/typecheck/test scripts, and git status.
+- [x] Write/refresh README with local setup, required environment variables, commands, and architecture summary.
+- [x] Confirm Next.js + TypeScript strict mode baseline or scaffold it without overwriting unrelated work.
+- [x] Install only required dependencies: Tailwind, shadcn/ui, Supabase clients, validation library, state/query tooling, testing tools, React Three Fiber/Three.js/Rapier, and i18n tooling.
+- [x] Define module boundaries for player app, admin app, shared UI, game engine, ledger, database, and localization.
+- [x] Create environment schema validation; include public Supabase URL/anon key only and server-only variables separately.
 - [ ] Run lint, typecheck, tests, and production build; record baseline failures before proceeding.
 
 ## Phase 1 — Database and Supabase foundation
