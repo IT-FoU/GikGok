@@ -23,6 +23,10 @@
 # misc
 .DS_Store
 *.pem
+/backups/
+/test-results/
+/playwright-report/
+/blob-report/
 
 # debug
 npm-debug.log*

@@ -149,17 +149,17 @@
 
 ## Phase 11 — Security, performance, QA, and release
 
-- [ ] Audit all RLS policies, API/Edge Function authorization, input schemas, rate limits, and secret exposure.
-- [ ] Add secure headers, CSRF/origin protections where applicable, file validation, and dependency/security checks.
-- [ ] Implement structured error logging, operational health events, and user-safe error boundaries.
-- [ ] Add database backup/export procedure and documented recovery drill.
-- [ ] Optimize assets: lazy-load 3D/physics/audio, cache static files, compress textures/audio, and set performance budgets.
-- [ ] Verify 2D fallback on no-WebGL and lower-capability mobile environments.
-- [ ] Run Vitest suites for ledger, rewards, permissions, every game rule, config versions, and concurrency/idempotency.
-- [ ] Run Playwright end-to-end suites for register/verify, daily reward, request approval, three games, history, admin operations, and security boundaries.
+- [x] Audit all RLS policies, API/Edge Function authorization, input schemas, rate limits, and secret exposure.
+- [x] Add secure headers, CSRF/origin protections where applicable, file validation, and dependency/security checks.
+- [x] Implement structured error logging, operational health events, and user-safe error boundaries.
+- [x] Add database backup/export procedure and documented recovery drill.
+- [x] Optimize assets: lazy-load 3D/physics/audio, cache static files, compress textures/audio, and set performance budgets.
+- [x] Verify 2D fallback on no-WebGL and lower-capability mobile environments.
+- [x] Run Vitest suites for ledger, rewards, permissions, every game rule, config versions, and concurrency/idempotency.
+- [x] Run Playwright end-to-end suites for register/verify, daily reward, request approval, three games, history, admin operations, and security boundaries.
 - [ ] Perform manual QA on current iOS Safari, Android Chrome, tablet, and desktop browsers in Light/Dark modes and Lao/English.
-- [ ] Add PWA manifest, icons, service worker strategy, offline-shell behavior, and install QA after responsive web passes.
-- [ ] Configure staging deployment, production environment variables, migration release process, and rollback procedure.
-- [ ] Run final lint, typecheck, tests, build, migration verification, security review, and deployment smoke tests.
-- [ ] Update README/runbook with architecture, setup, deployment, backup/recovery, admin onboarding, and known limitations.
-- [ ] Deliver final report: commits, changed files, validation commands/results, deployed URL, and remaining follow-ups.
+- [x] Add PWA manifest, icons, service worker strategy, offline-shell behavior, and install QA after responsive web passes.
+- [x] Configure staging deployment, production environment variables, migration release process, and rollback procedure.
+- [x] Run final lint, typecheck, tests, build, migration verification, security review, and deployment smoke tests.
+- [x] Update README/runbook with architecture, setup, deployment, backup/recovery, admin onboarding, and known limitations.
+- [x] Deliver final report: commits, changed files, validation commands/results, deployed URL, and remaining follow-ups.

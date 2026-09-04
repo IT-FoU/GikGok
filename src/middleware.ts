@@ -10,6 +10,9 @@ const PUBLIC_PATHS = new Set([
   "/forgot-password",
   "/account-status",
   "/guide",
+  "/api/health",
+  "/manifest.webmanifest",
+  "/sw.js",
 ]);
 
 const AUTH_ONLY_PATHS = new Set([

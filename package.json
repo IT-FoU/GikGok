@@ -11,9 +11,11 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test",
+    "test:e2e": "npm run build:ci && playwright test",
     "format": "prettier --write .",
     "db:validate": "bash scripts/db-validate.sh",
+    "db:backup": "bash scripts/db-backup.sh",
+    "security:check": "bash scripts/security-check.sh",
     "db:types": "supabase gen types typescript --local -o src/lib/supabase/types.ts"
   },
   "dependencies": {

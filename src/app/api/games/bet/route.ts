@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { Json } from "@/lib/supabase/types";
+import { logEvent } from "@/lib/observability/logger";
+import {
+  assertSameOrigin,
+  sanitizeUserErrorMessage,
+} from "@/lib/security";
 import {
   GAME_BET_RATE_LIMIT,
   checkRateLimit,
@@ -17,6 +22,14 @@ const GAME_IDS: GameId[] = ["fish-prawn-crab", "high-low", "spinning-plate"];
  * Body never includes client-computed outcomes or payouts.
  */
 export async function POST(request: Request) {
+  const originCheck = assertSameOrigin(request, {
+    allowMissingInDev: true,
+  });
+  if (!originCheck.ok) {
+    logEvent("warn", "bet.origin_denied", { reason: originCheck.reason });
+    return NextResponse.json({ error: "Forbidden origin" }, { status: 403 });
+  }
+
   let body: {
     gameId?: string;
     stake?: number;
@@ -85,6 +98,14 @@ export async function POST(request: Request) {
     );
   }
 
+  const { error: playError } = await supabase.rpc("assert_play_allowed");
+  if (playError) {
+    return NextResponse.json(
+      { error: sanitizeUserErrorMessage(playError.message, "Play not allowed.") },
+      { status: 403 },
+    );
+  }
+
   const { data, error } = await supabase.rpc("place_and_settle_bet", {
     p_game_id: gameId,
     p_stake: body.stake,
@@ -93,8 +114,16 @@ export async function POST(request: Request) {
   });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    logEvent("warn", "bet.settle_failed", {
+      gameId,
+      code: error.code ?? null,
+    });
+    return NextResponse.json(
+      { error: sanitizeUserErrorMessage(error.message) },
+      { status: 400 },
+    );
   }
 
+  logEvent("info", "bet.settled", { gameId, userId: user.id.slice(0, 8) });
   return NextResponse.json({ ok: true, result: data });
 }
