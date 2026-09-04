@@ -20,7 +20,6 @@ const AUTH_ONLY_PATHS = new Set([
 
 function isPublicPath(pathname: string): boolean {
   if (PUBLIC_PATHS.has(pathname)) return true;
-  if (pathname.startsWith("/admin")) return true;
   return false;
 }
 
@@ -65,6 +64,14 @@ export async function middleware(request: NextRequest) {
   }
 
   if (!isPublicPath(pathname) && !user) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    url.searchParams.set("next", pathname);
+    return NextResponse.redirect(url);
+  }
+
+  // Admin console: require authenticated session; active-admin check is in layout.
+  if (pathname.startsWith("/admin") && !user && pathname !== "/admin/access-denied") {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.searchParams.set("next", pathname);

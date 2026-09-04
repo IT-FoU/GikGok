@@ -133,19 +133,19 @@
 
 ## Phase 10 — Admin Console and real-time operations
 
-- [ ] Secure `/admin` routing, session checks, admin PIN for sensitive actions, 2FA enforcement, and permission guards.
-- [ ] Build Owner admin-management UI: create admins, assign roles, override granular permissions, disable accounts, and review assignments.
-- [ ] Build admin dashboard with near-real-time operational presence, pending queues, game status, latest activity, and error/health summary.
-- [ ] Build Players module with search, profile, status changes, activity view, safe suspension/ban, and player ledger access by permission.
-- [ ] Build Credit Requests/Ledger module with approval workflow, adjustment limits, second approval, and receipts.
-- [ ] Build Game Control module: random/controlled-demo pre-round setup, availability, limits, smooth maintenance close, and sound controls.
-- [ ] Build Game Configuration module with versioned configs, wheel icons/payouts, rules presentation, and future-round-only changes.
-- [ ] Build Game Release Workflow with Draft, QA, Owner Approved, Scheduled, Live, Disabled states; Owner-only final approval.
-- [ ] Build Announcement, Ticket, Mission, Badge, Leaderboard, Feature Flag, Asset, and System Settings modules.
-- [ ] Build QA/Demo Account tools isolated from ordinary player analytics and ledger reporting.
-- [ ] Build audit log search/filter/export with actor, action, target, before/after, reason, approval chain, and timestamp.
-- [ ] Build reports for players, games, credits, activity, support, and system operations; permission-check every export.
-- [ ] Test every permission boundary, approval rule, audit event, maintenance transition, and concurrent admin action.
+- [x] Secure `/admin` routing, session checks, admin PIN for sensitive actions, 2FA enforcement, and permission guards.
+- [x] Build Owner admin-management UI: create admins, assign roles, override granular permissions, disable accounts, and review assignments.
+- [x] Build admin dashboard with near-real-time operational presence, pending queues, game status, latest activity, and error/health summary.
+- [x] Build Players module with search, profile, status changes, activity view, safe suspension/ban, and player ledger access by permission.
+- [x] Build Credit Requests/Ledger module with approval workflow, adjustment limits, second approval, and receipts.
+- [x] Build Game Control module: random/controlled-demo pre-round setup, availability, limits, smooth maintenance close, and sound controls.
+- [x] Build Game Configuration module with versioned configs, wheel icons/payouts, rules presentation, and future-round-only changes.
+- [x] Build Game Release Workflow with Draft, QA, Owner Approved, Scheduled, Live, Disabled states; Owner-only final approval.
+- [x] Build Announcement, Ticket, Mission, Badge, Leaderboard, Feature Flag, Asset, and System Settings modules.
+- [x] Build QA/Demo Account tools isolated from ordinary player analytics and ledger reporting.
+- [x] Build audit log search/filter/export with actor, action, target, before/after, reason, approval chain, and timestamp.
+- [x] Build reports for players, games, credits, activity, support, and system operations; permission-check every export.
+- [x] Test every permission boundary, approval rule, audit event, maintenance transition, and concurrent admin action.
 
 ## Phase 11 — Security, performance, QA, and release
 

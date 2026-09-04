@@ -24,7 +24,16 @@
     "settings": "Settings",
     "signIn": "Sign in",
     "signOut": "Sign out",
-    "createAccount": "Create account"
+    "createAccount": "Create account",
+    "admins": "Admins",
+    "announcements": "Announcements",
+    "audit": "Audit",
+    "reports": "Reports",
+    "flags": "Flags",
+    "assets": "Assets",
+    "qa": "QA",
+    "releases": "Releases",
+    "config": "Config"
   },
   "welcome": {
     "eyebrow": "Demo credits only",
@@ -189,8 +198,20 @@
   },
   "admin": {
     "title": "Admin console",
-    "body": "Secure admin routing, permissions, and operational modules continue in later phases. This shell reserves the /admin boundary.",
-    "desktopHint": "Desktop-first data layouts for operations."
+    "body": "Secure operations console with permission guards, PIN/2FA for sensitive actions, and audited workflows. Demo GIK credits only.",
+    "desktopHint": "Desktop-first data layouts for operations.",
+    "nav": {
+      "admins": "Admins",
+      "announcements": "Announcements",
+      "missions": "Missions",
+      "flags": "Flags",
+      "assets": "Assets",
+      "qa": "QA / Demo",
+      "audit": "Audit log",
+      "reports": "Reports",
+      "releases": "Releases",
+      "config": "Game config"
+    }
   },
   "status": {
     "suspendedTitle": "Account suspended",

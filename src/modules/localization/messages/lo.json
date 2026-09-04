@@ -24,7 +24,16 @@
     "settings": "ຕັ້ງຄ່າ",
     "signIn": "ເຂົ້າສູ່ລະບົບ",
     "signOut": "ອອກຈາກລະບົບ",
-    "createAccount": "ສ້າງບັນຊີ"
+    "createAccount": "ສ້າງບັນຊີ",
+    "admins": "ແອດມິນ",
+    "announcements": "ປະກາດ",
+    "audit": "ອອດິດ",
+    "reports": "ລາຍງານ",
+    "flags": "ທຸງຟີເຈີ",
+    "assets": "ຊັບສິນ",
+    "qa": "QA",
+    "releases": "ການປ່ອຍ",
+    "config": "ຕັ້ງຄ່າເກມ"
   },
   "welcome": {
     "eyebrow": "ຄຣດິດທົດສອບເທົ່ານັ້ນ",
@@ -189,8 +198,20 @@
   },
   "admin": {
     "title": "ຄອນໂຊລແອດມິນ",
-    "body": "ເສັ້ນທາງແອດມິນແບບປອດໄພ ແລະ ໂມດູນດຳເນີນການຈະມາໃນເຟສຕໍ່ໄປ.",
-    "desktopHint": "ໂຄງຮ່າງຂໍ້ມູນແບບ desktop-first ສຳລັບການດຳເນີນການ."
+    "body": "ຄອນໂຊລດຳເນີນການທີ່ປອດໄພ ມີການກວດສິດ PIN/2FA ແລະ ບັນທຶກ audit. ໃຊ້ຄຣດິດ GIK ທົດສອບເທົ່ານັ້ນ.",
+    "desktopHint": "ໂຄງຮ່າງຂໍ້ມູນແບບ desktop-first ສຳລັບການດຳເນີນການ.",
+    "nav": {
+      "admins": "ແອດມິນ",
+      "announcements": "ປະກາດ",
+      "missions": "ພາລະกิจ",
+      "flags": "ທຸງຟີເຈີ",
+      "assets": "ຊັບສິນ",
+      "qa": "QA / Demo",
+      "audit": "ບັນທຶກອອດິດ",
+      "reports": "ລາຍງານ",
+      "releases": "ການປ່ອຍ",
+      "config": "ຕັ້ງຄ່າເກມ"
+    }
   },
   "status": {
     "suspendedTitle": "ບັນຊີຖືກລະງັບ",
