@@ -489,6 +489,32 @@ export type Database = {
         Args: { p_permission: string; p_user_id?: string };
         Returns: boolean;
       };
+      ensure_player_profile: {
+        Args: {
+          p_user_id: string;
+          p_nickname: string;
+          p_email?: string | null;
+          p_phone?: string | null;
+          p_avatar_preset_id?: string | null;
+        };
+        Returns: Database["public"]["Tables"]["profiles"]["Row"];
+      };
+      mark_contact_verified: {
+        Args: { p_channel: string; p_user_id?: string };
+        Returns: Database["public"]["Tables"]["profiles"]["Row"];
+      };
+      grant_welcome_credit: {
+        Args: { p_user_id?: string };
+        Returns: Json;
+      };
+      request_account_deletion: {
+        Args: { p_reason?: string | null; p_user_id?: string };
+        Returns: Database["public"]["Tables"]["profiles"]["Row"];
+      };
+      get_player_access_state: {
+        Args: { p_user_id?: string };
+        Returns: Json;
+      };
     };
     Enums: {
       player_status: PlayerStatus;

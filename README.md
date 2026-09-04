@@ -67,6 +67,7 @@ See [docs/architecture.md](docs/architecture.md) for module boundaries:
 - **Localization** — `src/modules/localization`
 
 Database foundation details: [docs/phase-1-database.md](docs/phase-1-database.md).
+Auth lifecycle details: [docs/phase-2-auth.md](docs/phase-2-auth.md).
 
 Product requirements: [requirements.md](requirements.md).  
 Task plan: [tasks.md](tasks.md).
