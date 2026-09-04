@@ -22,3 +22,13 @@ NEXT_PUBLIC_SUPABASE_URL=https://example.supabase.co \
 NEXT_PUBLIC_SUPABASE_ANON_KEY=public-anon-key \
 npm run build
 ```
+
+
+## Results (2026-09-04)
+
+| Command | Result |
+|---------|--------|
+| `npm run lint` | pass |
+| `npm run typecheck` | pass |
+| `npm test` | pass (21 tests) |
+| `npm run build` | pass |
