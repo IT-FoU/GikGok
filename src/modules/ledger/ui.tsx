@@ -37,13 +37,12 @@ function ResultMessage({ state }: { state: ActionResult | null }) {
 export function DailyCheckInCard({
   config,
   streakDay,
-  lastClaimDate,
   balance,
   claimedToday,
 }: {
   config: CreditConfig;
   streakDay: number;
-  lastClaimDate: string | null;
+  lastClaimDate?: string | null;
   balance: number;
   claimedToday: boolean;
 }) {
