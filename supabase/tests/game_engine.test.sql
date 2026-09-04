@@ -20,7 +20,7 @@ DECLARE
   result1 jsonb;
   result2 jsonb;
   result3 jsonb;
-  balance bigint;
+  player_balance bigint;
   receipt_mode text;
   version_id uuid;
   round_id uuid;
@@ -40,8 +40,8 @@ BEGIN
     player_id, entry_type, amount, balance_after, source_type, reason
   ) VALUES (player, 'admin_adjustment', 50000, 0, 'admin', 'test top-up');
 
-  SELECT balance INTO balance FROM public.player_balances WHERE player_id = player;
-  PERFORM public.test_assert(balance >= 50000, 'player funded');
+  SELECT pb.balance INTO player_balance FROM public.player_balances pb WHERE pb.player_id = player;
+  PERFORM public.test_assert(player_balance >= 50000, 'player funded');
 
   -- Random FPC bet
   result1 := public.place_and_settle_bet(

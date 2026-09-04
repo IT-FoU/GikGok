@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import type { Json } from "@/lib/supabase/types";
 import {
   GAME_BET_RATE_LIMIT,
   checkRateLimit,
@@ -87,7 +88,7 @@ export async function POST(request: Request) {
   const { data, error } = await supabase.rpc("place_and_settle_bet", {
     p_game_id: gameId,
     p_stake: body.stake,
-    p_selection: body.selection,
+    p_selection: body.selection as Json,
     p_idempotency_key: body.idempotencyKey,
   });
 

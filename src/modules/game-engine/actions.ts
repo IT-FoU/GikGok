@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import type { Json } from "@/lib/supabase/types";
 import type { ActionResult } from "@/modules/player/auth-shared";
 
 import {
@@ -84,7 +85,7 @@ export async function placeBetAction(input: {
   const { data, error } = await supabase.rpc("place_and_settle_bet", {
     p_game_id: gameId,
     p_stake: input.stake,
-    p_selection: input.selection,
+    p_selection: input.selection as Json,
     p_idempotency_key: input.idempotencyKey,
   });
 
@@ -132,7 +133,7 @@ export async function openGameRoundAction(formData: FormData): Promise<ActionRes
   const { data, error } = await supabase.rpc("open_game_round", {
     p_game_id: gameId,
     p_settlement_mode: mode,
-    p_controlled_demo_payload: controlledPayload,
+    p_controlled_demo_payload: controlledPayload as Json | null,
   });
 
   if (error) {
