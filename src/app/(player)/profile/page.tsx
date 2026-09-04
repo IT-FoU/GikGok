@@ -15,6 +15,7 @@ import {
   uploadAvatarAction,
 } from "@/modules/player/actions";
 import { Button } from "@/components/ui/button";
+import { AppearanceControls } from "@/components/appearance-controls";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -43,7 +44,7 @@ export default async function ProfilePage() {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-8 px-6 py-12">
+    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-8">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-sm text-[var(--brand-muted)]">
@@ -51,7 +52,7 @@ export default async function ProfilePage() {
               ← Home
             </Link>
           </p>
-          <h1 className="text-3xl font-semibold text-[var(--brand-accent)]">
+          <h1 className="font-display text-3xl font-semibold text-[var(--brand-accent)]">
             Profile & settings
           </h1>
         </div>
@@ -62,8 +63,10 @@ export default async function ProfilePage() {
         </form>
       </div>
 
+      <AppearanceControls />
+
       <section className="space-y-3">
-        <h2 className="text-xl font-medium">Profile</h2>
+        <h2 className="font-display text-xl font-medium">Profile</h2>
         <p className="text-sm text-[var(--brand-muted)]">
           Status: {profile.status}
           {profile.email_verified_at || profile.phone_verified_at

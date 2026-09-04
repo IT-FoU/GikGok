@@ -1,16 +1,100 @@
 {
   "app": {
     "name": "GIKGOK",
-    "tagline": "Demo-credit game platform"
+    "tagline": "Demo-credit game platform",
+    "demoNotice": "GIK credits are demo credits only. They have no cash value."
   },
   "nav": {
     "home": "Home",
     "games": "Games",
     "history": "History",
     "profile": "Profile",
-    "admin": "Admin"
+    "guide": "Guide",
+    "admin": "Admin",
+    "dashboard": "Dashboard",
+    "players": "Players",
+    "credits": "Credits",
+    "tickets": "Tickets",
+    "settings": "Settings",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "createAccount": "Create account"
+  },
+  "welcome": {
+    "eyebrow": "Demo credits only",
+    "headline": "GIKGOK",
+    "body": "A private, mobile-first game platform using GIK demo credits. No real-money deposits, cash-out, or wallets — ever.",
+    "deleted": "Account deletion requested. Ledger and audit records are preserved."
+  },
+  "auth": {
+    "createAccount": "Create account",
+    "signIn": "Sign in",
+    "verifyTitle": "Verify contact",
+    "verifyBody": "Enter the OTP sent to your contact. At least one verified contact is required before playing.",
+    "forgotTitle": "Reset password",
+    "resetTitle": "Choose a new password",
+    "email": "Email",
+    "phone": "Phone",
+    "password": "Password",
+    "nickname": "Nickname",
+    "otp": "6-digit code"
+  },
+  "home": {
+    "greeting": "Welcome, {name}",
+    "balance": "Balance: {amount} GIK (demo credits only)",
+    "verifyHint": "Verify your contact to unlock play and welcome credit."
+  },
+  "profile": {
+    "title": "Profile & settings",
+    "preferences": "Preferences",
+    "avatarUpload": "Avatar upload",
+    "dangerZone": "Danger zone",
+    "language": "Language",
+    "soundPack": "Sound pack",
+    "graphics": "Graphics",
+    "quality": "Quality"
+  },
+  "guide": {
+    "title": "Game Guide",
+    "body": "Browse without signing in. Playing requires a verified account. GIK credits are demo credits only and have no cash value.",
+    "fpc": "Fish–Prawn–Crab — symbol dice with Single Symbol and Special Pair bets",
+    "highlow": "High–Low Dice — predict high or low; triples lose both sides",
+    "plate": "Spinning Plate — pick one of twelve slots and land exactly"
+  },
+  "admin": {
+    "title": "Admin console",
+    "body": "Secure admin routing, permissions, and operational modules continue in later phases. This shell reserves the /admin boundary.",
+    "desktopHint": "Desktop-first data layouts for operations."
+  },
+  "status": {
+    "suspendedTitle": "Account suspended",
+    "bannedTitle": "Account banned",
+    "deletionTitle": "Deletion requested"
   },
   "common": {
-    "demoNotice": "GIK credits are demo credits only. They have no cash value."
+    "loading": "Loading…",
+    "error": "Something went wrong",
+    "empty": "Nothing here yet",
+    "retry": "Try again",
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "noResults": "No results found"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Enter a valid email",
+    "invalidPhone": "Use E.164 phone format",
+    "nicknameTaken": "That nickname is already taken"
+  },
+  "sound": {
+    "classic": "Classic Casino",
+    "arcade": "Arcade",
+    "silent": "Silent",
+    "muted": "Muted"
   }
 }

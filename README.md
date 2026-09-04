@@ -68,6 +68,7 @@ See [docs/architecture.md](docs/architecture.md) for module boundaries:
 
 Database foundation details: [docs/phase-1-database.md](docs/phase-1-database.md).
 Auth lifecycle details: [docs/phase-2-auth.md](docs/phase-2-auth.md).
+Design system details: [docs/phase-3-design.md](docs/phase-3-design.md).
 
 Product requirements: [requirements.md](requirements.md).  
 Task plan: [tasks.md](tasks.md).

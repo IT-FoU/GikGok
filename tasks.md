@@ -49,17 +49,17 @@
 
 ## Phase 3 — Design system, responsive shell, and localization
 
-- [ ] Create GIKGOK brand tokens: deep green base, lime accent, rounded surfaces, typography, spacing, elevation, states, and chart/status colors.
-- [ ] Implement Light and Dark mode preserving green brand identity.
-- [ ] Implement Owner-controlled system accent theme (red/white, blue/white, yellow/gray); prevent player theme changes.
-- [ ] Build responsive player shell: phone bottom navigation, tablet compact navigation, desktop layout.
-- [ ] Build responsive admin shell with secure `/admin` route and desktop-first data layouts.
-- [ ] Implement Lao and English translation catalogs for all user-facing text, validation, empty states, and admin UI.
-- [ ] Structure localization so Thai can be added without refactoring.
-- [ ] Build accessible shared components: buttons, inputs, dialogs, cards, tables, filters, toasts, loading/error states, and pagination.
-- [ ] Implement reduced motion, keyboard navigation, touch targets, focus management, and contrast checks.
-- [ ] Build sound manager with Classic Casino, Arcade, Silent, volume, preload/lazy-load strategy, and mute behavior.
-- [ ] Validate layouts at phone, tablet, and desktop breakpoints in both languages and both modes.
+- [x] Create GIKGOK brand tokens: deep green base, lime accent, rounded surfaces, typography, spacing, elevation, states, and chart/status colors.
+- [x] Implement Light and Dark mode preserving green brand identity.
+- [x] Implement Owner-controlled system accent theme (red/white, blue/white, yellow/gray); prevent player theme changes.
+- [x] Build responsive player shell: phone bottom navigation, tablet compact navigation, desktop layout.
+- [x] Build responsive admin shell with secure `/admin` route and desktop-first data layouts.
+- [x] Implement Lao and English translation catalogs for all user-facing text, validation, empty states, and admin UI.
+- [x] Structure localization so Thai can be added without refactoring.
+- [x] Build accessible shared components: buttons, inputs, dialogs, cards, tables, filters, toasts, loading/error states, and pagination.
+- [x] Implement reduced motion, keyboard navigation, touch targets, focus management, and contrast checks.
+- [x] Build sound manager with Classic Casino, Arcade, Silent, volume, preload/lazy-load strategy, and mute behavior.
+- [x] Validate layouts at phone, tablet, and desktop breakpoints in both languages and both modes.
 
 ## Phase 4 — Ledger, rewards, and credit requests
 
