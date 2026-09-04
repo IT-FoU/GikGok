@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   CreditCard,
+  Dices,
   LayoutDashboard,
   Settings,
   Ticket,
@@ -17,6 +18,7 @@ const ADMIN_LINKS = [
   { href: "/admin", key: "nav.dashboard", icon: LayoutDashboard },
   { href: "/admin#players", key: "nav.players", icon: Users },
   { href: "/admin/credits", key: "nav.credits", icon: CreditCard },
+  { href: "/admin/games", key: "nav.games", icon: Dices },
   { href: "/admin#tickets", key: "nav.tickets", icon: Ticket },
   { href: "/admin#settings", key: "nav.settings", icon: Settings },
 ] as const;

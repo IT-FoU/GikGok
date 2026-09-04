@@ -428,6 +428,84 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["games"]["Insert"]>;
         Relationships: [];
       };
+      game_versions: {
+        Row: {
+          id: string;
+          game_id: string;
+          version: number;
+          config: Json;
+          guide_i18n: Json;
+          created_by: string | null;
+          approved_by: string | null;
+          approved_at: string | null;
+          is_active: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          game_id: string;
+          version: number;
+          config?: Json;
+          guide_i18n?: Json;
+          created_by?: string | null;
+          approved_by?: string | null;
+          approved_at?: string | null;
+          is_active?: boolean;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["game_versions"]["Insert"]>;
+        Relationships: [];
+      };
+      game_rounds: {
+        Row: {
+          id: string;
+          game_id: string;
+          game_version_id: string;
+          status: RoundStatus;
+          settlement_mode: SettlementMode;
+          controlled_demo_payload: Json | null;
+          opened_at: string;
+          locked_at: string | null;
+          settled_at: string | null;
+          created_by: string | null;
+          metadata: Json;
+        };
+        Insert: {
+          id?: string;
+          game_id: string;
+          game_version_id: string;
+          status?: RoundStatus;
+          settlement_mode?: SettlementMode;
+          controlled_demo_payload?: Json | null;
+          opened_at?: string;
+          locked_at?: string | null;
+          settled_at?: string | null;
+          created_by?: string | null;
+          metadata?: Json;
+        };
+        Update: Partial<Database["public"]["Tables"]["game_rounds"]["Insert"]>;
+        Relationships: [];
+      };
+      feature_flags: {
+        Row: {
+          key: string;
+          description: string;
+          enabled: boolean;
+          payload: Json;
+          updated_by: string | null;
+        } & Timestamps;
+        Insert: {
+          key: string;
+          description: string;
+          enabled?: boolean;
+          payload?: Json;
+          updated_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["feature_flags"]["Insert"]>;
+        Relationships: [];
+      };
       bets: {
         Row: {
           id: string;
@@ -624,6 +702,46 @@ export type Database = {
       };
       reconcile_player_balance: {
         Args: { p_player_id: string };
+        Returns: Json;
+      };
+      place_and_settle_bet: {
+        Args: {
+          p_game_id: string;
+          p_stake: number;
+          p_selection: Json;
+          p_idempotency_key: string;
+          p_player_id?: string;
+        };
+        Returns: Json;
+      };
+      open_game_round: {
+        Args: {
+          p_game_id: string;
+          p_settlement_mode?: SettlementMode;
+          p_controlled_demo_payload?: Json | null;
+          p_admin_id?: string;
+        };
+        Returns: Json;
+      };
+      ensure_player_round: {
+        Args: { p_game_id: string };
+        Returns: Json;
+      };
+      start_smooth_maintenance_close: {
+        Args: {
+          p_game_id: string;
+          p_announcement_key?: string;
+          p_admin_id?: string;
+        };
+        Returns: Json;
+      };
+      set_game_availability: {
+        Args: {
+          p_game_id: string;
+          p_enabled: boolean;
+          p_lifecycle?: GameLifecycleStatus | string | null;
+          p_admin_id?: string;
+        };
         Returns: Json;
       };
       request_account_deletion: {

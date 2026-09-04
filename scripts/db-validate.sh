@@ -33,4 +33,7 @@ psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$ROOT_DIR/supabase/tests/auth_lifecycle.te
 echo "==> Running ledger/rewards SQL tests"
 psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$ROOT_DIR/supabase/tests/ledger_rewards.test.sql"
 
+echo "==> Running game engine SQL tests"
+psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$ROOT_DIR/supabase/tests/game_engine.test.sql"
+
 echo "OK: migrations + RLS tests passed"
