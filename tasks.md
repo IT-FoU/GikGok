@@ -2,50 +2,50 @@
 
 ## Execution rules
 
-- [ ] Read `requirements.md` completely before changing code.
-- [ ] Inspect the existing repository and preserve unrelated files/changes.
-- [ ] Keep the project demo-credit only; do not add real-money/payment/wallet/cash-out functionality.
-- [ ] Complete tasks in order; do not mark a task complete without running its stated validation.
-- [ ] Add migrations; never make production schema changes manually.
-- [ ] Use secure environment variables and never commit secrets.
-- [ ] Commit logical milestones with descriptive messages after tests pass.
+- [x] Read `requirements.md` completely before changing code.
+- [x] Inspect the existing repository and preserve unrelated files/changes.
+- [x] Keep the project demo-credit only; do not add real-money/payment/wallet/cash-out functionality.
+- [x] Complete tasks in order; do not mark a task complete without running its stated validation.
+- [x] Add migrations; never make production schema changes manually.
+- [x] Use secure environment variables and never commit secrets.
+- [x] Commit logical milestones with descriptive messages after tests pass.
 
 ## Phase 0 — Discovery and architecture
 
-- [ ] Inspect repository, package manager, existing app, environment files, lint/typecheck/test scripts, and git status.
-- [ ] Write/refresh README with local setup, required environment variables, commands, and architecture summary.
-- [ ] Confirm Next.js + TypeScript strict mode baseline or scaffold it without overwriting unrelated work.
-- [ ] Install only required dependencies: Tailwind, shadcn/ui, Supabase clients, validation library, state/query tooling, testing tools, React Three Fiber/Three.js/Rapier, and i18n tooling.
-- [ ] Define module boundaries for player app, admin app, shared UI, game engine, ledger, database, and localization.
-- [ ] Create environment schema validation; include public Supabase URL/anon key only and server-only variables separately.
-- [ ] Run lint, typecheck, tests, and production build; record baseline failures before proceeding.
+- [x] Inspect repository, package manager, existing app, environment files, lint/typecheck/test scripts, and git status.
+- [x] Write/refresh README with local setup, required environment variables, commands, and architecture summary.
+- [x] Confirm Next.js + TypeScript strict mode baseline or scaffold it without overwriting unrelated work.
+- [x] Install only required dependencies: Tailwind, shadcn/ui, Supabase clients, validation library, state/query tooling, testing tools, React Three Fiber/Three.js/Rapier, and i18n tooling.
+- [x] Define module boundaries for player app, admin app, shared UI, game engine, ledger, database, and localization.
+- [x] Create environment schema validation; include public Supabase URL/anon key only and server-only variables separately.
+- [x] Run lint, typecheck, tests, and production build; record baseline failures before proceeding.
 
 ## Phase 1 — Database and Supabase foundation
 
-- [ ] Create Supabase project configuration and typed client helpers for browser, server, and admin-safe server routes.
-- [ ] Create migrations for profiles, verified contact fields, avatar metadata, user settings, status, and last-activity data.
-- [ ] Create migrations for admin roles, granular permissions, role assignments, admin PIN/2FA metadata, and approval limits.
-- [ ] Create immutable ledger, balance projection, credit request, credit request review, and daily reward/streak tables.
-- [ ] Create migrations for games, game versions/configurations, game release lifecycle, feature flags, rounds, bets, outcomes, and receipts.
-- [ ] Create migrations for announcements, notifications, tickets/messages/attachments, missions, achievements, leaderboard projections, friends/invites, and QA accounts.
-- [ ] Create migrations for audit log, system settings, asset metadata, maintenance state, and operational health events.
-- [ ] Add indexes, foreign keys, check constraints, enum/status constraints, timestamps, and soft-delete policy where appropriate.
-- [ ] Implement Row Level Security for every table and Storage bucket.
-- [ ] Add Storage policies for avatar, ticket attachment, and game asset buckets.
-- [ ] Generate database types and verify migration up/down or local reset succeeds.
-- [ ] Write RLS tests proving player isolation and least-privilege administrator access.
+- [x] Create Supabase project configuration and typed client helpers for browser, server, and admin-safe server routes.
+- [x] Create migrations for profiles, verified contact fields, avatar metadata, user settings, status, and last-activity data.
+- [x] Create migrations for admin roles, granular permissions, role assignments, admin PIN/2FA metadata, and approval limits.
+- [x] Create immutable ledger, balance projection, credit request, credit request review, and daily reward/streak tables.
+- [x] Create migrations for games, game versions/configurations, game release lifecycle, feature flags, rounds, bets, outcomes, and receipts.
+- [x] Create migrations for announcements, notifications, tickets/messages/attachments, missions, achievements, leaderboard projections, friends/invites, and QA accounts.
+- [x] Create migrations for audit log, system settings, asset metadata, maintenance state, and operational health events.
+- [x] Add indexes, foreign keys, check constraints, enum/status constraints, timestamps, and soft-delete policy where appropriate.
+- [x] Implement Row Level Security for every table and Storage bucket.
+- [x] Add Storage policies for avatar, ticket attachment, and game asset buckets.
+- [x] Generate database types and verify migration up/down or local reset succeeds.
+- [x] Write RLS tests proving player isolation and least-privilege administrator access.
 
 ## Phase 2 — Authentication and account lifecycle
 
-- [ ] Build Welcome, registration, login, logout, password reset, and session-expiry flows.
-- [ ] Support email and phone registration/login with OTP verification of at least one contact before play.
-- [ ] Build nickname validation, preset avatar selection, safe avatar upload/crop/validation, and fallback avatar.
-- [ ] Enforce one account per verified email/phone and explain conflicts clearly.
-- [ ] Create verified-player welcome-credit ledger flow that runs exactly once.
-- [ ] Build Profile/Settings page with language, sound volume/pack, graphics settings, and account controls.
-- [ ] Add self-service account deletion request flow that preserves required ledger/audit records.
-- [ ] Add player status enforcement for active, suspended, and banned accounts.
-- [ ] Test login, OTP, reset, profile, avatar, suspension, and account deletion paths.
+- [x] Build Welcome, registration, login, logout, password reset, and session-expiry flows.
+- [x] Support email and phone registration/login with OTP verification of at least one contact before play.
+- [x] Build nickname validation, preset avatar selection, safe avatar upload/crop/validation, and fallback avatar.
+- [x] Enforce one account per verified email/phone and explain conflicts clearly.
+- [x] Create verified-player welcome-credit ledger flow that runs exactly once.
+- [x] Build Profile/Settings page with language, sound volume/pack, graphics settings, and account controls.
+- [x] Add self-service account deletion request flow that preserves required ledger/audit records.
+- [x] Add player status enforcement for active, suspended, and banned accounts.
+- [x] Test login, OTP, reset, profile, avatar, suspension, and account deletion paths.
 
 ## Phase 3 — Design system, responsive shell, and localization
 

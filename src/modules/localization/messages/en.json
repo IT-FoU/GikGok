@@ -1,0 +1,16 @@
+{
+  "app": {
+    "name": "GIKGOK",
+    "tagline": "Demo-credit game platform"
+  },
+  "nav": {
+    "home": "Home",
+    "games": "Games",
+    "history": "History",
+    "profile": "Profile",
+    "admin": "Admin"
+  },
+  "common": {
+    "demoNotice": "GIK credits are demo credits only. They have no cash value."
+  }
+}
