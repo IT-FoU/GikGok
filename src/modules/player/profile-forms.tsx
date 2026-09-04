@@ -199,19 +199,33 @@ export function SettingsForm({
         </div>
       </div>
       <div className="grid gap-2 sm:grid-cols-2">
-        {[
-          ["muted", "Mute sound", defaults.muted],
-          ["shadowsEnabled", "Shadows", defaults.shadowsEnabled],
-          ["effectsEnabled", "Effects", defaults.effectsEnabled],
-          ["reduceMotion", "Reduce motion", defaults.reduceMotion],
-        ].map(([name, label, checked]) => (
-          <label key={name} className="flex items-center gap-2 text-sm">
+        {(
+          [
+            { name: "muted", label: "Mute sound", checked: defaults.muted },
+            {
+              name: "shadowsEnabled",
+              label: "Shadows",
+              checked: defaults.shadowsEnabled,
+            },
+            {
+              name: "effectsEnabled",
+              label: "Effects",
+              checked: defaults.effectsEnabled,
+            },
+            {
+              name: "reduceMotion",
+              label: "Reduce motion",
+              checked: defaults.reduceMotion,
+            },
+          ] as const
+        ).map((item) => (
+          <label key={item.name} className="flex items-center gap-2 text-sm">
             <input
               type="checkbox"
-              name={name}
-              defaultChecked={Boolean(checked)}
+              name={item.name}
+              defaultChecked={item.checked}
             />
-            {label}
+            {item.label}
           </label>
         ))}
       </div>

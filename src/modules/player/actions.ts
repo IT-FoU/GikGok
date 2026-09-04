@@ -55,12 +55,13 @@ export async function registerAction(
   const input = parsed.data;
   const supabase = await createServerSupabaseClient();
   const email =
-    input.contactType === "email" ? input.email!.trim().toLowerCase() : undefined;
-  const phone = input.contactType === "phone" ? input.phone!.trim() : undefined;
+    input.contactType === "email"
+      ? input.email!.trim().toLowerCase()
+      : undefined;
+  const phone =
+    input.contactType === "phone" ? input.phone!.trim() : undefined;
 
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    phone,
+  const signUpOptions = {
     password: input.password,
     options: {
       data: {
@@ -69,7 +70,18 @@ export async function registerAction(
         contact_type: input.contactType,
       },
     },
-  });
+  };
+
+  const { data, error } =
+    input.contactType === "email"
+      ? await supabase.auth.signUp({
+          email: email!,
+          ...signUpOptions,
+        })
+      : await supabase.auth.signUp({
+          phone: phone!,
+          ...signUpOptions,
+        });
 
   if (error) {
     return { ok: false, message: mapAuthConflictMessage(error.message) };
@@ -230,9 +242,7 @@ export async function verifyOtpAction(
     return { ok: false, message: mapAuthConflictMessage(markError.message) };
   }
 
-  const { data: grant, error: grantError } = await supabase.rpc(
-    "grant_welcome_credit",
-  );
+  const { error: grantError } = await supabase.rpc("grant_welcome_credit");
 
   if (grantError) {
     return { ok: false, message: mapAuthConflictMessage(grantError.message) };
@@ -332,16 +342,14 @@ export async function updateProfileAction(
     return { ok: false, message: "Sign in required." };
   }
 
-  const updates: Record<string, string> = {
-    nickname: parsed.data.nickname,
-  };
-  if (parsed.data.avatarPresetId) {
-    updates.avatar_preset_id = parsed.data.avatarPresetId;
-  }
-
   const { error } = await supabase
     .from("profiles")
-    .update(updates)
+    .update({
+      nickname: parsed.data.nickname,
+      ...(parsed.data.avatarPresetId
+        ? { avatar_preset_id: parsed.data.avatarPresetId }
+        : {}),
+    })
     .eq("id", user.id);
 
   if (error) {

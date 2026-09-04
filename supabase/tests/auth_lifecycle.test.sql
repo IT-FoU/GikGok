@@ -63,7 +63,7 @@ BEGIN
   WHERE player_id = player AND entry_type = 'welcome_credit';
   PERFORM public.test_assert(ledger_count = 1, 'welcome credit ledger row exactly once');
 
-  SELECT balance INTO balance FROM public.player_balances WHERE player_id = player;
+  SELECT pb.balance INTO balance FROM public.player_balances pb WHERE pb.player_id = player;
   PERFORM public.test_assert(balance = 50000, 'balance projection after welcome credit');
 
   -- Verified email conflict

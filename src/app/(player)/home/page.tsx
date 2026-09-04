@@ -45,7 +45,16 @@ export default async function PlayerHomePage() {
     nickname = profile.nickname;
     balance = balanceRow?.balance ?? 0;
     verified = Boolean(profile.email_verified_at || profile.phone_verified_at);
-  } catch {
+  } catch (error) {
+    // Next.js redirect() throws; never swallow it.
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "digest" in error &&
+      String((error as { digest?: string }).digest).startsWith("NEXT_REDIRECT")
+    ) {
+      throw error;
+    }
     // Missing env during local preview — show shell without session data.
   }
 
