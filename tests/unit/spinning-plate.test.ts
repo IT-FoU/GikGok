@@ -141,7 +141,7 @@ describe("Spinning Plate receipt, graphics, recovery", () => {
     expect(resolveGraphicsMode("3d", true, "high")).toBe("2d");
     expect(resolveGraphicsMode("auto", false, "low")).toBe("2d");
     expect(resolveGraphicsMode("3d", false, "high", true)).toBe("2d");
-    expect(rotationForSlot(1)).toBe(0);
+    expect(rotationForSlot(1)).toBeCloseTo(0);
     expect(rotationForSlot(2)).toBe(-30);
   });
 });

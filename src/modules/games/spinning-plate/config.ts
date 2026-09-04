@@ -70,7 +70,8 @@ export function slotMultiplier(slot: number): number {
 /** Wheel rotation (deg) so `slot` sits under the fixed top pointer. */
 export function rotationForSlot(slot: number): number {
   const index = ((slot - 1) % PLATE_SLOT_COUNT + PLATE_SLOT_COUNT) % PLATE_SLOT_COUNT;
-  return -index * PLATE_CONFIG.degreesPerSlot;
+  const degrees = -index * PLATE_CONFIG.degreesPerSlot;
+  return Object.is(degrees, -0) ? 0 : degrees;
 }
 
 export function assertConfigAligned() {
