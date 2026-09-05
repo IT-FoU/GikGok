@@ -1,7 +1,9 @@
+import { PlayerShell } from "@/components/shell/player-shell";
+
 export default function PlayerLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <div className="flex min-h-full flex-1 flex-col">{children}</div>;
+  return <PlayerShell>{children}</PlayerShell>;
 }

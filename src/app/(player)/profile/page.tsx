@@ -14,6 +14,7 @@ import {
   updateSettingsAction,
   uploadAvatarAction,
 } from "@/modules/player/actions";
+import { AppearanceControls } from "@/components/appearance-controls";
 import { Button } from "@/components/ui/button";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
@@ -85,6 +86,11 @@ export default async function ProfilePage() {
       <section className="space-y-3">
         <h2 className="text-xl font-medium">Avatar upload</h2>
         <AvatarUploadForm action={uploadAvatarAction} />
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-xl font-medium">Appearance</h2>
+        <AppearanceControls />
       </section>
 
       <section className="space-y-3">

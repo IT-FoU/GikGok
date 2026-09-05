@@ -1,0 +1,140 @@
+/* GIKGOK brand tokens — deep casino green + lime accent */
+
+:root {
+  /* Typography scale */
+  --font-display: var(--font-sora), "Noto Sans Lao", sans-serif;
+  --font-body: var(--font-noto-lao), var(--font-sora), sans-serif;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* Radius / elevation */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.12);
+  --shadow-md: 0 8px 24px rgb(0 0 0 / 0.18);
+  --shadow-lg: 0 16px 40px rgb(0 0 0 / 0.22);
+
+  /* Motion */
+  --motion-fast: 120ms;
+  --motion-base: 220ms;
+  --motion-slow: 420ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Touch */
+  --touch-min: 44px;
+
+  /* Status / chart (shared across themes) */
+  --status-success: #34d399;
+  --status-warning: #fbbf24;
+  --status-danger: #f87171;
+  --status-info: #60a5fa;
+  --chart-1: #a3e635;
+  --chart-2: #34d399;
+  --chart-3: #38bdf8;
+  --chart-4: #fbbf24;
+  --chart-5: #fb7185;
+}
+
+/* Dark mode (default brand atmosphere) */
+:root,
+[data-color-mode="dark"] {
+  --brand-base: #0b3d2e;
+  --brand-background: #06251c;
+  --brand-surface: #12503c;
+  --brand-surface-elevated: #176049;
+  --brand-border: #1f6b51;
+  --brand-foreground: #f4faf7;
+  --brand-muted: #b7d4c6;
+  --brand-accent: #a3e635;
+  --brand-accent-foreground: #0b3d2e;
+  --focus-ring: #bef264;
+  --overlay: rgb(2 18 12 / 0.64);
+  --background: var(--brand-background);
+  --foreground: var(--brand-foreground);
+}
+
+/* Light mode — keeps green identity */
+[data-color-mode="light"] {
+  --brand-base: #e7f6ee;
+  --brand-background: #f3faf6;
+  --brand-surface: #ffffff;
+  --brand-surface-elevated: #ffffff;
+  --brand-border: #b7d4c6;
+  --brand-foreground: #06251c;
+  --brand-muted: #3f6b58;
+  --brand-accent: #65a30d;
+  --brand-accent-foreground: #ffffff;
+  --focus-ring: #4d7c0f;
+  --overlay: rgb(6 37 28 / 0.4);
+  --background: var(--brand-background);
+  --foreground: var(--brand-foreground);
+  --shadow-sm: 0 1px 2px rgb(6 37 28 / 0.08);
+  --shadow-md: 0 8px 24px rgb(6 37 28 / 0.1);
+  --shadow-lg: 0 16px 40px rgb(6 37 28 / 0.12);
+}
+
+/* Owner-controlled accent themes (players cannot override) */
+[data-accent="green"] {
+  --brand-accent: #a3e635;
+  --brand-accent-foreground: #0b3d2e;
+}
+[data-color-mode="light"][data-accent="green"] {
+  --brand-accent: #65a30d;
+  --brand-accent-foreground: #ffffff;
+}
+
+[data-accent="red_white"] {
+  --brand-accent: #ef4444;
+  --brand-accent-foreground: #ffffff;
+}
+[data-color-mode="light"][data-accent="red_white"] {
+  --brand-accent: #dc2626;
+  --brand-accent-foreground: #ffffff;
+}
+
+[data-accent="blue_white"] {
+  --brand-accent: #3b82f6;
+  --brand-accent-foreground: #ffffff;
+}
+[data-color-mode="light"][data-accent="blue_white"] {
+  --brand-accent: #2563eb;
+  --brand-accent-foreground: #ffffff;
+}
+
+[data-accent="yellow_gray"] {
+  --brand-accent: #eab308;
+  --brand-accent-foreground: #1f2937;
+}
+[data-color-mode="light"][data-accent="yellow_gray"] {
+  --brand-accent: #ca8a04;
+  --brand-accent-foreground: #111827;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 0ms;
+    --motion-base: 0ms;
+    --motion-slow: 0ms;
+  }
+}
