@@ -17,23 +17,28 @@
 - [x] Confirm Next.js + TypeScript strict mode baseline or scaffold it without overwriting unrelated work.
 - [x] Install only required dependencies: Tailwind, shadcn/ui, Supabase clients, validation library, state/query tooling, testing tools, React Three Fiber/Three.js/Rapier, and i18n tooling.
 - [x] Define module boundaries for player app, admin app, shared UI, game engine, ledger, database, and localization.
-- [x] Create environment schema validation; include public Supabase URL/anon key only and server-only variables separately.
+- [x] Create environment schema validation; include public Supabase URL/publishable key only and server-only variables separately.
 - [x] Run lint, typecheck, tests, and production build; record baseline failures before proceeding.
 
 ## Phase 1 — Database and Supabase foundation
 
-- [ ] Create Supabase project configuration and typed client helpers for browser, server, and admin-safe server routes.
-- [ ] Create migrations for profiles, verified contact fields, avatar metadata, user settings, status, and last-activity data.
-- [ ] Create migrations for admin roles, granular permissions, role assignments, admin PIN/2FA metadata, and approval limits.
-- [ ] Create immutable ledger, balance projection, credit request, credit request review, and daily reward/streak tables.
-- [ ] Create migrations for games, game versions/configurations, game release lifecycle, feature flags, rounds, bets, outcomes, and receipts.
-- [ ] Create migrations for announcements, notifications, tickets/messages/attachments, missions, achievements, leaderboard projections, friends/invites, and QA accounts.
-- [ ] Create migrations for audit log, system settings, asset metadata, maintenance state, and operational health events.
-- [ ] Add indexes, foreign keys, check constraints, enum/status constraints, timestamps, and soft-delete policy where appropriate.
-- [ ] Implement Row Level Security for every table and Storage bucket.
-- [ ] Add Storage policies for avatar, ticket attachment, and game asset buckets.
-- [ ] Generate database types and verify migration up/down or local reset succeeds.
-- [ ] Write RLS tests proving player isolation and least-privilege administrator access.
+- [x] Create Supabase project configuration and typed client helpers for browser, server, and admin-safe server routes. (`supabase/config.toml`, `src/lib/supabase/*`, generated `types.gen.ts`)
+- [x] Create migrations for profiles, verified contact fields, avatar metadata, user settings, status, and last-activity data.
+- [x] Create migrations for admin roles, granular permissions, role assignments, admin PIN/2FA metadata, and approval limits.
+- [x] Create immutable ledger, balance projection, credit request, credit request review, and daily reward/streak tables.
+- [x] Create migrations for games, game versions/configurations, game release lifecycle, feature flags, rounds, bets, outcomes, and receipts.
+- [x] Create migrations for announcements, notifications, tickets/messages/attachments, missions, achievements, leaderboard projections, friends/invites, and QA accounts.
+- [x] Create migrations for audit log, system settings, asset metadata, maintenance state, and operational health events.
+- [x] Add indexes, foreign keys, check constraints, enum/status constraints, timestamps, and soft-delete policy where appropriate.
+- [x] Implement Row Level Security for every table and Storage bucket.
+- [x] Add Storage policies for avatar, ticket attachment, and game asset buckets.
+- [x] Generate database types and verify migration up/down or local reset succeeds. (`npm run db:validate`)
+- [x] Write RLS tests proving player isolation and least-privilege administrator access. (`npm run db:test`)
+- [ ] Remote staging integration (link / `db push` / seed): **WAITING** — needs `SUPABASE_ACCESS_TOKEN` + staging DB password; run only after approval. See [docs/database.md](docs/database.md).
+
+> Note: server-authoritative game settlement (Phase 5) remains for a later phase.
+> Migration RPCs cover ledger append, daily reward, credit review, and status changes;
+> per-game round settlement is intentionally not implemented here.
 
 ## Phase 2 — Authentication and account lifecycle
 

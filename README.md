@@ -18,7 +18,7 @@ No real-money deposits, payments, cash-out, wallets, or monetary value.
 ```bash
 npm install
 cp .env.example .env.local
-# Fill NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY
+# Fill NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 npm run dev
 ```
 
@@ -31,7 +31,7 @@ Copy `.env.example` to `.env.local`. Never commit secrets.
 | Variable | Scope | Required | Description |
 |----------|-------|----------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Public | Yes | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public | Yes | Supabase anon/public key |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Public | Yes | Supabase publishable key (`sb_publishable_…`) |
 | `NEXT_PUBLIC_APP_URL` | Public | No | Canonical app URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | Server only | For admin ops | Service-role key — never in frontend |
 | `SUPABASE_JWT_SECRET` | Server only | Optional | JWT secret when needed server-side |
@@ -51,6 +51,12 @@ Validation lives in `src/lib/env/client.ts` (public) and `src/lib/env/server.ts`
 | `npm test` | Vitest unit tests |
 | `npm run test:e2e` | Playwright E2E (later phases) |
 | `npm run format` | Prettier write |
+| `npm run db:start` / `db:stop` | Local Supabase stack (Docker) |
+| `npm run db:reset` | Recreate local DB, apply migrations, seed |
+| `npm run db:test` | RLS isolation tests (requires local DB) |
+| `npm run db:validate` | Structural DB validation |
+| `npm run security:check` | Secret-leak + RLS + SECURITY DEFINER checks |
+| `npm run db:types` | Regenerate `src/lib/supabase/types.gen.ts` |
 
 ## Architecture
 
@@ -63,6 +69,9 @@ See [docs/architecture.md](docs/architecture.md) for module boundaries:
 - **Ledger** — `src/modules/ledger`
 - **Database** — `supabase/migrations`, `src/lib/supabase`
 - **Localization** — `src/modules/localization`
+
+Database schema, RLS/security model, seed, and staging test-user setup:
+[docs/database.md](docs/database.md).
 
 Product requirements: [requirements.md](requirements.md).  
 Task plan: [tasks.md](tasks.md).

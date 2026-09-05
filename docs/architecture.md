@@ -17,7 +17,7 @@
 - Demo GIK credits only — no real-money, wallet, cash-out, or payment features.
 - Server-side settlement and ledger writes are authoritative.
 - Browser code (including 2D/3D renderers) reveals results; it never decides balances or outcomes.
-- Public env: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` only.
+- Public env: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` only.
 - Service-role and other secrets stay server-only via `src/lib/env/server.ts`.
 
 ## Stack baseline
