@@ -1,0 +1,27 @@
+export {
+  PLATE_CONFIG,
+  PLATE_CONFIG_VERSION,
+  PLATE_GAME_ID,
+  PLATE_SLOT_COUNT,
+  assertConfigAligned,
+  rotationForSlot,
+  slotIcon,
+  slotMultiplier,
+  type PlateReceiptView,
+  type PlateSelection,
+  type PlateServerResult,
+} from "./config";
+export {
+  buildPlateSelection,
+  formatGik,
+  loadPlateSession,
+  newIdempotencyKey,
+  parsePlaceBetPayload,
+  parsePlateServerResult,
+  parseReplayReceipt,
+  resolveGraphicsMode,
+  savePlateSession,
+  supportsWebGl,
+  totalReturnLabel,
+  watchLowFps,
+} from "./session";
