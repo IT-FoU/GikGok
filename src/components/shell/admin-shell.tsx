@@ -16,7 +16,7 @@ import { useTranslations } from "@/modules/localization/provider";
 const ADMIN_LINKS = [
   { href: "/admin", key: "nav.dashboard", icon: LayoutDashboard },
   { href: "/admin#players", key: "nav.players", icon: Users },
-  { href: "/admin#credits", key: "nav.credits", icon: CreditCard },
+  { href: "/admin/credits", key: "nav.credits", icon: CreditCard },
   { href: "/admin#tickets", key: "nav.tickets", icon: Ticket },
   { href: "/admin#settings", key: "nav.settings", icon: Settings },
 ] as const;
@@ -38,14 +38,18 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <nav className="space-y-1" aria-label="Admin navigation">
             {ADMIN_LINKS.map((link) => {
               const Icon = link.icon;
-              const active = pathname.startsWith("/admin");
+              const base = link.href.split("#")[0]!;
+              const active =
+                link.href === "/admin"
+                  ? pathname === "/admin"
+                  : pathname === base || pathname.startsWith(`${base}/`);
               return (
                 <Link
                   key={link.href}
                   href={link.href}
                   className={cn(
                     "touch-target flex items-center gap-3 rounded-[var(--radius-md)] px-3 text-sm",
-                    active && link.href === "/admin"
+                    active
                       ? "bg-[var(--brand-surface)] text-[var(--brand-accent)]"
                       : "text-[var(--brand-muted)] hover:bg-[var(--brand-surface)] hover:text-[var(--brand-foreground)]",
                   )}

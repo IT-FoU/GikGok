@@ -7,7 +7,9 @@ import {
   Gamepad2,
   History,
   Home,
+  ScrollText,
   UserRound,
+  Wallet,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -16,6 +18,8 @@ import { useSound } from "@/modules/sound/sound-provider";
 
 const PLAYER_LINKS = [
   { href: "/home", key: "nav.home", icon: Home },
+  { href: "/credits", key: "nav.credits", icon: Wallet },
+  { href: "/ledger", key: "nav.ledger", icon: ScrollText },
   { href: "/guide", key: "nav.guide", icon: BookOpen },
   { href: "/guide#games", key: "nav.games", icon: Gamepad2 },
   { href: "/profile", key: "nav.profile", icon: UserRound },
@@ -123,13 +127,13 @@ export function PlayerShell({ children }: { children: React.ReactNode }) {
         className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--brand-border)] bg-[color-mix(in_oklab,var(--brand-background)_92%,transparent)] backdrop-blur-md md:hidden"
         aria-label="Player bottom navigation"
       >
-        <ul className="mx-auto grid max-w-lg grid-cols-5 gap-1 px-2 py-2">
+        <ul className="mx-auto flex max-w-2xl gap-1 overflow-x-auto px-2 py-2">
           {PLAYER_LINKS.map((link) => {
             const base = link.href.split("#")[0]!;
             const active = pathname === base || pathname.startsWith(base);
             const Icon = link.icon;
             return (
-              <li key={link.href}>
+              <li key={link.href} className="min-w-[4.25rem] flex-1">
                 <Link
                   href={link.href}
                   onClick={() => void sound.play("ui_click")}

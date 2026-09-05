@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -47,7 +49,16 @@ export default function AdminHomePage() {
 
       <section id="credits" className="space-y-3">
         <h2 className="font-display text-xl font-semibold">{t("nav.credits")}</h2>
-        <EmptyState title={t("common.empty")} />
+        <EmptyState
+          title={t("common.empty")}
+          description="Open the credit review queue for pending demo-credit requests."
+        />
+        <Link
+          href="/admin/credits"
+          className="text-sm text-[var(--brand-accent)] underline-offset-4 hover:underline"
+        >
+          {t("nav.credits")} →
+        </Link>
       </section>
 
       <section id="tickets" className="space-y-3">
