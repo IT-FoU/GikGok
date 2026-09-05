@@ -27,3 +27,13 @@ npm run build
 2. `vitest.config.ts` — Vite plugin type conflict between Vite 8 (from `@vitejs/plugin-react`) and Vitest’s bundled Vite; removed unused React plugin and excluded Vitest/Playwright configs from app `tsconfig`.
 
 No remaining baseline failures. Ready for Phase 1 (database / Supabase foundation).
+
+## Correction (Phase 1 database status)
+
+Any earlier implication that a database `db:validate` had "passed" did **not**
+reflect a validated deployed schema — at that time no migration or seed files
+existed, so there was nothing to validate. As of Phase 1, `npm run db:validate`
+validates the real schema against a local Supabase database (migrations applied,
+RLS on every table, seed present). Remote staging integration (link / `db push` /
+seed) is **WAITING** and has not been performed. See
+[docs/database.md](database.md).
