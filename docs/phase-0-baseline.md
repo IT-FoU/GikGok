@@ -35,5 +35,5 @@ reflect a validated deployed schema — at that time no migration or seed files
 existed, so there was nothing to validate. As of Phase 1, `npm run db:validate`
 validates the real schema against a local Supabase database (migrations applied,
 RLS on every table, seed present). Remote staging integration (link / `db push` /
-seed) is **WAITING** and has not been performed. See
+seed) has been applied to project `jlpcfatcpymjnjbxmclo`. See
 [docs/database.md](database.md).

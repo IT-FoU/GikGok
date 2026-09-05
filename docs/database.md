@@ -118,19 +118,31 @@ through supported Supabase Auth APIs, then promote as needed:
 | RLS isolation tests | ✅ pass (`db:test`) |
 | `db:validate` / `security:check` | ✅ pass |
 | Generated types current | ✅ `db:types:check` clean |
-| **Remote staging integration** (link / `db push` / seed) | ⏳ **WAITING** — not yet performed; needs `SUPABASE_ACCESS_TOKEN` + DB password |
+| **Remote staging integration** (link / `db push` / seed) | ✅ applied to `jlpcfatcpymjnjbxmclo` (14 migrations + seed) |
+| Remote RLS / `security:check` against staging | ✅ pass (pooler connection) |
+| Staging test users (owner / admin / player) | ✅ created + promoted (passwords ephemeral — reset via dashboard) |
 
 > Correction to the earlier Phase 0 record: the previous `db:validate` "PASS"
 > did **not** validate a deployed schema, because migration and seed files did
 > not yet exist. `db:validate` now validates the real schema against a local
 > Supabase database.
 
-## Proposed remote commands (run only after explicit approval)
+## Remote staging commands (guarded; staging project only)
+
+Target project ref: `jlpcfatcpymjnjbxmclo`. Never `db reset` remote, never
+touch another project, never deploy production.
 
 ```bash
 export SUPABASE_ACCESS_TOKEN=…   # personal access token (secret)
 export SUPABASE_DB_PASSWORD=…    # staging DB password (secret)
 npx supabase link --project-ref jlpcfatcpymjnjbxmclo
+npx supabase migration list --linked
+npx supabase db push --dry-run   # confirm exactly the reviewed 14 migrations
 npx supabase db push             # apply migrations to staging
 npx supabase db push --include-seed   # staging-only: also load seed.sql
 ```
+
+Auth Admin user creation needs the **legacy** `service_role` JWT (or a working
+secret key accepted by GoTrue). The Cloud Environment currently injects
+`NEXT_PUBLIC_SUPABASE_*`, `SUPABASE_ACCESS_TOKEN`, and `SUPABASE_DB_PASSWORD`
+only — not `SUPABASE_SECRET_KEY` / `SUPABASE_SERVICE_ROLE_KEY`.
