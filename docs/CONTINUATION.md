@@ -1,31 +1,33 @@
 # Continuation checkpoint — GIKGOK continuous implementation
 
 ## Branch
-- Working tip: `cursor/phase-9-11-player-admin-security-62a3`
-- Base: `cursor/gikgok-continuous-implementation`
-- Staging: `jlpcfatcpymjnjbxmclo`
+- `cursor/gikgok-continuous-implementation` @ `f5d9bda`
+- PR base: `cursor/supabase-staging-integration-455c`
+- Staging: `jlpcfatcpymjnjbxmclo` (migrations through `20260905210000`)
 
 ## Progress
 | Phase | Status |
 |-------|--------|
-| 0–8 | COMPLETE |
-| 9 Player experience | COMPLETE (UI + RPCs on staging) |
-| 10 Admin console | COMPLETE (modules + RPCs on staging) |
-| 11 Security / QA / release prep | COMPLETE (docs + headers + PWA; device/OTP WAITING) |
+| 0–11 implementable | COMPLETE |
+| Playwright authenticated E2E | WAITING credentials |
+| Physical device QA | WAITING devices |
+| Phone OTP live | WAITING SMS provider |
+| Local Docker Supabase | BLOCKED (overlayfs) |
+| Hosted preview deploy | WAITING Owner hosting |
 
-## Game keys (staging)
-`fish_prawn_crab`, `high_low`, `spinning_plate`
+## Last completed
+Phase 11 security headers, PWA, runbook, final report.
 
-## Migrations applied this loop
-- `20260905200000_player_experience_rpcs.sql`
-- `20260905210000_admin_console_rpcs.sql`
+## Next (Owner / follow-up agent)
+1. Provide staging auth credentials → run Playwright critical journeys
+2. Physical iOS/Android/tablet Light/Dark Lao/English QA
+3. Configure SMS provider → complete Phone OTP
+4. Deploy staging web preview if desired
+5. Do **not** merge to `main` or production without Owner approval
 
-## Waiting / blocked
-- Local Docker Supabase **BLOCKED**
-- Phone OTP **WAITING** SMS provider
-- Physical device QA **WAITING**
-- Authenticated Playwright against staging **WAITING** credentials
-- Production / `main` merge **not done**
+## Validation (latest)
+- lint / typecheck / test (88) / build / security:check — PASS
+- Local DB scripts — BLOCKED
 
 ## Safe resume
-All implementable Phase 9–11 tasks for staging schema are delivered. Next human steps: device QA, SMS OTP, staging E2E credentials, hosting deploy smoke on `/api/health`.
+Only WAITING/BLOCKED items remain. Do not re-apply applied migrations.
