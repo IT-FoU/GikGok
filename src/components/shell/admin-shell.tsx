@@ -3,25 +3,40 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  ClipboardList,
   CreditCard,
+  Flag,
   Gamepad2,
   LayoutDashboard,
+  ScrollText,
   Settings,
+  Shield,
   Ticket,
   Users,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { ADMIN_NAV } from "@/modules/admin";
 import { useTranslations } from "@/modules/localization/provider";
 
-const ADMIN_LINKS = [
-  { href: "/admin", key: "nav.dashboard", icon: LayoutDashboard },
-  { href: "/admin#players", key: "nav.players", icon: Users },
-  { href: "/admin/credits", key: "nav.credits", icon: CreditCard },
-  { href: "/admin/games", key: "nav.games", icon: Gamepad2 },
-  { href: "/admin#tickets", key: "nav.tickets", icon: Ticket },
-  { href: "/admin#settings", key: "nav.settings", icon: Settings },
-] as const;
+const ICON_BY_HREF: Record<string, typeof LayoutDashboard> = {
+  "/admin": LayoutDashboard,
+  "/admin/players": Users,
+  "/admin/credits": CreditCard,
+  "/admin/games": Gamepad2,
+  "/admin/games/releases": Gamepad2,
+  "/admin/games/config": Gamepad2,
+  "/admin/admins": Shield,
+  "/admin/announcements": ScrollText,
+  "/admin/tickets": Ticket,
+  "/admin/missions": Flag,
+  "/admin/flags": Flag,
+  "/admin/assets": ClipboardList,
+  "/admin/qa": Users,
+  "/admin/audit": ScrollText,
+  "/admin/reports": ClipboardList,
+  "/admin/settings": Settings,
+};
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -38,13 +53,13 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <p className="text-xs text-[var(--brand-muted)]">{t("admin.title")}</p>
           </div>
           <nav className="space-y-1" aria-label="Admin navigation">
-            {ADMIN_LINKS.map((link) => {
-              const Icon = link.icon;
-              const base = link.href.split("#")[0]!;
+            {ADMIN_NAV.map((link) => {
+              const Icon = ICON_BY_HREF[link.href] ?? LayoutDashboard;
               const active =
                 link.href === "/admin"
                   ? pathname === "/admin"
-                  : pathname === base || pathname.startsWith(`${base}/`);
+                  : pathname === link.href ||
+                    pathname.startsWith(`${link.href}/`);
               return (
                 <Link
                   key={link.href}
@@ -57,7 +72,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                   )}
                 >
                   <Icon className="h-4 w-4" aria-hidden />
-                  {t(link.key)}
+                  {t(link.labelKey)}
                 </Link>
               );
             })}
@@ -82,13 +97,13 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             className="mt-3 flex gap-2 overflow-x-auto lg:hidden"
             aria-label="Admin compact navigation"
           >
-            {ADMIN_LINKS.map((link) => (
+            {ADMIN_NAV.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 className="touch-target whitespace-nowrap rounded-[var(--radius-md)] border border-[var(--brand-border)] px-3 text-sm text-[var(--brand-muted)]"
               >
-                {t(link.key)}
+                {t(link.labelKey)}
               </Link>
             ))}
           </nav>

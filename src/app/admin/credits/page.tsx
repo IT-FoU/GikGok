@@ -6,10 +6,12 @@ import {
   SecondApproveForm,
 } from "@/modules/ledger/ui";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { requireAdminSession } from "@/modules/admin/guards";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminCreditsPage() {
+  await requireAdminSession("credits.view");
   let pending: Array<{
     id: string;
     requested_amount: number;

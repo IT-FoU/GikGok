@@ -3,6 +3,7 @@ import Link from "next/link";
 import { AdminGameControls } from "@/modules/game-engine/ui";
 import { listGameDefinitions } from "@/modules/game-engine";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { requireAdminSession } from "@/modules/admin/guards";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +14,7 @@ const DISPLAY_NAMES: Record<string, string> = {
 };
 
 export default async function AdminGamesPage() {
+  await requireAdminSession("games.view");
   let rows: Array<{
     key: string;
     name: string;

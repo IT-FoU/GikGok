@@ -1,7 +1,3 @@
-"use client";
-
-import Link from "next/link";
-
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -11,68 +7,118 @@ import {
   THead,
   TR,
 } from "@/components/ui/table";
-import { EmptyState } from "@/components/ui/states";
-import { useTranslations } from "@/modules/localization/provider";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { requireAdminSession } from "@/modules/admin/guards";
 
-export default function AdminHomePage() {
-  const t = useTranslations();
+export const dynamic = "force-dynamic";
+
+type Dashboard = {
+  pending_credit_requests?: number;
+  open_tickets?: number;
+  open_rounds?: number;
+  active_players_15m?: number;
+  games?: Array<{
+    key: string;
+    name: string;
+    status: string;
+    is_enabled: boolean;
+  }>;
+  health_events?: Array<{
+    level: string;
+    source: string;
+    message: string;
+  }>;
+  maintenance?: { is_active?: boolean };
+  generated_at?: string;
+};
+
+export default async function AdminDashboardPage() {
+  await requireAdminSession();
+  const supabase = await createServerSupabaseClient();
+
+  let dashboard: Dashboard = {};
+  let errorMessage: string | null = null;
+
+  const { data, error } = await supabase.rpc("get_admin_dashboard");
+  if (error) {
+    errorMessage = error.message;
+  } else {
+    dashboard = (data ?? {}) as Dashboard;
+  }
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
       <Card>
         <CardHeader>
-          <CardTitle>{t("admin.title")}</CardTitle>
-          <CardDescription>{t("admin.body")}</CardDescription>
+          <CardTitle>Operations dashboard</CardTitle>
+          <CardDescription>
+            Near-real-time queues, game status, and health. Demo credits only —
+            no real-money rails.
+          </CardDescription>
         </CardHeader>
-        <p className="text-sm text-[var(--brand-muted)]">{t("admin.desktopHint")}</p>
+        {errorMessage ? (
+          <p className="text-sm text-red-400">{errorMessage}</p>
+        ) : (
+          <p className="text-xs text-[var(--brand-muted)]">
+            Generated {dashboard.generated_at ?? "—"}
+          </p>
+        )}
       </Card>
 
-      <section id="players" className="space-y-3">
-        <h2 className="font-display text-xl font-semibold">{t("nav.players")}</h2>
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {[
+          ["Pending credits", dashboard.pending_credit_requests ?? 0],
+          ["Open tickets", dashboard.open_tickets ?? 0],
+          ["Open rounds", dashboard.open_rounds ?? 0],
+          ["Active players (15m)", dashboard.active_players_15m ?? 0],
+        ].map(([label, value]) => (
+          <Card key={String(label)}>
+            <CardDescription>{label}</CardDescription>
+            <p className="font-display text-3xl font-semibold">{value}</p>
+          </Card>
+        ))}
+      </div>
+
+      <section className="space-y-3">
+        <h2 className="font-display text-xl font-semibold">Game status</h2>
         <Table>
           <THead>
             <TR>
-              <TH>ID</TH>
-              <TH>{t("auth.nickname")}</TH>
-              <TH>Status</TH>
+              <TH>Game</TH>
+              <TH>Lifecycle</TH>
+              <TH>Enabled</TH>
             </TR>
           </THead>
           <TBody>
-            <TR>
-              <TD colSpan={3}>
-                <EmptyState title={t("common.empty")} description={t("common.noResults")} />
-              </TD>
-            </TR>
+            {(dashboard.games ?? []).map((game) => (
+              <TR key={game.key}>
+                <TD>{game.name ?? game.key}</TD>
+                <TD>{game.status}</TD>
+                <TD>{game.is_enabled ? "yes" : "no"}</TD>
+              </TR>
+            ))}
           </TBody>
         </Table>
       </section>
 
-      <section id="credits" className="space-y-3">
-        <h2 className="font-display text-xl font-semibold">{t("nav.credits")}</h2>
-        <EmptyState
-          title={t("common.empty")}
-          description="Open the credit review queue for pending demo-credit requests."
-        />
-        <Link
-          href="/admin/credits"
-          className="text-sm text-[var(--brand-accent)] underline-offset-4 hover:underline"
-        >
-          {t("nav.credits")} →
-        </Link>
-      </section>
-
-      <section id="tickets" className="space-y-3">
-        <h2 className="font-display text-xl font-semibold">{t("nav.tickets")}</h2>
-        <EmptyState title={t("common.empty")} />
-      </section>
-
-      <section id="settings" className="space-y-3">
-        <h2 className="font-display text-xl font-semibold">{t("nav.settings")}</h2>
+      <section className="space-y-3">
+        <h2 className="font-display text-xl font-semibold">Health</h2>
         <Card>
           <CardDescription>
-            Owner accent theme is system-wide and not player-editable. Configure
-            in later admin settings modules.
+            Maintenance:{" "}
+            {dashboard.maintenance?.is_active ? "ACTIVE" : "inactive"}
           </CardDescription>
+          {(dashboard.health_events ?? []).length === 0 ? (
+            <p className="text-sm text-[var(--brand-muted)]">No open health events.</p>
+          ) : (
+            <ul className="space-y-2 text-sm">
+              {(dashboard.health_events ?? []).map((event, index) => (
+                <li key={`${event.source}-${index}`}>
+                  [{event.level}] {event.source}: {event.message}
+                </li>
+              ))}
+            </ul>
+          )}
         </Card>
       </section>
     </div>

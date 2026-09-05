@@ -93,8 +93,20 @@
   },
   "admin": {
     "title": "Admin console",
-    "body": "Secure admin routing, permissions, and operational modules continue in later phases. This shell reserves the /admin boundary.",
-    "desktopHint": "Desktop-first data layouts for operations."
+    "body": "Secure admin routing, permissions, and operational modules.",
+    "desktopHint": "Desktop-first data layouts for operations.",
+    "nav": {
+      "releases": "Releases",
+      "config": "Game config",
+      "admins": "Admins",
+      "announcements": "Announcements",
+      "missions": "Missions",
+      "flags": "Flags",
+      "assets": "Assets",
+      "qa": "QA accounts",
+      "audit": "Audit",
+      "reports": "Reports"
+    }
   },
   "status": {
     "suspendedTitle": "Account suspended",
