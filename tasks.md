@@ -94,34 +94,34 @@
 
 ## Phase 6 — Fish–Prawn–Crab
 
-- [ ] Add versioned Fish–Prawn–Crab game configuration and Lao/English Guide.
-- [ ] Implement server settlement for Single Symbol: one selection, at least one matching die, Total Return x2.
-- [ ] Implement server settlement for Special Pair: two distinct symbols, both must occur, Total Return x10.
-- [ ] Build 2D dice symbols, selection controls, stake input/quick stakes, locked state, result, receipt, and history representation.
-- [ ] Build lazy-loaded optional 3D dice with physics-based visual reveal of the settled server result.
-- [ ] Add Classic Casino/Arcade sound cues and reduce-motion fallback.
-- [ ] Test all winning/losing combinations, invalid pair selections, insufficient balance, double submission, and refresh recovery.
+- [x] Add versioned Fish–Prawn–Crab game configuration and Lao/English Guide.
+- [x] Implement server settlement for Single Symbol: one selection, at least one matching die, Total Return x2.
+- [x] Implement server settlement for Special Pair: two distinct symbols, both must occur, Total Return x10.
+- [x] Build 2D dice symbols, selection controls, stake input/quick stakes, locked state, result, receipt, and history representation.
+- [x] Build lazy-loaded optional 3D dice with physics-based visual reveal of the settled server result.
+- [x] Add Classic Casino/Arcade sound cues and reduce-motion fallback.
+- [x] Test all winning/losing combinations, invalid pair selections, insufficient balance, double submission, and refresh recovery.
 
 ## Phase 7 — High–Low Dice
 
-- [ ] Add versioned High–Low configuration and bilingual Game Guide.
-- [ ] Implement server settlement for Low 3–10 and High 11–18, Total Return x2.
-- [ ] Implement triple override: any triple loses both High and Low.
-- [ ] Build 2D UI, stake controls, locked state, dice/total/triple result explanation, receipt, and history representation.
-- [ ] Build lazy-loaded 3D three-dice physics animation revealing settled result.
-- [ ] Add sound, reduced-motion, graphics quality, and recovery behavior.
-- [ ] Test all totals, all triples, selected side, payout, retries, and disconnected/reconnected flows.
+- [x] Add versioned High–Low configuration and bilingual Game Guide.
+- [x] Implement server settlement for Low 3–10 and High 11–18, Total Return x2.
+- [x] Implement triple override: any triple loses both High and Low.
+- [x] Build 2D UI, stake controls, locked state, dice/total/triple result explanation, receipt, and history representation.
+- [x] Build lazy-loaded 3D three-dice physics animation revealing settled result.
+- [x] Add sound, reduced-motion, graphics quality, and recovery behavior.
+- [x] Test all totals, all triples, selected side, payout, retries, and disconnected/reconnected flows.
 
 ## Phase 8 — Spinning Plate
 
-- [ ] Add versioned 12-slot spinning-plate configuration and bilingual Game Guide.
-- [ ] Configure initial slots/icons and returns: slots 1–4 x2, 5–7 x3, 8–9 x4, 10 x5, 11 x7, 12 x10.
-- [ ] Implement server settlement: exactly one selected slot and exact-match-only win.
-- [ ] Build 2D circular wheel with fixed pointer, selection states, multiplier labels, locked state, and selected/landed highlight.
-- [ ] Build lazy-loaded 3D spinning plate using physics-inspired animation that lands on server-settled slot.
-- [ ] Implement Graphics Auto/2D/3D setting, WebGL detection, low-FPS fallback, and quality controls.
-- [ ] Add sound, reduced-motion, accessibility textual result, and receipt/history display.
-- [ ] Test all 12 slots, multipliers, loss cases, retry/idempotency, fallback renderer, and refresh recovery.
+- [x] Add versioned 12-slot spinning-plate configuration and bilingual Game Guide.
+- [x] Configure initial slots/icons and returns: slots 1–4 x2, 5–7 x3, 8–9 x4, 10 x5, 11 x7, 12 x10.
+- [x] Implement server settlement: exactly one selected slot and exact-match-only win.
+- [x] Build 2D circular wheel with fixed pointer, selection states, multiplier labels, locked state, and selected/landed highlight.
+- [x] Build lazy-loaded 3D spinning plate using physics-inspired animation that lands on server-settled slot.
+- [x] Implement Graphics Auto/2D/3D setting, WebGL detection, low-FPS fallback, and quality controls.
+- [x] Add sound, reduced-motion, accessibility textual result, and receipt/history display.
+- [x] Test all 12 slots, multipliers, loss cases, retry/idempotency, fallback renderer, and refresh recovery.
 
 ## Phase 9 — Player experience and engagement
 

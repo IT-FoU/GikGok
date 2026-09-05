@@ -9,17 +9,20 @@
 |-------|--------|
 | 0–4 | COMPLETE |
 | 5 Game engine | COMPLETE (migration `20260905190000` on staging) |
-| 6–8 Games UI | NEXT |
-| 9–11 | PENDING |
+| 6 Fish–Prawn–Crab UI | COMPLETE (`/play/fish_prawn_crab`) |
+| 7 High–Low UI | COMPLETE (`/play/high_low`) |
+| 8 Spinning Plate UI | COMPLETE (`/play/spinning_plate`) |
+| 9–11 | PENDING (Phase 9 helpers started) |
 
 ## Game keys (staging)
 `fish_prawn_crab`, `high_low`, `spinning_plate`
 
 ## Last completed
-Phase 5 server settlement RPCs + domain tests (17).
+Phases 6–8 play UIs adapted to staging GameIds + `place_and_settle_bet` / `receipts` shape.
+Unit tests: 75 passing.
 
 ## Next
-Phase 6 Fish–Prawn–Crab play UI (2D/3D reveal of server result).
+Phase 9 player experience and engagement (home polish, history, missions, etc.).
 
 ## Waiting / blocked
 - Local Docker Supabase BLOCKED
@@ -27,4 +30,4 @@ Phase 6 Fish–Prawn–Crab play UI (2D/3D reveal of server result).
 - Physical device QA WAITING
 
 ## Safe resume
-First unchecked Phase 6 task. Do not re-apply `20260905190000`.
+First unchecked Phase 9 task. Do not re-apply `20260905190000`. No new game-guide SQL needed (guides already in `game_versions.config.guide`).
