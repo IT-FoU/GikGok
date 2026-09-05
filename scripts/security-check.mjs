@@ -108,6 +108,25 @@ async function dbChecks() {
         failures.push(`SECURITY DEFINER function executable by PUBLIC: ${row.proname}`);
       }
     }
+
+    // anon must never execute SECURITY DEFINER RPCs (Supabase default privileges
+    // historically re-granted EXECUTE to anon/authenticated on CREATE).
+    const anonExec = await client.query(`
+      select p.proname
+      from pg_proc p
+      join pg_namespace n on n.oid = p.pronamespace
+      where n.nspname = 'public'
+        and p.prosecdef
+        and has_function_privilege('anon', p.oid, 'execute')
+      order by 1`);
+    if (anonExec.rowCount > 0) {
+      failures.push(
+        `SECURITY DEFINER executable by anon: ${anonExec.rows.map((r) => r.proname).join(", ")}`,
+      );
+    } else {
+      notes.push("No SECURITY DEFINER functions are executable by anon.");
+    }
+
     notes.push(`Checked ${secdef.rowCount} SECURITY DEFINER functions.`);
 
     const views = await client.query(`

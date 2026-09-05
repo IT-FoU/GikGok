@@ -34,7 +34,8 @@
 - [x] Add Storage policies for avatar, ticket attachment, and game asset buckets.
 - [x] Generate database types and verify migration up/down or local reset succeeds. (`npm run db:validate`)
 - [x] Write RLS tests proving player isolation and least-privilege administrator access. (`npm run db:test`)
-- [ ] Remote staging integration (link / `db push` / seed): **WAITING** — needs `SUPABASE_ACCESS_TOKEN` + staging DB password; run only after approval. See [docs/database.md](docs/database.md).
+- [x] Remote staging integration (link / `db push` / seed): applied to `jlpcfatcpymjnjbxmclo` (14 migrations + seed); remote RLS/`security:check` pass; staging test users created. See [docs/database.md](docs/database.md).
+- [x] Security remediation before manual QA: DEFINER privilege hardening, search_path pins, FK indexes, RLS `(select auth.uid())`, advisor cleanup, expanded RPC tests, `sb_secret` 401 root-caused (use `apikey` header / `createClient`). Forward migrations `20260905155508_…` + `20260905160657_…`.
 
 > Note: server-authoritative game settlement (Phase 5) remains for a later phase.
 > Migration RPCs cover ledger append, daily reward, credit review, and status changes;

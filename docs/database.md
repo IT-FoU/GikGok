@@ -118,19 +118,78 @@ through supported Supabase Auth APIs, then promote as needed:
 | RLS isolation tests | ✅ pass (`db:test`) |
 | `db:validate` / `security:check` | ✅ pass |
 | Generated types current | ✅ `db:types:check` clean |
-| **Remote staging integration** (link / `db push` / seed) | ⏳ **WAITING** — not yet performed; needs `SUPABASE_ACCESS_TOKEN` + DB password |
+| **Remote staging integration** (link / `db push` / seed) | ✅ applied to `jlpcfatcpymjnjbxmclo` (14 migrations + seed) |
+| Remote RLS / `security:check` against staging | ✅ pass (pooler connection) |
+| Staging test users (owner / admin / player) | ✅ created + promoted (passwords ephemeral — reset via dashboard) |
+| Security DEFINER privilege hardening | ✅ forward migration `20260905155508_harden_security_definer_privileges_and_rls_performance.sql` applied |
+| Security / Performance advisors (post-hardening) | ✅ anon DEFINER + mutable search_path cleared; remaining findings documented below |
 
 > Correction to the earlier Phase 0 record: the previous `db:validate` "PASS"
 > did **not** validate a deployed schema, because migration and seed files did
 > not yet exist. `db:validate` now validates the real schema against a local
 > Supabase database.
 
-## Proposed remote commands (run only after explicit approval)
+## SECURITY DEFINER privilege matrix (post-hardening)
+
+| Function | Class | DEFINER required? | `anon` | `authenticated` | `service_role` |
+|----------|-------|-------------------|--------|-----------------|----------------|
+| `is_admin` / `is_owner` / `has_permission` | RLS helper | Yes — read admin tables under RLS | ✗ | ✓ | ✓ |
+| `handle_new_user` | trigger | Yes — insert profile/settings on signup | ✗ | ✗ | ✗ (trigger only) |
+| `append_ledger_entry` | internal-only | Yes — mint ledger rows | ✗ | ✗ | ✓ |
+| `write_audit` | internal-only | Yes — insert audit rows | ✗ | ✗ | ✓ |
+| `get_setting` | authenticated RPC | Yes — settings table is admin-gated | ✗ | ✓ (requires `auth.uid()` or service) | ✓ |
+| `claim_daily_reward` | authenticated player RPC | Yes — writes claims/ledger for caller | ✗ | ✓ (`auth.uid()` only) | ✓ |
+| `cancel_credit_request` | authenticated player RPC | Yes — updates own pending request | ✗ | ✓ (own row only) | ✓ |
+| `admin_set_player_status` | permission-gated admin RPC | Yes — updates any profile after `players.suspend` check | ✗ | ✓ | ✓ |
+| `review_credit_request` | permission-gated admin RPC | Yes — credits `request.player_id` after `credits.adjust` | ✗ | ✓ | ✓ |
+| `bootstrap_first_owner` | internal bootstrap | Yes — creates first owner; refuses if one exists; JWT role must be `service_role` | ✗ | ✗ | ✓ |
+| `set_updated_at` / `prevent_mutation` / `apply_ledger_entry` / `enforce_attachment_limit` | trigger helpers | No — `SECURITY INVOKER` + pinned `search_path` | ✗ | ✗ | ✗ |
+
+`has_permission` / `is_admin` / `is_owner` ignore caller-supplied `uid` unless the JWT role is `service_role`.
+
+## Advisor findings (staging)
+
+**Before → after** the hardening migration:
+
+| Advisor | Before | After | Disposition |
+|---------|--------|-------|-------------|
+| `anon_security_definer_function_executable` | 12 | 0 | Fixed |
+| `function_search_path_mutable` | 4 | 0 | Fixed |
+| `authenticated_security_definer_function_executable` | 12 | 8 | **Accepted** — intentional EXECUTE for RLS helpers + player/admin RPCs |
+| `rls_enabled_no_policy` (`admin_security`) | 1 | 1 | **Accepted** — deny-all by design |
+| `auth_leaked_password_protection` | 1 | 1 | **Deferred** — Auth dashboard setting |
+| `unindexed_foreign_keys` | 31 | 0 | Fixed |
+| `auth_rls_initplan` | 38 | 0 | Fixed (`(select auth.uid())`) |
+| `multiple_permissive_policies` | 18 | 1 (after follow-up) | **Accepted** — remaining overlap is `player_contacts` `FOR ALL` own-row + admin SELECT combined policy; merging would change write semantics. Redundant `player_settings` SELECT dropped in `20260905160657_…` |
+| `unused_index` | 39 | 70 | **Deferred** — empty staging; includes new FK indexes; do not drop |
+| `auth_db_connections_absolute` | 1 | 1 | **Deferred** — project plan / pool sizing |
+
+## `sb_secret_…` HTTP 401 root cause
+
+Official docs: send publishable/secret keys on the **`apikey` header**, not alone on
+`Authorization: Bearer` (they are not JWTs). Repro without printing secrets:
+
+| Call pattern | Result |
+|--------------|--------|
+| `Authorization: Bearer sb_secret_…` only | **401** `No API key found in request` |
+| `apikey: sb_secret_…` (REST) | **200** |
+| `createClient(url, sb_secret_…)` then `auth.admin.listUsers` | **ok** |
+
+Earlier Auth Admin failures were from Bearer-only usage. Do **not** add a legacy
+`service_role` key to Cloud Environment; use `SUPABASE_SECRET_KEY` with the
+supported client/`apikey` convention when backend admin APIs are needed.
+
+## Remote staging commands (guarded; staging project only)
+
+Target project ref: `jlpcfatcpymjnjbxmclo`. Never `db reset` remote, never
+touch another project, never deploy production.
 
 ```bash
 export SUPABASE_ACCESS_TOKEN=…   # personal access token (secret)
 export SUPABASE_DB_PASSWORD=…    # staging DB password (secret)
 npx supabase link --project-ref jlpcfatcpymjnjbxmclo
-npx supabase db push             # apply migrations to staging
-npx supabase db push --include-seed   # staging-only: also load seed.sql
+npx supabase migration list --linked
+npx supabase db push --dry-run   # confirm only the reviewed forward migration(s)
+npx supabase db push             # apply to staging
+npx supabase db push --include-seed   # staging-only seed (already applied once)
 ```
