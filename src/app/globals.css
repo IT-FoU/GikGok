@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+:root {
+  --brand-base: #0b3d2e;
+  --brand-accent: #a3e635;
+  --brand-accent-foreground: #0b3d2e;
+  --brand-foreground: #f4faf7;
+  --brand-muted: #b7d4c6;
+  --brand-surface: #12503c;
+  --brand-border: #1f6b51;
+  --brand-background: #06251c;
+  --background: var(--brand-background);
+  --foreground: var(--brand-foreground);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background:
+    radial-gradient(
+      ellipse at top,
+      color-mix(in oklab, var(--brand-accent) 18%, transparent),
+      transparent 55%
+    ),
+    linear-gradient(180deg, var(--brand-base), var(--brand-background));
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  min-height: 100vh;
+}
