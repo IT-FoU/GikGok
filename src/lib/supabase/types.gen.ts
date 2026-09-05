@@ -1526,6 +1526,7 @@ export type Database = {
           last_active_at: string | null
           nickname: string
           status: Database["public"]["Enums"]["player_status"]
+          welcome_credit_granted_at: string | null
           suspended_at: string | null
           suspended_reason: string | null
           updated_at: string
@@ -1540,6 +1541,7 @@ export type Database = {
           last_active_at?: string | null
           nickname: string
           status?: Database["public"]["Enums"]["player_status"]
+          welcome_credit_granted_at?: string | null
           suspended_at?: string | null
           suspended_reason?: string | null
           updated_at?: string
@@ -1554,6 +1556,7 @@ export type Database = {
           last_active_at?: string | null
           nickname?: string
           status?: Database["public"]["Enums"]["player_status"]
+          welcome_credit_granted_at?: string | null
           suspended_at?: string | null
           suspended_reason?: string | null
           updated_at?: string
@@ -1990,6 +1993,27 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+
+      complete_player_onboarding: {
+        Args: {
+          p_avatar_preset?: string
+          p_contact_type: Database["public"]["Enums"]["contact_type"]
+          p_contact_value: string
+          p_nickname: string
+        }
+        Returns: Database["public"]["Tables"]["profiles"]["Row"]
+      }
+      get_player_access_state: { Args: { p_user_id?: string }; Returns: Json }
+      get_welcome_credit_amount: { Args: never; Returns: number }
+      grant_welcome_credit: { Args: { p_user_id?: string }; Returns: Json }
+      mark_contact_verified: {
+        Args: { p_channel: string; p_user_id?: string }
+        Returns: Database["public"]["Tables"]["profiles"]["Row"]
+      }
+      request_account_deletion: {
+        Args: { p_reason?: string; p_user_id?: string }
+        Returns: Database["public"]["Tables"]["profiles"]["Row"]
       }
       claim_daily_reward: { Args: never; Returns: Json }
       get_setting: { Args: { p_default?: Json; p_key: string }; Returns: Json }

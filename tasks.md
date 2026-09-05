@@ -5,10 +5,10 @@
 - [x] Read `requirements.md` completely before changing code.
 - [x] Inspect the existing repository and preserve unrelated files/changes.
 - [x] Keep the project demo-credit only; do not add real-money/payment/wallet/cash-out functionality.
-- [ ] Complete tasks in order; do not mark a task complete without running its stated validation.
-- [ ] Add migrations; never make production schema changes manually.
+- [x] Complete tasks in order; do not mark a task complete without running its stated validation.
+- [x] Add migrations; never make production schema changes manually.
 - [x] Use secure environment variables and never commit secrets.
-- [ ] Commit logical milestones with descriptive messages after tests pass.
+- [x] Commit logical milestones with descriptive messages after tests pass.
 
 ## Phase 0 — Discovery and architecture
 
@@ -43,15 +43,15 @@
 
 ## Phase 2 — Authentication and account lifecycle
 
-- [ ] Build Welcome, registration, login, logout, password reset, and session-expiry flows.
-- [ ] Support email and phone registration/login with OTP verification of at least one contact before play.
-- [ ] Build nickname validation, preset avatar selection, safe avatar upload/crop/validation, and fallback avatar.
-- [ ] Enforce one account per verified email/phone and explain conflicts clearly.
-- [ ] Create verified-player welcome-credit ledger flow that runs exactly once.
-- [ ] Build Profile/Settings page with language, sound volume/pack, graphics settings, and account controls.
-- [ ] Add self-service account deletion request flow that preserves required ledger/audit records.
-- [ ] Add player status enforcement for active, suspended, and banned accounts.
-- [ ] Test login, OTP, reset, profile, avatar, suspension, and account deletion paths.
+- [x] Build Welcome, registration, login, logout, password reset, and session-expiry flows.
+- [x] Support email and phone registration/login with OTP verification of at least one contact before play.
+- [x] Build nickname validation, preset avatar selection, safe avatar upload/crop/validation, and fallback avatar.
+- [x] Enforce one account per verified email/phone and explain conflicts clearly.
+- [x] Create verified-player welcome-credit ledger flow that runs exactly once.
+- [x] Build Profile/Settings page with language, sound volume/pack, graphics settings, and account controls.
+- [x] Add self-service account deletion request flow that preserves required ledger/audit records.
+- [x] Add player status enforcement for active, suspended, and banned accounts.
+- [x] Test login, OTP, reset, profile, avatar, suspension, and account deletion paths.
 
 ## Phase 3 — Design system, responsive shell, and localization
 
