@@ -5,6 +5,7 @@ export type SoundCue =
   | "ui_success"
   | "ui_error"
   | "bet_lock"
+  | "dice_roll"
   | "payout";
 
 type SoundManagerOptions = {
@@ -133,6 +134,13 @@ export class SoundManager {
           freq: 420,
           gain: 0.09,
           duration: 0.12,
+        };
+      case "dice_roll":
+        return {
+          type: arcade ? "square" : "sawtooth",
+          freq: arcade ? 240 : 200,
+          gain: 0.08,
+          duration: 0.22,
         };
       case "payout":
         return {
