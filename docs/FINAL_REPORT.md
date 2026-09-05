@@ -16,7 +16,7 @@ Staging Supabase project: **`jlpcfatcpymjnjbxmclo`** (forward migrations only; n
 |--------|---------|
 | `a523b18` | Phase 9 — engagement pages + `20260905200000_player_experience_rpcs` |
 | `4cabb17` | Phase 10 — admin console + `20260905210000_admin_console_rpcs` |
-| *(Phase 11 tip)* | Security headers, PWA, docs, Playwright smoke, tasks/CONTINUATION |
+| `7fa171e` | Phase 11 — security headers, PWA, docs, release prep |
 
 ## Pages added
 
