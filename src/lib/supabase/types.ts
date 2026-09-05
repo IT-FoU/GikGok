@@ -1,12 +1,6 @@
 /**
- * Placeholder until Phase 1 generates types from Supabase migrations.
- * Prefer regenerating via `supabase gen types typescript`.
+ * Database types are generated from Supabase migrations.
+ * Regenerate with: `npm run db:types` (writes `types.gen.ts`).
+ * Do not edit `types.gen.ts` by hand.
  */
-export type Database = {
-  public: {
-    Tables: Record<string, never>;
-    Views: Record<string, never>;
-    Functions: Record<string, never>;
-    Enums: Record<string, never>;
-  };
-};
+export type { Database, Json, Tables, TablesInsert, TablesUpdate, Enums } from "./types.gen";
