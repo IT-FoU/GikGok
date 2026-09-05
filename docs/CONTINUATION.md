@@ -1,42 +1,30 @@
 # Continuation checkpoint — GIKGOK continuous implementation
 
 ## Branch
-
-- `cursor/gikgok-continuous-implementation` (PR → `cursor/supabase-staging-integration-455c`)
+- `cursor/gikgok-continuous-implementation` → PR base `cursor/supabase-staging-integration-455c`
 - Staging: `jlpcfatcpymjnjbxmclo`
 
 ## Progress
-
 | Phase | Status |
 |-------|--------|
-| 0–1 | COMPLETE |
-| 2 Auth | COMPLETE (Phone OTP WAITING SMS) |
-| 3 Design | COMPLETE |
-| 4 Ledger/rewards/credits | COMPLETE |
-| 5–11 | NEXT — Phase 5 game engine |
+| 0–4 | COMPLETE |
+| 5 Game engine | COMPLETE (migration `20260905190000` on staging) |
+| 6–8 Games UI | NEXT |
+| 9–11 | PENDING |
+
+## Game keys (staging)
+`fish_prawn_crab`, `high_low`, `spinning_plate`
 
 ## Last completed
+Phase 5 server settlement RPCs + domain tests (17).
 
-Phase 4 ledger domain, daily reward UI, credit requests, admin review, ledger history.
-
-## Next task
-
-Phase 5 — Server-authoritative shared game engine.
-
-## Tests passed
-
-lint, typecheck, unit (29), build, security:check (static)
+## Next
+Phase 6 Fish–Prawn–Crab play UI (2D/3D reveal of server result).
 
 ## Waiting / blocked
-
-- Local Supabase Docker overlayfs BLOCKED
+- Local Docker Supabase BLOCKED
 - Phone OTP WAITING SMS provider
 - Physical device QA WAITING
 
-## Migrations on staging
-
-Through `20260905183000_auth_lifecycle_rpcs.sql`
-
 ## Safe resume
-
-Start at first unchecked Phase 5 task in `tasks.md`. Do not retarget main/production/other projects.
+First unchecked Phase 6 task. Do not re-apply `20260905190000`.

@@ -83,14 +83,14 @@
 
 ## Phase 5 — Server-authoritative game engine
 
-- [ ] Create central game-definition/configuration interface reusable by current and future games.
-- [ ] Create shared bet validation, idempotency-key, atomic debit/settle, receipt, game-version, and audit services.
-- [ ] Implement secure server/Edge Function settlement; browser must not calculate outcomes, credit, or payouts.
-- [ ] Implement Random Mode default and explicit auditable Controlled Demo Mode selected before a round.
-- [ ] Ensure controlled-demo state appears in admin records and player receipt; never silently alter locked normal rounds.
-- [ ] Implement game availability, feature flags, limits, smooth maintenance closure, and release lifecycle.
-- [ ] Add rate limiting and replay protection for every game endpoint.
-- [ ] Write exhaustive unit tests for validation, settlement, negative balance prevention, duplicate requests, and config version retention.
+- [x] Create central game-definition/configuration interface reusable by current and future games.
+- [x] Create shared bet validation, idempotency-key, atomic debit/settle, receipt, game-version, and audit services.
+- [x] Implement secure server/Edge Function settlement; browser must not calculate outcomes, credit, or payouts.
+- [x] Implement Random Mode default and explicit auditable Controlled Demo Mode selected before a round.
+- [x] Ensure controlled-demo state appears in admin records and player receipt; never silently alter locked normal rounds.
+- [x] Implement game availability, feature flags, limits, smooth maintenance closure, and release lifecycle.
+- [x] Add rate limiting and replay protection for every game endpoint.
+- [x] Write exhaustive unit tests for validation, settlement, negative balance prevention, duplicate requests, and config version retention.
 
 ## Phase 6 — Fish–Prawn–Crab
 
