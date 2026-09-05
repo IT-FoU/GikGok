@@ -147,9 +147,16 @@ export async function reviewCreditRequestAction(
   const { data, error } = await supabase.rpc("review_credit_request", {
     p_request_id: requestId,
     p_decision: decision,
-    p_gross: decision === "approved" ? gross : null,
-    p_fee_percent: decision === "approved" ? feePercent : 0,
-    p_bonus: decision === "approved" ? (Number.isFinite(bonus) ? bonus : 0) : 0,
+    ...(decision === "approved"
+      ? {
+          p_gross: gross,
+          p_fee_percent: feePercent,
+          p_bonus: Number.isFinite(bonus) ? bonus : 0,
+        }
+      : {
+          p_fee_percent: 0,
+          p_bonus: 0,
+        }),
     p_reason: reason,
   });
 
