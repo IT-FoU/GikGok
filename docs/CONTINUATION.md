@@ -2,47 +2,41 @@
 
 ## Branch
 
-- Branch: `cursor/gikgok-continuous-implementation`
-- Base: `cursor/supabase-staging-integration-455c` (includes `83e79ce…`)
-- PR: targets staging-integration (not main)
-- Staging project: `GikGok-staging` / `jlpcfatcpymjnjbxmclo`
+- `cursor/gikgok-continuous-implementation` (PR → `cursor/supabase-staging-integration-455c`)
+- Staging: `jlpcfatcpymjnjbxmclo`
 
 ## Progress
 
 | Phase | Status |
 |-------|--------|
-| 0 Discovery | COMPLETE |
-| 1 Database | COMPLETE |
-| 2 Auth | COMPLETE (Phone OTP live WAITING SMS provider) |
-| 3 Design / i18n / sound | COMPLETE |
-| 4–11 | NEXT — start Phase 4 ledger/rewards |
+| 0–1 | COMPLETE |
+| 2 Auth | COMPLETE (Phone OTP WAITING SMS) |
+| 3 Design | COMPLETE |
+| 4 Ledger/rewards/credits | COMPLETE |
+| 5–11 | NEXT — Phase 5 game engine |
 
-## Last completed task
+## Last completed
 
-Phase 3 design system, responsive shells, Lao/English, accessibility, sound packs.
+Phase 4 ledger domain, daily reward UI, credit requests, admin review, ledger history.
 
-## Current / next task
+## Next task
 
-Phase 4 — Ledger, rewards, and credit requests.
+Phase 5 — Server-authoritative shared game engine.
 
 ## Tests passed
 
-- lint, typecheck, unit tests (23), build, security:check (static)
+lint, typecheck, unit (29), build, security:check (static)
 
-## Tests waiting / blocked
+## Waiting / blocked
 
-- Local `db:validate` / `db:test` / `db:types:check` — Docker overlayfs BLOCKED
-- Phone OTP live — WAITING Owner SMS provider
-- Physical device QA — WAITING
+- Local Supabase Docker overlayfs BLOCKED
+- Phone OTP WAITING SMS provider
+- Physical device QA WAITING
 
 ## Migrations on staging
 
-- Through `20260905183000_auth_lifecycle_rpcs.sql` applied to `jlpcfatcpymjnjbxmclo`
+Through `20260905183000_auth_lifecycle_rpcs.sql`
 
 ## Safe resume
 
-1. Checkout `cursor/gikgok-continuous-implementation`
-2. Read `tasks.md` + this file
-3. Start at first unchecked Phase 4 task
-4. Do not re-apply already-applied migrations
-5. Never target main / production / other Supabase projects
+Start at first unchecked Phase 5 task in `tasks.md`. Do not retarget main/production/other projects.
