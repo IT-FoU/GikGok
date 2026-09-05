@@ -55,4 +55,29 @@ describe("engagement helpers", () => {
   it("exposes engagement module identity", () => {
     expect(ENGAGEMENT_MODULE).toBe("engagement");
   });
+
+  it("detects claimable mission progress", async () => {
+    const { missionClaimable } = await import("@/modules/engagement/helpers");
+    expect(
+      missionClaimable({ is_completed: true, reward_ledger_id: null }),
+    ).toBe(true);
+    expect(
+      missionClaimable({
+        is_completed: true,
+        reward_ledger_id: "ledger-1",
+      }),
+    ).toBe(false);
+    expect(
+      missionClaimable({ is_completed: false, reward_ledger_id: null }),
+    ).toBe(false);
+  });
+
+  it("parses staging leaderboard board keys", async () => {
+    const { parseLeaderboardMetric } = await import(
+      "@/modules/engagement/helpers"
+    );
+    expect(parseLeaderboardMetric("current_credit")).toBe("current_credit");
+    expect(parseLeaderboardMetric("bogus")).toBe("current_credit");
+    expect(parseLeaderboardMetric("most_wins")).toBe("most_wins");
+  });
 });

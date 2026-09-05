@@ -47,6 +47,11 @@ export async function placeBetAction(input: {
     return { ok: false, message: "Sign in required." };
   }
 
+  const { error: pauseError } = await supabase.rpc("assert_play_allowed");
+  if (pauseError) {
+    return { ok: false, message: asMessage(pauseError) };
+  }
+
   const rate = checkRateLimit({
     key: `bet:${user.id}:${gameId}`,
     limit: GAME_BET_RATE_LIMIT.limit,
@@ -96,9 +101,25 @@ export async function placeBetAction(input: {
     return { ok: false, message: asMessage(error) };
   }
 
+  // Best-effort engagement hooks (never fail the settled bet).
+  try {
+    await supabase.rpc("record_mission_progress", { p_game_key: gameId });
+    const payload = (data ?? {}) as { is_win?: boolean };
+    if (payload.is_win) {
+      await supabase.rpc("unlock_achievement", { p_key: "first_win" });
+    }
+    if (input.stake >= 10_000) {
+      await supabase.rpc("unlock_achievement", { p_key: "high_roller" });
+    }
+  } catch {
+    // ignore engagement side-effects
+  }
+
   revalidatePath("/home");
   revalidatePath("/credits");
   revalidatePath("/ledger");
+  revalidatePath("/missions");
+  revalidatePath("/achievements");
   revalidatePath(`/play/${gameId}`);
 
   return {

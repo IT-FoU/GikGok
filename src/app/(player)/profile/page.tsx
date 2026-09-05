@@ -16,6 +16,8 @@ import {
 } from "@/modules/player/actions";
 import { AppearanceControls } from "@/components/appearance-controls";
 import { Button } from "@/components/ui/button";
+import { ResponsiblePlaySection } from "@/modules/engagement/ui";
+import { parseResponsiblePlayConfig } from "@/modules/engagement/helpers";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -30,25 +32,31 @@ export default async function ProfilePage() {
     redirect("/login");
   }
 
-  const [{ data: profile }, { data: settings }, { data: contacts }] =
-    await Promise.all([
-      supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
-      supabase
-        .from("player_settings")
-        .select("*")
-        .eq("player_id", user.id)
-        .maybeSingle(),
-      supabase
-        .from("player_contacts")
-        .select("is_verified")
-        .eq("player_id", user.id),
-    ]);
+  const [
+    { data: profile },
+    { data: settings },
+    { data: contacts },
+    { data: responsibleRaw },
+  ] = await Promise.all([
+    supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
+    supabase
+      .from("player_settings")
+      .select("*")
+      .eq("player_id", user.id)
+      .maybeSingle(),
+    supabase
+      .from("player_contacts")
+      .select("is_verified")
+      .eq("player_id", user.id),
+    supabase.rpc("get_responsible_play_config"),
+  ]);
 
   if (!profile) {
     redirect("/register");
   }
 
   const verified = Boolean(contacts?.some((row) => row.is_verified));
+  const responsible = parseResponsiblePlayConfig(responsibleRaw);
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-8 px-6 py-12">
@@ -110,6 +118,12 @@ export default async function ProfilePage() {
           }}
         />
       </section>
+
+      <ResponsiblePlaySection
+        config={responsible}
+        sessionStartedAt={profile.session_started_at ?? null}
+        playPausedUntil={profile.play_paused_until ?? null}
+      />
 
       <section className="space-y-3">
         <h2 className="text-xl font-medium text-red-300">Danger zone</h2>

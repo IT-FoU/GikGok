@@ -7,11 +7,10 @@ export type BetReceiptRow = {
   bet_id: string;
   game_id: string;
   game_version_id: string;
-  settlement_mode: string;
+  mode: string;
   stake: number;
   selection: Json;
-  total_return_multiplier: number;
-  payout_amount: number;
+  total_return: number;
   balance_after: number;
   is_win: boolean;
   created_at: string;
@@ -125,12 +124,12 @@ export function parseResponsiblePlayConfig(
 }
 
 export type LeaderboardMetric =
-  | "highest_credit"
+  | "current_credit"
   | "cumulative_winnings"
   | "most_wins";
 
 export const LEADERBOARD_METRICS: LeaderboardMetric[] = [
-  "highest_credit",
+  "current_credit",
   "cumulative_winnings",
   "most_wins",
 ];
@@ -140,5 +139,12 @@ export function parseLeaderboardMetric(
 ): LeaderboardMetric {
   return LEADERBOARD_METRICS.includes(value as LeaderboardMetric)
     ? (value as LeaderboardMetric)
-    : "highest_credit";
+    : "current_credit";
+}
+
+export function missionClaimable(progress: {
+  is_completed: boolean;
+  reward_ledger_id: string | null;
+}): boolean {
+  return progress.is_completed && progress.reward_ledger_id === null;
 }

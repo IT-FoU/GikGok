@@ -282,16 +282,19 @@ export type Database = {
       announcement_reads: {
         Row: {
           announcement_id: string
+          dismissed_at: string | null
           player_id: string
           read_at: string
         }
         Insert: {
           announcement_id: string
+          dismissed_at?: string | null
           player_id: string
           read_at?: string
         }
         Update: {
           announcement_id?: string
+          dismissed_at?: string | null
           player_id?: string
           read_at?: string
         }
@@ -1554,6 +1557,8 @@ export type Database = {
           is_qa_account: boolean
           last_active_at: string | null
           nickname: string
+          play_paused_until: string | null
+          session_started_at: string | null
           status: Database["public"]["Enums"]["player_status"]
           welcome_credit_granted_at: string | null
           suspended_at: string | null
@@ -1569,6 +1574,8 @@ export type Database = {
           is_qa_account?: boolean
           last_active_at?: string | null
           nickname: string
+          play_paused_until?: string | null
+          session_started_at?: string | null
           status?: Database["public"]["Enums"]["player_status"]
           welcome_credit_granted_at?: string | null
           suspended_at?: string | null
@@ -1584,6 +1591,8 @@ export type Database = {
           is_qa_account?: boolean
           last_active_at?: string | null
           nickname?: string
+          play_paused_until?: string | null
+          session_started_at?: string | null
           status?: Database["public"]["Enums"]["player_status"]
           welcome_credit_granted_at?: string | null
           suspended_at?: string | null
@@ -2129,6 +2138,63 @@ export type Database = {
         }
         Returns: Json
       }
+
+      assert_play_allowed: { Args: never; Returns: undefined }
+      claim_mission_reward: {
+        Args: { p_mission_id: string }
+        Returns: Json
+      }
+      create_invite_code: {
+        Args: never
+        Returns: Database["public"]["Tables"]["invites"]["Row"]
+      }
+      create_support_ticket: {
+        Args: {
+          p_category: Database["public"]["Enums"]["ticket_category"]
+          p_message: string
+          p_subject: string
+        }
+        Returns: Database["public"]["Tables"]["support_tickets"]["Row"]
+      }
+      feature_flag_enabled: { Args: { p_key: string }; Returns: boolean }
+      get_responsible_play_config: { Args: never; Returns: Json }
+      mark_all_notifications_read: { Args: never; Returns: number }
+      mark_announcement_read: {
+        Args: { p_announcement_id: string; p_dismiss?: boolean }
+        Returns: undefined
+      }
+      mark_notification_read: {
+        Args: { p_notification_id: string }
+        Returns: undefined
+      }
+      record_mission_progress: {
+        Args: { p_game_key: string }
+        Returns: undefined
+      }
+      refresh_leaderboard_entries: { Args: never; Returns: undefined }
+      reply_support_ticket: {
+        Args: { p_message: string; p_ticket_id: string }
+        Returns: Database["public"]["Tables"]["ticket_messages"]["Row"]
+      }
+      request_friend: {
+        Args: { p_nickname: string }
+        Returns: Database["public"]["Tables"]["friendships"]["Row"]
+      }
+      respond_friendship: {
+        Args: { p_action: string; p_friendship_id: string }
+        Returns: Database["public"]["Tables"]["friendships"]["Row"]
+      }
+      set_play_pause: {
+        Args: { p_days: number }
+        Returns: Database["public"]["Tables"]["profiles"]["Row"]
+      }
+      submit_ticket_satisfaction: {
+        Args: { p_comment?: string | null; p_score: number; p_ticket_id: string }
+        Returns: Database["public"]["Tables"]["support_tickets"]["Row"]
+      }
+      touch_play_session: { Args: never; Returns: string }
+      unlock_achievement: { Args: { p_key: string }; Returns: boolean }
+
       write_audit: {
         Args: {
           p_action: string

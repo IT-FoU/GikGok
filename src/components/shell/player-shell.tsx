@@ -3,12 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  Bell,
   BookOpen,
   Gamepad2,
   History,
   Home,
+  Medal,
   ScrollText,
+  Trophy,
   UserRound,
+  Users,
   Wallet,
 } from "lucide-react";
 
@@ -19,11 +23,15 @@ import { useSound } from "@/modules/sound/sound-provider";
 const PLAYER_LINKS = [
   { href: "/home", key: "nav.home", icon: Home },
   { href: "/play/fish_prawn_crab", key: "nav.games", icon: Gamepad2 },
+  { href: "/history", key: "nav.history", icon: History },
   { href: "/credits", key: "nav.credits", icon: Wallet },
+  { href: "/missions", key: "nav.missions", icon: Trophy },
+  { href: "/leaderboard", key: "nav.leaderboard", icon: Medal },
+  { href: "/notifications", key: "nav.notifications", icon: Bell },
+  { href: "/friends", key: "nav.friends", icon: Users },
   { href: "/ledger", key: "nav.ledger", icon: ScrollText },
   { href: "/guide", key: "nav.guide", icon: BookOpen },
   { href: "/profile", key: "nav.profile", icon: UserRound },
-  { href: "/profile#history", key: "nav.history", icon: History },
 ] as const;
 
 const AUTH_PATHS = new Set([

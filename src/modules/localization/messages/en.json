@@ -17,6 +17,12 @@
     "ledger": "Ledger",
     "tickets": "Tickets",
     "settings": "Settings",
+    "missions": "Missions",
+    "leaderboard": "Leaderboard",
+    "notifications": "Alerts",
+    "friends": "Friends",
+    "achievements": "Badges",
+    "support": "Support",
     "signIn": "Sign in",
     "signOut": "Sign out",
     "createAccount": "Create account"
