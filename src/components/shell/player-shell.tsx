@@ -18,10 +18,10 @@ import { useSound } from "@/modules/sound/sound-provider";
 
 const PLAYER_LINKS = [
   { href: "/home", key: "nav.home", icon: Home },
+  { href: "/play/fish_prawn_crab", key: "nav.games", icon: Gamepad2 },
   { href: "/credits", key: "nav.credits", icon: Wallet },
   { href: "/ledger", key: "nav.ledger", icon: ScrollText },
   { href: "/guide", key: "nav.guide", icon: BookOpen },
-  { href: "/guide#games", key: "nav.games", icon: Gamepad2 },
   { href: "/profile", key: "nav.profile", icon: UserRound },
   { href: "/profile#history", key: "nav.history", icon: History },
 ] as const;
@@ -63,7 +63,10 @@ export function PlayerShell({ children }: { children: React.ReactNode }) {
           >
             {PLAYER_LINKS.map((link) => {
               const base = link.href.split("#")[0]!;
-              const active = pathname === base || pathname.startsWith(base);
+              const active =
+                link.key === "nav.games"
+                  ? pathname.startsWith("/play")
+                  : pathname === base || pathname.startsWith(`${base}/`) || pathname.startsWith(base);
               const Icon = link.icon;
               return (
                 <Link
@@ -98,7 +101,10 @@ export function PlayerShell({ children }: { children: React.ReactNode }) {
           <nav className="surface sticky top-24 space-y-1 p-3">
             {PLAYER_LINKS.map((link) => {
               const base = link.href.split("#")[0]!;
-              const active = pathname === base || pathname.startsWith(base);
+              const active =
+                link.key === "nav.games"
+                  ? pathname.startsWith("/play")
+                  : pathname === base || pathname.startsWith(`${base}/`) || pathname.startsWith(base);
               const Icon = link.icon;
               return (
                 <Link
@@ -130,7 +136,10 @@ export function PlayerShell({ children }: { children: React.ReactNode }) {
         <ul className="mx-auto flex max-w-2xl gap-1 overflow-x-auto px-2 py-2">
           {PLAYER_LINKS.map((link) => {
             const base = link.href.split("#")[0]!;
-            const active = pathname === base || pathname.startsWith(base);
+            const active =
+              link.key === "nav.games"
+                ? pathname.startsWith("/play")
+                : pathname === base || pathname.startsWith(base);
             const Icon = link.icon;
             return (
               <li key={link.href} className="min-w-[4.25rem] flex-1">

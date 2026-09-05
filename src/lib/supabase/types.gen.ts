@@ -935,6 +935,35 @@ export type Database = {
           },
         ]
       }
+      game_rate_limits: {
+        Row: {
+          bucket: string
+          created_at: string
+          id: string
+          player_id: string
+        }
+        Insert: {
+          bucket: string
+          created_at?: string
+          id?: string
+          player_id: string
+        }
+        Update: {
+          bucket?: string
+          created_at?: string
+          id?: string
+          player_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_rate_limits_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       games: {
         Row: {
           active_version_id: string | null
@@ -1993,6 +2022,69 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+
+      assert_game_playable: {
+        Args: { p_game_key: string }
+        Returns: Database["public"]["Tables"]["games"]["Row"]
+      }
+      ensure_player_round: {
+        Args: { p_game_key: string }
+        Returns: Database["public"]["Tables"]["game_rounds"]["Row"]
+      }
+      enforce_game_rate_limit: {
+        Args: {
+          p_bucket: string
+          p_limit?: number
+          p_player_id: string
+          p_window?: number
+        }
+        Returns: undefined
+      }
+      get_active_game_version: {
+        Args: { p_game_key: string }
+        Returns: Database["public"]["Tables"]["game_versions"]["Row"]
+      }
+      open_game_round: {
+        Args: {
+          p_controlled_result?: Json | null
+          p_game_key: string
+          p_mode?: Database["public"]["Enums"]["game_mode"]
+        }
+        Returns: Database["public"]["Tables"]["game_rounds"]["Row"]
+      }
+      place_and_settle_bet: {
+        Args: {
+          p_controlled_result?: Json | null
+          p_game_key: string
+          p_idempotency_key: string
+          p_mode?: Database["public"]["Enums"]["game_mode"]
+          p_selection: Json
+          p_stake: number
+        }
+        Returns: Json
+      }
+      set_game_availability: {
+        Args: {
+          p_enabled: boolean
+          p_game_key: string
+          p_message?: string | null
+        }
+        Returns: Database["public"]["Tables"]["games"]["Row"]
+      }
+      settle_game_outcome: {
+        Args: {
+          p_controlled: Json
+          p_game_key: string
+          p_mode: Database["public"]["Enums"]["game_mode"]
+          p_selection: Json
+          p_stake: number
+        }
+        Returns: Json
+      }
+      start_smooth_maintenance_close: {
+        Args: { p_game_key: string; p_message?: string }
+        Returns: Database["public"]["Tables"]["games"]["Row"]
       }
 
       complete_player_onboarding: {

@@ -62,6 +62,23 @@
     "highlow": "High–Low Dice — predict high or low; triples lose both sides",
     "plate": "Spinning Plate — pick one of twelve slots and land exactly"
   },
+  "games": {
+    "fpc": {
+      "name": "Fish–Prawn–Crab",
+      "description": "Three-dice symbol game. Single Symbol x2, Special Pair x10.",
+      "guide": "Choose one symbol (x2) or a special pair (x10)."
+    },
+    "highlow": {
+      "name": "High–Low Dice",
+      "description": "Three dice; Low 3–10, High 11–18. Any triple loses. x2.",
+      "guide": "Pick High or Low. Any triple loses."
+    },
+    "plate": {
+      "name": "Spinning Plate",
+      "description": "Twelve-slot wheel with a fixed pointer; exact-match wins.",
+      "guide": "Select one of twelve slots. Exact land only."
+    }
+  },
   "admin": {
     "title": "Admin console",
     "body": "Secure admin routing, permissions, and operational modules continue in later phases. This shell reserves the /admin boundary.",

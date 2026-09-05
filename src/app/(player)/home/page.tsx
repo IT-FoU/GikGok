@@ -97,12 +97,30 @@ export default async function PlayerHomePage() {
         )}
       </div>
 
+      <section className="space-y-3" aria-label="Games">
+        <h2 className="text-lg font-medium">Games</h2>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <Button asChild variant="secondary" className="h-auto justify-start py-3">
+            <Link href="/play/fish_prawn_crab">Fish–Prawn–Crab</Link>
+          </Button>
+          <Button asChild variant="secondary" className="h-auto justify-start py-3">
+            <Link href="/play/high_low">High–Low Dice</Link>
+          </Button>
+          <Button asChild variant="secondary" className="h-auto justify-start py-3">
+            <Link href="/play/spinning_plate">Spinning Plate</Link>
+          </Button>
+        </div>
+      </section>
+
       <div className="flex flex-wrap gap-3">
         <Button asChild>
           <Link href="/profile">Profile & settings</Link>
         </Button>
         <Button asChild variant="secondary">
           <Link href="/guide">Game Guide</Link>
+        </Button>
+        <Button asChild variant="outline">
+          <Link href="/credits">Credits</Link>
         </Button>
         <Button asChild variant="outline">
           <Link href="/verify">Verify contact</Link>

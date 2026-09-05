@@ -28,9 +28,9 @@ describe("Phase 0 module boundaries", () => {
   it("keeps game-engine module identity and game ids", () => {
     expect(GAME_ENGINE_MODULE).toBe("game-engine");
     const games: GameId[] = [
-      "fish-prawn-crab",
-      "high-low",
-      "spinning-plate",
+      "fish_prawn_crab",
+      "high_low",
+      "spinning_plate",
     ];
     expect(games).toHaveLength(3);
   });
