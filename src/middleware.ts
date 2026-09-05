@@ -10,13 +10,17 @@ const PUBLIC_PATHS = new Set([
   "/forgot-password",
   "/account-status",
   "/guide",
+  "/api/health",
+  "/manifest.webmanifest",
+  "/sw.js",
+  "/admin/access-denied",
 ]);
 
 const AUTH_ONLY_PATHS = new Set(["/login", "/register", "/forgot-password"]);
 
 function isPublicPath(pathname: string): boolean {
   if (PUBLIC_PATHS.has(pathname)) return true;
-  if (pathname.startsWith("/admin")) return true;
+  if (pathname.startsWith("/icons/")) return true;
   return false;
 }
 

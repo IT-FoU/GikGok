@@ -35,6 +35,8 @@ function walk(dir) {
 const SERVER_ONLY_ALLOWED = [
   join("src", "lib", "env", "server.ts"),
   join("src", "lib", "supabase", "admin.ts"),
+  join("src", "lib", "security", "index.ts"),
+  join("src", "lib", "observability", "logger.ts"),
 ];
 
 const srcFiles = walk(join(ROOT, "src")).filter((f) => /\.(ts|tsx|js|jsx|mjs)$/.test(f));

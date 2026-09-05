@@ -19,6 +19,7 @@
     "db:types": "supabase gen types typescript --local > src/lib/supabase/types.gen.ts",
     "db:types:check": "supabase gen types typescript --local > /tmp/gikgok-types.gen.ts && diff -u src/lib/supabase/types.gen.ts /tmp/gikgok-types.gen.ts",
     "db:validate": "node scripts/db-validate.mjs",
+    "db:backup": "bash scripts/db-backup.sh",
     "security:check": "node scripts/security-check.mjs"
   },
   "dependencies": {
