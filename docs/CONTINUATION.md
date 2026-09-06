@@ -38,15 +38,18 @@
 - Stable ActionResult codes + shared `resolveActionMessage`
 - Migration `20260906080000` (Storage INSERT ticket ownership; revoke `get_active_game_version` from authenticated)
 - Proxy nonce CSP for scripts; static CSP removed from `next.config.ts`
+- Serialize Vitest DB workers (`fileParallelism: false`, `maxWorkers: 1`) to stop shared-fixture races
+- CI concurrency: group by branch name (push+PR); DB job queues on `gikgok-staging-db-rls-suite` so parallel workflows cannot race staging fixtures
 
 ## Next actions
-1. Recount Advisors via dashboard when Management API allows (do not claim “fully clean”)
-2. Owner: staging auth credentials → Playwright critical journeys
-3. Owner: physical iOS/Android/tablet Light/Dark Lao/English QA
-4. Owner: SMS provider → Phone OTP
-5. Owner: hosted preview deploy
-6. Do **not** merge to `main` or production without Owner approval
-7. Optional follow-up: style CSP nonce (`style-src` still `unsafe-inline`); deeper DEFINER COMMENT coverage
+1. Confirm tip Actions green after concurrency serialization (Static + DB)
+2. Recount Advisors via dashboard when Management API allows (do not claim “fully clean”)
+3. Owner: staging auth credentials → Playwright critical journeys
+4. Owner: physical iOS/Android/tablet Light/Dark Lao/English QA
+5. Owner: SMS provider → Phone OTP
+6. Owner: hosted preview deploy
+7. Do **not** merge to `main` or production without Owner approval
+8. Optional follow-up: style CSP nonce (`style-src` still `unsafe-inline`); deeper DEFINER COMMENT coverage; residual admin/ledger chrome i18n
 
 ## Tip Actions (Owner-corrected secret)
 - Green run: [https://github.com/IT-FoU/GikGok/actions/runs/34026129961](https://github.com/IT-FoU/GikGok/actions/runs/34026129961) — Static PASS + DB PASS on `2474719`

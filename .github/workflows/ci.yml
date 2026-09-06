@@ -6,8 +6,10 @@ on:
       - "**"
   pull_request:
 
+# Group by branch name so push + pull_request for the same tip cancel each other
+# (github.ref differs: refs/heads/... vs refs/pull/N/merge).
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
@@ -67,6 +69,11 @@ jobs:
     name: DB · RLS/RPC security suite
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # All trusted CI hits the same staging project. Queue (do not cancel mid-test)
+    # so parallel branches/workflows cannot race shared fixtures / unique constraints.
+    concurrency:
+      group: gikgok-staging-db-rls-suite
+      cancel-in-progress: false
     if: >-
       github.event_name == 'push' ||
       github.event.pull_request.head.repo.full_name == github.repository

@@ -28,6 +28,7 @@ Identify the tested implementation commit with `git rev-parse HEAD` on the branc
 | ID | Severity | Fix | Verification |
 |----|----------|-----|--------------|
 | CI-001 | High | Stopped invalid secrets-in-job-`if`; static always runs; DB only trusted+configured | Workflow + Actions |
+| CI-002 | High | Serialize DB Vitest workers; queue staging DB job across workflows (push+PR / branches) | `vitest.db.config.ts` + `ci.yml` concurrency |
 | ORPHAN-001 | High | Revoke direct writes; session RPC with ownership/bounds/dedupe; admin claim/validate/resolve | `tests/db/storage-orphan.test.ts` |
 | ORPHAN-002 | High | Manual admin retry only; orphan row never authorizes delete | Admin action + DB RPCs |
 | ATTACH-001 | Medium | Collision-resistant filenames; honest failure messaging | Engagement actions |
