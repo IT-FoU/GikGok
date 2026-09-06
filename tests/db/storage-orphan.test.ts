@@ -255,6 +255,70 @@ describe.skipIf(!dbUp)("storage_orphan_objects authorization", () => {
       ]);
     });
   });
+
+
+
+
+  it("happy-path: record → claim → validate → resolve", async () => {
+    const ticketId = randomUUID();
+    const path = `${ticketId}/${PLAYER_A}/happy.jpg`;
+
+    await commitAsPostgres(async (c) => {
+      await c.query(
+        `insert into public.support_tickets (id, player_id, category, subject, status)
+         values ($1, $2, 'other', 'orphan-happy', 'open')`,
+        [ticketId, PLAYER_A],
+      );
+    });
+
+    const orphanId = await asPlayer(PLAYER_A, async (c) => {
+      const r = await c.query(
+        `select public.record_storage_orphan(
+           'ticket-attachments', $1, 'ticket_attachment_delete', null, 'happy') as id`,
+        [path],
+      );
+      return r.rows[0].id as string;
+    });
+
+    const claimed = await asPlayer(ADMIN_CREDIT, async (c) => {
+      const r = await c.query(
+        `select public.claim_storage_orphan_retry_batch(25) as row`,
+      );
+      return r.rows.map((row) => {
+        const payload = row.row as { id?: string } | string;
+        return typeof payload === "string" ? payload : payload?.id;
+      });
+    });
+    expect(claimed).toEqual(expect.arrayContaining([orphanId]));
+
+    await asPlayer(ADMIN_CREDIT, async (c) => {
+      // claim already validated; resolve explicitly
+      await c.query(
+        `select public.mark_storage_orphan_resolved($1, 'manual cleanup ok')`,
+        [orphanId],
+      );
+    });
+
+    const resolvedAt = await commitAsPostgres(async (c) => {
+      const r = await c.query(
+        `select resolved_at from public.storage_orphan_objects where id = $1`,
+        [orphanId],
+      );
+      return r.rows[0]?.resolved_at as string | null;
+    });
+    expect(resolvedAt).toBeTruthy();
+
+    await commitAsPostgres(async (c) => {
+      await c.query(`delete from public.storage_orphan_objects where id = $1`, [
+        orphanId,
+      ]);
+      await c.query(`delete from public.support_tickets where id = $1`, [
+        ticketId,
+      ]);
+    });
+  });
+
+
 });
 
 describe.skipIf(dbUp)(

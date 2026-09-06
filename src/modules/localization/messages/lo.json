@@ -83,7 +83,34 @@
   "home": {
     "greeting": "ຍິນດີຕ້ອນຮັບ, {name}",
     "balance": "ຍອດ: {amount} GIK (ຄຣດິດທົດສອບເທົ່ານັ້ນ)",
-    "verifyHint": "ຢືນຢັນການຕິດຕໍ່ເພື່ອເປີດການຫຼິ້ນ ແລະ ຮັບຄຣດິດຕ້ອນຮັບ."
+    "verifyHint": "ຢືນຢັນການຕິດຕໍ່ເພື່ອເປີດການຫຼິ້ນ ແລະ ຮັບຄຣດິດຕ້ອນຮັບ.",
+    "playPausedUntil": "ຢຸດຫຼິ້ນຈົນຮອດ {until}",
+    "dailyReward": "ລາງວັນປະຈຳວັນ",
+    "streak": "ຕໍ່ເນື່ອງ: {count}",
+    "claimedToday": "ຮັບແລ້ວມື້ນີ້",
+    "availableOnCredits": "ພ້ອມໃນ Credits",
+    "openCredits": "ເປີດ Credits & ເຊັກອິນ",
+    "games": "ເກມ",
+    "announcements": "ປະກາດ",
+    "unreadCount": "{count} ຍັງບໍ່ອ່ານ",
+    "noAnnouncements": "ບໍ່ມີປະກາດ.",
+    "activity": "ກິດຈະກຳ",
+    "betActivity": "ກິດຈະກຳເດີມພັນ",
+    "fullHistory": "ປະຫວັດເຕັມ",
+    "missions": "ພາລະກິດ",
+    "none": "ບໍ່ມີ",
+    "viewMissions": "ເບິ່ງພາລະກິດ",
+    "achievement": "ຜົງານ",
+    "noneYet": "ຍັງບໍ່ມີ",
+    "collection": "ຄໍເລັກຊັນ",
+    "leaderboard": "ຕາຕະລາງອັນດັບ",
+    "open": "ເປີດ",
+    "noRankings": "ຍັງບໍ່ມີອັນດັບ.",
+    "profileSettings": "ໂປຣໄຟລ໌ & ຕັ້ງຄ່າ",
+    "support": "ຊ່ວຍເຫຼືອ",
+    "friends": "ໝູ່",
+    "gameGuide": "ຄູ່ມືເກມ",
+    "breakReminder": "ເຕືອນພັກພັກ — ຄວນພັກສັ້ນໆ."
   },
   "profile": {
     "title": "ໂປຣໄຟລ ແລະ ຕັ້ງຄ່າ",
@@ -203,7 +230,18 @@
   },
   "notifications": {
     "title": "ການແຈ້ງເຕືອນ",
-    "empty": "ຍັງບໍ່ມີການແຈ້ງເຕືອນ"
+    "empty": "ຍັງບໍ່ມີການແຈ້ງເຕືອນ",
+    "typeCreditApproved": "ອະນຸມັດຄຳຂໍເຄຣດິດແລ້ວ",
+    "typeCreditRejected": "ປະຕິເສດຄຳຂໍເຄຣດິດ",
+    "typeTicketReply": "ຄຳຕອບຕິກເກັດ",
+    "typeGeneric": "ການແຈ້ງເຕືອນ",
+    "typeVerification": "ການຢືນຢັນ",
+    "typeReward": "ລາງວັນ",
+    "typeCreditRequest": "ຄຳຂໍເຄຣດິດ",
+    "typeTicket": "ຕິກເກັດຊ່ວຍເຫຼືອ",
+    "typeAchievement": "ຜົງານ",
+    "typeAnnouncement": "ປະກາດ",
+    "typeSystem": "ລະບົບ"
   },
   "guide": {
     "title": "ຄູ່ມືເກມ",
@@ -270,7 +308,23 @@
     "mfa": {
       "pinLabel": "PIN ແອດມິນ",
       "pinHint": "ການກະທຳສຳຄັນຕ້ອງໃຊ້ PIN ແອດມິນໃໝ່. MFA ແຍກຕ່າງຫາກ: ເຊດຊັນຕ້ອງເປັນ aal2 (ເຮັດ MFA ທີ່ Admin → MFA).",
-      "enrollFailed": "ການລົງທະບຽນບໍ່ສຳເລັດ."
+      "enrollFailed": "ການລົງທະບຽນບໍ່ສຳເລັດ.",
+      "setPinTitle": "ຕັ້ງ PIN ແອດມິນ",
+      "setPinHint": "PIN ແມ່ນການຢືນຢັນໄລຍະສັ້ນແຍກຕ່າງຫາກສຳລັບການກະທຳສຳຄັນ.",
+      "savePin": "ບັນທຶກ PIN",
+      "verifyPinTitle": "ຢືນຢັນ PIN",
+      "verifyPinCta": "ຢືນຢັນ PIN (5 ນາທີ)",
+      "enrollTitle": "ລົງທະບຽນແອັບຢືນຢັນ (TOTP)",
+      "enrollHint": "ໃຊ້ Supabase Auth MFA. ເຈົ້າຂອງ ແລະ ແອດມິນທີ່ຕ້ອງການ 2FA ຕ້ອງຮອດ aal2 ກ່ອນໃຊ້ຄອນໂຊລ.",
+      "startEnroll": "ເລີ່ມລົງທະບຽນ",
+      "regenQr": "ສ້າງ QR ໃໝ່",
+      "confirmEnroll": "ຢືນຢັນການລົງທະບຽນ",
+      "upgradeTitle": "ອັບເກຣດເຊດຊັນເປັນ aal2",
+      "upgradeHint": "ໃສ່ລະຫັດຈາກແອັບຢືນຢັນຫຼັງເຂົ້າສູ່ລະບົບ.",
+      "verifyAuthenticator": "ຢືນຢັນແອັບຢືນຢັນ",
+      "disableFlag": "ປິດທຸງ 2FA ແອດມິນ",
+      "qrAlt": "ລະຫັດ QR ສຳລັບແອັບຢືນຢັນ",
+      "secretLabel": "ລະຫັດລັບ: {secret}"
     },
     "tickets": {
       "title": "ຕິກເກັດສະໜັບສະໜູນ",
@@ -279,7 +333,14 @@
       "category": "ໝວດ",
       "status": "ສະຖານະ",
       "created": "ສ້າງເມື່ອ",
-      "attachments": "ໄຟລ໌ແນບ"
+      "attachments": "ໄຟລ໌ແນບ",
+      "statusOpen": "ເປີດ",
+      "statusInProgress": "ກຳລັງດຳເນີນ",
+      "statusWaiting": "ລໍຖ້າຜູ້ຫຼິ້ນ",
+      "statusResolved": "ແກ້ໄຂແລ້ວ",
+      "statusClosed": "ປິດ",
+      "replyPlaceholder": "ຄຳຕອບພະນັກງານ (ທາງເລືອກ)",
+      "updateCta": "ອັບເດດຕິກເກັດ"
     }
   },
   "status": {
@@ -505,6 +566,18 @@
     "ADMIN_OTP_MISUSE": "ໃຊ້ MFA ແອັບຢືນຢັນສຳລັບ 2FA; ຢ່າສົ່ງລະຫັດ OTP ໃຫ້ການກະທຳແອດມິນ.",
     "ADMIN_MFA_ENROLL_STARTED": "ສະແກນ QR ດ້ວຍແອັບຢືນຢັນ ແລ້ວຢືນຢັນດ້ວຍລະຫັດ.",
     "ADMIN_ORPHAN_NONE": "ບໍ່ມີ storage orphan ທີ່ພ້ອມສຳລັບການລອງໃໝ່ດ້ວຍມື.",
-    "ADMIN_ORPHAN_RESULT": "ທຳຄວາມສະອາດ orphan: ສຳເລັດ {resolved}, ລົ້ມເຫຼວ {failed}, ດຶງມາ {claimed}."
+    "ADMIN_ORPHAN_RESULT": "ທຳຄວາມສະອາດ orphan: ສຳເລັດ {resolved}, ລົ້ມເຫຼວ {failed}, ດຶງມາ {claimed}.",
+    "ADMIN_PIN_SAVED": "ບັນທຶກ PIN ແອດມິນແລ້ວ.",
+    "ADMIN_PIN_VERIFIED": "ຢືນຢັນ PIN ແລ້ວ 5 ນາທີ.",
+    "ADMIN_PIN_INVALID": "PIN ບໍ່ຖືກຕ້ອງ.",
+    "ADMIN_PIN_VALIDATION": "PIN ຕ້ອງມີ 4–12 ຕົວເລກ.",
+    "ADMIN_MFA_ENABLED": "ເປີດ 2FA ແອດມິນແລ້ວ (Supabase Auth MFA).",
+    "ADMIN_MFA_DISABLED": "ປິດ 2FA ແອດມິນແລ້ວ.",
+    "ADMIN_MFA_ENROLL_CONFIRMED": "ລົງທະບຽນ authenticator ແລະ ເປີດ 2FA ແອດມິນແລ້ວ.",
+    "ADMIN_MFA_SESSION_OK": "ຢືນຢັນ authenticator ແລ້ວ. ອັບເກຣດເຊດຊັນເປັນ aal2.",
+    "ADMIN_TICKET_UPDATED": "ອັບເດດຕິກເກັດແລ້ວ.",
+    "ADMIN_EXPORT_DONE": "ສົ່ງອອກລາຍງານ {reportType} ແລ້ວ.",
+    "ENGAGEMENT_OK": "ດຳເນີນການສຳເລັດ.",
+    "LEDGER_OK": "ດຳເນີນການເຄຣດິດສຳເລັດ."
   }
 }

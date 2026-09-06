@@ -1,14 +1,16 @@
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader } from "@/components/ui/card";
 import {
   Table,
   TBody,
   TD,
-  TH,
-  THead,
   TR,
 } from "@/components/ui/table";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { TicketStatusForm, StorageOrphanCard } from "@/modules/admin/ui";
+import {
+  AdminTicketsHeader,
+  AdminTicketsTableHead,
+} from "@/modules/admin/tickets-chrome";
 import { requireAdminSession } from "@/modules/admin/guards";
 import { signTicketAttachmentUrls } from "@/modules/engagement/actions";
 
@@ -37,8 +39,7 @@ export default async function AdminTicketsPage() {
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
       <Card>
         <CardHeader>
-          <CardTitle>Support tickets</CardTitle>
-          <CardDescription>Queue, status transitions, and staff replies.</CardDescription>
+          <AdminTicketsHeader />
         </CardHeader>
         <TicketStatusForm
           tickets={(tickets ?? []).map((t) => ({
@@ -50,15 +51,7 @@ export default async function AdminTicketsPage() {
       </Card>
       <StorageOrphanCard />
       <Table>
-        <THead>
-          <TR>
-            <TH>Subject</TH>
-            <TH>Category</TH>
-            <TH>Status</TH>
-            <TH>Created</TH>
-            <TH>Attachments</TH>
-          </TR>
-        </THead>
+        <AdminTicketsTableHead />
         <TBody>
           {(tickets ?? []).map((ticket) => {
             const items = attachmentsByTicket.get(ticket.id) ?? [];

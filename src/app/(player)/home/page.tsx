@@ -1,7 +1,13 @@
-import Link from "next/link";
-import { redirect } from "next/navigation";
-
 import { Button } from "@/components/ui/button";
+import { redirect } from "next/navigation";
+import Link from "next/link";
+import {
+  HomeGreeting,
+  HomeSignOutButton,
+  HomeDailyReward,
+  HomeSectionTitle,
+  HomeText,
+} from "@/modules/player/home-chrome";
 import { logoutAction } from "@/modules/player/actions";
 import {
   AnnouncementDismissForm,
@@ -146,53 +152,26 @@ export default async function PlayerHomePage() {
     <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6">
       <PlaySessionTouch />
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-semibold text-[var(--brand-accent)]">
-            Welcome, {profile.nickname}
-          </h1>
-          <p className="mt-2 text-[var(--brand-muted)]">
-            Balance: {balance.toLocaleString()} GIK (demo credits only)
-          </p>
-          <p className="mt-1 text-sm text-[var(--brand-muted)]">
-            {responsible.demo_notice}
-          </p>
-          {!verified ? (
-            <p className="mt-2 text-sm text-amber-200">
-              Verify your contact to unlock play and welcome credit.
-            </p>
-          ) : null}
-          {playPaused ? (
-            <p className="mt-2 text-sm text-amber-200">
-              Play paused until{" "}
-              {new Date(profile.play_paused_until!).toLocaleString()}
-            </p>
-          ) : null}
-          {breakDue ? (
-            <p className="mt-2 text-sm text-amber-200">
-              Session break reminder — consider taking a short pause.
-            </p>
-          ) : null}
-        </div>
+        <HomeGreeting
+          nickname={profile.nickname}
+          balance={balance}
+          verifyHint={!verified}
+          playPausedUntil={playPaused ? profile.play_paused_until : null}
+          breakDue={breakDue}
+          demoNotice={responsible.demo_notice}
+        />
         <form action={logoutAction}>
-          <Button type="submit" variant="outline">
-            Sign out
-          </Button>
+          <HomeSignOutButton />
         </form>
       </div>
 
-      <section className="space-y-3" aria-label="Daily reward">
-        <h2 className="text-lg font-medium">Daily reward</h2>
-        <p className="text-sm text-[var(--brand-muted)]">
-          Streak: {streak?.current_streak ?? 0}
-          {claimedToday ? " · claimed today" : " · available on Credits"}
-        </p>
-        <Button asChild variant="secondary">
-          <Link href="/credits">Open credits & check-in</Link>
-        </Button>
-      </section>
+      <HomeDailyReward
+        streak={streak?.current_streak ?? 0}
+        claimedToday={claimedToday}
+      />
 
       <section className="space-y-3" aria-label="Games">
-        <h2 className="text-lg font-medium">Games</h2>
+        <HomeSectionTitle labelKey="home.games" />
         <div className="grid gap-3 sm:grid-cols-3">
           {GAME_CARDS.map((game) => (
             <Button
@@ -209,16 +188,16 @@ export default async function PlayerHomePage() {
 
       <section className="space-y-3" aria-label="Announcements">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-lg font-medium">Announcements</h2>
+          <HomeSectionTitle labelKey="home.announcements" />
           <Link
             href="/notifications"
             className="text-sm text-[var(--brand-accent)] underline-offset-4 hover:underline"
           >
-            {unreadNotifications ?? 0} unread
+            <HomeText id="home.unreadCount" params={{ count: unreadNotifications ?? 0 }} />
           </Link>
         </div>
         {!visibleAnnouncements.length ? (
-          <p className="text-sm text-[var(--brand-muted)]">No announcements.</p>
+          <p className="text-sm text-[var(--brand-muted)]"><HomeText id="home.noAnnouncements" /></p>
         ) : (
           <ul className="space-y-3">
             {visibleAnnouncements.map((announcement) => (
@@ -243,7 +222,7 @@ export default async function PlayerHomePage() {
 
       <section className="grid gap-4 sm:grid-cols-3" aria-label="Activity">
         <div className="border border-[var(--brand-border)] p-4">
-          <p className="text-sm text-[var(--brand-muted)]">Bet activity</p>
+          <p className="text-sm text-[var(--brand-muted)]"><HomeText id="home.betActivity" /></p>
           <p className="mt-1 text-2xl font-semibold">
             {recentBetsCount ?? 0}
           </p>
@@ -251,44 +230,45 @@ export default async function PlayerHomePage() {
             href="/history"
             className="mt-2 inline-block text-sm text-[var(--brand-accent)] underline-offset-4 hover:underline"
           >
-            Full history
+            <HomeText id="home.fullHistory" />
           </Link>
         </div>
         <div className="border border-[var(--brand-border)] p-4">
-          <p className="text-sm text-[var(--brand-muted)]">Missions</p>
+          <p className="text-sm text-[var(--brand-muted)]"><HomeText id="home.missions" /></p>
           <p className="mt-1 text-sm">
-            {(missionRows ?? [])
-              .map((m) => m.name)
-              .slice(0, 2)
-              .join(" · ") || "None"}
+            {(missionRows ?? []).map((m) => m.name).slice(0, 2).join(" · ") || (
+              <HomeText id="home.none" />
+            )}
           </p>
           <Link
             href="/missions"
             className="mt-2 inline-block text-sm text-[var(--brand-accent)] underline-offset-4 hover:underline"
           >
-            View missions
+            <HomeText id="home.viewMissions" />
           </Link>
         </div>
         <div className="border border-[var(--brand-border)] p-4">
-          <p className="text-sm text-[var(--brand-muted)]">Achievement</p>
-          <p className="mt-1 text-sm">{achievementName ?? "None yet"}</p>
+          <p className="text-sm text-[var(--brand-muted)]"><HomeText id="home.achievement" /></p>
+          <p className="mt-1 text-sm">
+            {achievementName ?? <HomeText id="home.noneYet" />}
+          </p>
           <Link
             href="/achievements"
             className="mt-2 inline-block text-sm text-[var(--brand-accent)] underline-offset-4 hover:underline"
           >
-            Collection
+            <HomeText id="home.collection" />
           </Link>
         </div>
       </section>
 
       <section className="space-y-3" aria-label="Leaderboard preview">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-medium">Leaderboard</h2>
+          <HomeSectionTitle labelKey="home.leaderboard" />
           <Link
             href="/leaderboard"
             className="text-sm text-[var(--brand-accent)] underline-offset-4 hover:underline"
           >
-            Open
+            <HomeText id="home.open" />
           </Link>
         </div>
         <ol className="space-y-2">
@@ -306,23 +286,23 @@ export default async function PlayerHomePage() {
             </li>
           ))}
           {!leaderboardRows?.length ? (
-            <li className="text-sm text-[var(--brand-muted)]">No rankings yet.</li>
+            <li className="text-sm text-[var(--brand-muted)]"><HomeText id="home.noRankings" /></li>
           ) : null}
         </ol>
       </section>
 
       <div className="flex flex-wrap gap-3">
         <Button asChild>
-          <Link href="/profile">Profile & settings</Link>
+          <Link href="/profile"><HomeText id="home.profileSettings" /></Link>
         </Button>
         <Button asChild variant="secondary">
-          <Link href="/support">Support</Link>
+          <Link href="/support"><HomeText id="home.support" /></Link>
         </Button>
         <Button asChild variant="outline">
-          <Link href="/friends">Friends</Link>
+          <Link href="/friends"><HomeText id="home.friends" /></Link>
         </Button>
         <Button asChild variant="outline">
-          <Link href="/guide">Game Guide</Link>
+          <Link href="/guide"><HomeText id="home.gameGuide" /></Link>
         </Button>
       </div>
     </main>

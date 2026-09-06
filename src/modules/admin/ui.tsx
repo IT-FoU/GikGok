@@ -57,16 +57,14 @@ function Banner({ result }: { result: ActionResult | null }) {
 }
 
 function SensitiveFields() {
+  const t = useTranslations();
   return (
     <div className="grid gap-2">
       <div>
-        <Label htmlFor="pin">Admin PIN</Label>
+        <Label htmlFor="pin">{t("admin.mfa.pinLabel")}</Label>
         <Input id="pin" name="pin" type="password" inputMode="numeric" autoComplete="off" />
       </div>
-      <p className="text-xs text-[var(--brand-muted)]">
-        High-impact actions need a fresh admin PIN. Authenticator MFA is separate:
-        your session must already be aal2 (complete MFA at Admin → MFA).
-      </p>
+      <p className="text-xs text-[var(--brand-muted)]">{t("admin.mfa.pinHint")}</p>
     </div>
   );
 }
@@ -87,6 +85,7 @@ function useActionForm(
 }
 
 export function AdminSecurityForms() {
+  const t = useTranslations();
   const pin = useActionForm(setAdminPinAction);
   const verifyPin = useActionForm(verifyAdminPinAction);
   const disableTwoFa = useActionForm(setAdmin2faAction);
@@ -103,7 +102,7 @@ export function AdminSecurityForms() {
     startEnroll(async () => {
       const result = await startAdminMfaEnrollAction();
       if (!result.ok) {
-        setEnrollError(result.message ?? "Enrollment failed.");
+        setEnrollError(result.message ?? t("admin.mfa.enrollFailed"));
         return;
       }
       setFactorId(result.factorId ?? "");
@@ -115,47 +114,44 @@ export function AdminSecurityForms() {
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       <form className="space-y-3" onSubmit={pin.onSubmit}>
-        <h3 className="font-medium">Set admin PIN</h3>
-        <p className="text-xs text-[var(--brand-muted)]">
-          PIN is a separate short-lived confirmation for high-impact actions.
-        </p>
-        <Input name="pin" type="password" inputMode="numeric" placeholder="4–12 digits" required />
+        <h3 className="font-medium">{t("admin.mfa.setPinTitle")}</h3>
+        <p className="text-xs text-[var(--brand-muted)]">{t("admin.mfa.setPinHint")}</p>
+        <Input name="pin" type="password" inputMode="numeric" placeholder="4–12" required />
         <Button type="submit" disabled={pin.pending}>
-          Save PIN
+          {t("admin.mfa.savePin")}
         </Button>
         <Banner result={pin.result} />
       </form>
       <form className="space-y-3" onSubmit={verifyPin.onSubmit}>
-        <h3 className="font-medium">Verify PIN</h3>
+        <h3 className="font-medium">{t("admin.mfa.verifyPinTitle")}</h3>
         <Input name="pin" type="password" inputMode="numeric" required />
         <Button type="submit" disabled={verifyPin.pending} variant="secondary">
-          Verify PIN (5 minutes)
+          {t("admin.mfa.verifyPinCta")}
         </Button>
         <Banner result={verifyPin.result} />
       </form>
       <div className="space-y-3">
-        <h3 className="font-medium">Enroll authenticator (TOTP)</h3>
-        <p className="text-xs text-[var(--brand-muted)]">
-          Uses Supabase Auth MFA (enroll → QR/secret → challenge → verify). Owners
-          and admins marked require_2fa must reach aal2 before using the console.
-        </p>
+        <h3 className="font-medium">{t("admin.mfa.enrollTitle")}</h3>
+        <p className="text-xs text-[var(--brand-muted)]">{t("admin.mfa.enrollHint")}</p>
         <Button type="button" disabled={enrollPending} onClick={beginEnroll}>
-          {qr ? "Re-generate QR" : "Start enrollment"}
+          {qr ? t("admin.mfa.regenQr") : t("admin.mfa.startEnroll")}
         </Button>
         {enrollError ? <p className="text-sm text-red-400">{enrollError}</p> : null}
         {qr ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={qr} alt="Authenticator QR code" className="h-48 w-48 rounded-md bg-white p-2" />
+          <img src={qr} alt={t("admin.mfa.qrAlt")} className="h-48 w-48 rounded-md bg-white p-2" />
         ) : null}
         {secret ? (
-          <p className="break-all font-mono text-xs text-[var(--brand-muted)]">Secret: {secret}</p>
+          <p className="break-all font-mono text-xs text-[var(--brand-muted)]">
+            {t("admin.mfa.secretLabel", { secret })}
+          </p>
         ) : null}
         {factorId ? (
           <form className="space-y-3" onSubmit={confirmEnroll.onSubmit}>
             <input type="hidden" name="factorId" value={factorId} />
             <Input name="otp" placeholder="6-digit code" required autoComplete="one-time-code" />
             <Button type="submit" disabled={confirmEnroll.pending}>
-              Confirm enrollment
+              {t("admin.mfa.confirmEnroll")}
             </Button>
             <Banner result={confirmEnroll.result} />
           </form>
@@ -163,21 +159,18 @@ export function AdminSecurityForms() {
       </div>
       <div className="space-y-3">
         <form className="space-y-3" onSubmit={verifyOtp.onSubmit}>
-          <h3 className="font-medium">Upgrade session to aal2</h3>
-          <p className="text-xs text-[var(--brand-muted)]">
-            Enter a current authenticator code after password sign-in. This does not
-            mint a separate admin OTP stamp.
-          </p>
+          <h3 className="font-medium">{t("admin.mfa.upgradeTitle")}</h3>
+          <p className="text-xs text-[var(--brand-muted)]">{t("admin.mfa.upgradeHint")}</p>
           <Input name="otp" required autoComplete="one-time-code" />
           <Button type="submit" disabled={verifyOtp.pending} variant="secondary">
-            Verify authenticator
+            {t("admin.mfa.verifyAuthenticator")}
           </Button>
           <Banner result={verifyOtp.result} />
         </form>
         <form className="space-y-3" onSubmit={disableTwoFa.onSubmit}>
           <input type="hidden" name="enabled" value="false" />
           <Button type="submit" disabled={disableTwoFa.pending} variant="secondary">
-            Disable admin 2FA flag
+            {t("admin.mfa.disableFlag")}
           </Button>
           <Banner result={disableTwoFa.result} />
         </form>
@@ -362,6 +355,7 @@ export function TicketStatusForm({
 }: {
   tickets: Array<{ id: string; subject: string; status: string }>;
 }) {
+  const t = useTranslations();
   const { pending, result, onSubmit } = useActionForm(updateTicketStatusAction);
   return (
     <form className="space-y-3" onSubmit={onSubmit}>
@@ -373,15 +367,15 @@ export function TicketStatusForm({
         ))}
       </select>
       <select name="status" className="w-full rounded-md border border-[var(--brand-border)] bg-[var(--brand-surface)] px-3 py-2 text-sm" defaultValue="in_progress">
-        <option value="open">Open</option>
-        <option value="in_progress">In progress</option>
-        <option value="waiting_for_player">Waiting for player</option>
-        <option value="resolved">Resolved</option>
-        <option value="closed">Closed</option>
+        <option value="open">{t("admin.tickets.statusOpen")}</option>
+        <option value="in_progress">{t("admin.tickets.statusInProgress")}</option>
+        <option value="waiting_for_player">{t("admin.tickets.statusWaiting")}</option>
+        <option value="resolved">{t("admin.tickets.statusResolved")}</option>
+        <option value="closed">{t("admin.tickets.statusClosed")}</option>
       </select>
-      <Input name="reply" placeholder="Staff reply (optional)" />
+      <Input name="reply" placeholder={t("admin.tickets.replyPlaceholder")} />
       <Button type="submit" disabled={pending}>
-        Update ticket
+        {t("admin.tickets.updateCta")}
       </Button>
       <Banner result={result} />
     </form>

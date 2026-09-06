@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { Noto_Sans_Lao, Sora } from "next/font/google";
@@ -47,12 +48,16 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
   const accent = sanitizeAccentTheme("green");
+  // Proxy sets CSP + x-nonce on the request. Next 16 reads the CSP nonce for
+  // framework scripts automatically; we also surface it for any future Script tags.
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
 
   return (
     <html
       lang={DEFAULT_LOCALE}
+      data-nonce={nonce}
       data-color-mode="dark"
       data-accent={accent}
       className={`${sora.variable} ${notoLao.variable} h-full antialiased`}

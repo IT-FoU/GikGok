@@ -7,6 +7,7 @@ import {
   NotificationReadButton,
 } from "@/modules/engagement/ui";
 import { T } from "@/modules/localization/t";
+import { NotificationTypeLabel } from "@/modules/engagement/notification-type-label";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -61,7 +62,7 @@ export default async function NotificationsPage() {
                     </p>
                   ) : null}
                   <p className="mt-2 text-xs text-[var(--brand-muted)]">
-                    {notification.type} ·{" "}
+                    <NotificationTypeLabel type={notification.type} data={notification.data as Record<string, unknown> | null} /> ·{" "}
                     {new Date(notification.created_at).toLocaleString()}
                   </p>
                 </div>

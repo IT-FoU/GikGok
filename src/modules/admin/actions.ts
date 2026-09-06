@@ -73,13 +73,13 @@ export async function setAdminPinAction(formData: FormData): Promise<ActionResul
   await assertMutatingOrigin();
   const pin = String(formData.get("pin") ?? "");
   if (!pinSchemaValid(pin)) {
-    return { ok: false, message: "PIN must be 4–12 digits." };
+    return { ok: false, code: "ADMIN_PIN_VALIDATION", message: "PIN must be 4–12 digits." };
   }
   const supabase = await createServerSupabaseClient();
   const { error } = await supabase.rpc("set_admin_pin", { p_pin: pin });
   if (error) return failFromError(error);
   revalidateAdmin("/admin", "/admin/settings");
-  return { ok: true, message: "Admin PIN saved." };
+  return { ok: true, code: "ADMIN_PIN_SAVED", message: "Admin PIN saved." };
 }
 
 export async function verifyAdminPinAction(formData: FormData): Promise<ActionResult> {
@@ -89,8 +89,8 @@ export async function verifyAdminPinAction(formData: FormData): Promise<ActionRe
   const { data, error } = await supabase.rpc("verify_admin_pin", { p_pin: pin });
   if (error) return failFromError(error);
   return data
-    ? { ok: true, message: "PIN verified for 5 minutes." }
-    : { ok: false, message: "Invalid PIN." };
+    ? { ok: true, code: "ADMIN_PIN_VERIFIED", message: "PIN verified for 5 minutes." }
+    : { ok: false, code: "ADMIN_PIN_INVALID", message: "Invalid PIN." };
 }
 
 export async function setAdmin2faAction(formData: FormData): Promise<ActionResult> {
@@ -121,6 +121,7 @@ export async function setAdmin2faAction(formData: FormData): Promise<ActionResul
   revalidateAdmin("/admin/settings");
   return {
     ok: true,
+    code: enabled ? "ADMIN_MFA_ENABLED" : "ADMIN_MFA_DISABLED",
     message: enabled
       ? "Admin 2FA enabled (Supabase Auth MFA)."
       : "Admin 2FA disabled.",
@@ -174,7 +175,7 @@ export async function confirmAdminMfaEnrollAction(
   });
   if (error) return failFromError(error);
   revalidateAdmin("/admin/settings", "/admin/mfa");
-  return { ok: true, message: "Authenticator enrolled. Admin 2FA is enabled." };
+  return { ok: true, code: "ADMIN_MFA_ENROLL_CONFIRMED", message: "Authenticator enrolled. Admin 2FA is enabled." };
 }
 
 export async function verifyAdmin2faAction(formData: FormData): Promise<ActionResult> {
@@ -206,7 +207,7 @@ export async function verifyAdmin2faAction(formData: FormData): Promise<ActionRe
   if (verified.error) return failFromError(verified.error);
 
   revalidateAdmin("/admin", "/admin/mfa", "/admin/settings");
-  return { ok: true, message: "Authenticator verified. Session upgraded to aal2." };
+  return { ok: true, code: "ADMIN_MFA_SESSION_OK", message: "Authenticator verified. Session upgraded to aal2." };
 }
 
 export async function createAdminAccountAction(formData: FormData): Promise<ActionResult> {
@@ -351,7 +352,7 @@ export async function updateTicketStatusAction(formData: FormData): Promise<Acti
   });
   if (error) return failFromError(error);
   revalidateAdmin("/admin/tickets");
-  return { ok: true, message: "Ticket updated." };
+  return { ok: true, code: "ADMIN_TICKET_UPDATED", message: "Ticket updated." };
 }
 
 export async function upsertMissionAction(formData: FormData): Promise<ActionResult> {
@@ -550,8 +551,9 @@ export async function exportReportAction(formData: FormData): Promise<ActionResu
   revalidateAdmin("/admin/reports", "/admin/audit");
   return {
     ok: true,
+    code: "ADMIN_EXPORT_DONE",
     message: `Exported ${reportType} report.`,
-    data: data as Record<string, unknown>,
+    data: { reportType, payload: data },
   };
 }
 

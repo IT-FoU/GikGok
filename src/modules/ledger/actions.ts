@@ -84,7 +84,7 @@ export async function createCreditRequestAction(
   }
 
   revalidatePath("/credits");
-  return { ok: true, message: "Credit request submitted." };
+  return { ok: true, code: "LEDGER_OK", message: "Credit request submitted." };
 }
 
 export async function cancelCreditRequestAction(
@@ -101,7 +101,7 @@ export async function cancelCreditRequestAction(
   }
 
   revalidatePath("/credits");
-  return { ok: true, message: "Request cancelled." };
+  return { ok: true, code: "LEDGER_OK", message: "Request cancelled." };
 }
 
 export async function reviewCreditRequestAction(

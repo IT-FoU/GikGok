@@ -83,7 +83,34 @@
   "home": {
     "greeting": "Welcome, {name}",
     "balance": "Balance: {amount} GIK (demo credits only)",
-    "verifyHint": "Verify your contact to unlock play and welcome credit."
+    "verifyHint": "Verify your contact to unlock play and welcome credit.",
+    "dailyReward": "Daily reward",
+    "streak": "Streak: {count}",
+    "claimedToday": "claimed today",
+    "availableOnCredits": "available on Credits",
+    "openCredits": "Open credits & check-in",
+    "games": "Games",
+    "announcements": "Announcements",
+    "unreadCount": "{count} unread",
+    "noAnnouncements": "No announcements.",
+    "activity": "Activity",
+    "betActivity": "Bet activity",
+    "fullHistory": "Full history",
+    "missions": "Missions",
+    "none": "None",
+    "viewMissions": "View missions",
+    "achievement": "Achievement",
+    "noneYet": "None yet",
+    "collection": "Collection",
+    "leaderboard": "Leaderboard",
+    "open": "Open",
+    "noRankings": "No rankings yet.",
+    "profileSettings": "Profile & settings",
+    "support": "Support",
+    "friends": "Friends",
+    "gameGuide": "Game Guide",
+    "playPausedUntil": "Play paused until {until}",
+    "breakReminder": "Session break reminder — consider taking a short pause."
   },
   "profile": {
     "title": "Profile & settings",
@@ -203,7 +230,18 @@
   },
   "notifications": {
     "title": "Notifications",
-    "empty": "No notifications yet"
+    "empty": "No notifications yet",
+    "typeCreditApproved": "Credit request approved",
+    "typeCreditRejected": "Credit request rejected",
+    "typeTicketReply": "Support ticket reply",
+    "typeGeneric": "Notification",
+    "typeVerification": "Verification",
+    "typeReward": "Reward",
+    "typeCreditRequest": "Credit request",
+    "typeTicket": "Support ticket",
+    "typeAchievement": "Achievement",
+    "typeAnnouncement": "Announcement",
+    "typeSystem": "System"
   },
   "guide": {
     "title": "Game Guide",
@@ -270,7 +308,23 @@
     "mfa": {
       "pinLabel": "Admin PIN",
       "pinHint": "High-impact actions need a fresh admin PIN. Authenticator MFA is separate: your session must already be aal2 (complete MFA at Admin → MFA).",
-      "enrollFailed": "Enrollment failed."
+      "enrollFailed": "Enrollment failed.",
+      "setPinTitle": "Set admin PIN",
+      "setPinHint": "PIN is a separate short-lived confirmation for high-impact actions.",
+      "savePin": "Save PIN",
+      "verifyPinTitle": "Verify PIN",
+      "verifyPinCta": "Verify PIN (5 minutes)",
+      "enrollTitle": "Enroll authenticator (TOTP)",
+      "enrollHint": "Uses Supabase Auth MFA (enroll → QR/secret → challenge → verify). Owners and admins marked require_2fa must reach aal2 before using the console.",
+      "startEnroll": "Start enrollment",
+      "regenQr": "Re-generate QR",
+      "confirmEnroll": "Confirm enrollment",
+      "upgradeTitle": "Upgrade session to aal2",
+      "upgradeHint": "Enter a current authenticator code after password sign-in.",
+      "verifyAuthenticator": "Verify authenticator",
+      "disableFlag": "Disable admin 2FA flag",
+      "qrAlt": "Authenticator QR code",
+      "secretLabel": "Secret: {secret}"
     },
     "tickets": {
       "title": "Support tickets",
@@ -279,7 +333,14 @@
       "category": "Category",
       "status": "Status",
       "created": "Created",
-      "attachments": "Attachments"
+      "attachments": "Attachments",
+      "statusOpen": "Open",
+      "statusInProgress": "In progress",
+      "statusWaiting": "Waiting for player",
+      "statusResolved": "Resolved",
+      "statusClosed": "Closed",
+      "replyPlaceholder": "Staff reply (optional)",
+      "updateCta": "Update ticket"
     }
   },
   "status": {
@@ -505,6 +566,18 @@
     "ADMIN_OTP_MISUSE": "Use authenticator MFA for 2FA; do not submit OTP codes to admin actions.",
     "ADMIN_MFA_ENROLL_STARTED": "Scan the QR code with your authenticator app, then confirm with a code.",
     "ADMIN_ORPHAN_NONE": "No eligible storage orphans ready for manual retry.",
-    "ADMIN_ORPHAN_RESULT": "Manual orphan cleanup: {resolved} resolved, {failed} failed, {claimed} claimed."
+    "ADMIN_ORPHAN_RESULT": "Manual orphan cleanup: {resolved} resolved, {failed} failed, {claimed} claimed.",
+    "ADMIN_PIN_SAVED": "Admin PIN saved.",
+    "ADMIN_PIN_VERIFIED": "PIN verified for 5 minutes.",
+    "ADMIN_PIN_INVALID": "Invalid PIN.",
+    "ADMIN_PIN_VALIDATION": "PIN must be 4–12 digits.",
+    "ADMIN_MFA_ENABLED": "Admin 2FA enabled (Supabase Auth MFA).",
+    "ADMIN_MFA_DISABLED": "Admin 2FA disabled.",
+    "ADMIN_MFA_ENROLL_CONFIRMED": "Authenticator enrolled. Admin 2FA is enabled.",
+    "ADMIN_MFA_SESSION_OK": "Authenticator verified. Session upgraded to aal2.",
+    "ADMIN_TICKET_UPDATED": "Ticket updated.",
+    "ADMIN_EXPORT_DONE": "Exported {reportType} report.",
+    "ENGAGEMENT_OK": "Request completed.",
+    "LEDGER_OK": "Credit action completed."
   }
 }

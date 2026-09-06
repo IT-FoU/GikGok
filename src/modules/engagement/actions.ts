@@ -146,7 +146,7 @@ export async function markNotificationReadAction(
   }
 
   revalidateEngagement();
-  return { ok: true, message: "Notification marked read." };
+  return { ok: true, code: "ENGAGEMENT_OK", message: "Notification marked read." };
 }
 
 export async function markAllNotificationsReadAction(): Promise<ActionResult> {
@@ -161,6 +161,7 @@ export async function markAllNotificationsReadAction(): Promise<ActionResult> {
   revalidateEngagement();
   return {
     ok: true,
+    code: "ENGAGEMENT_OK",
     message: `Marked ${Number(data ?? 0)} notification(s) as read.`,
     data: { count: Number(data ?? 0) },
   };
@@ -230,7 +231,7 @@ export async function respondFriendshipAction(
   }
 
   revalidateEngagement();
-  return { ok: true, message: `Friendship ${action}.` };
+  return { ok: true, code: "ENGAGEMENT_OK", message: `Friendship ${action}.` };
 }
 
 export async function createInviteAction(): Promise<ActionResult> {
@@ -576,10 +577,15 @@ export async function deleteTicketAttachmentAction(
   }
 
   revalidateEngagement([`/support/${row.ticket_id}`, "/admin/tickets"]);
-  return { ok: true, message: "Attachment deleted." };
+  return { ok: true, code: "ENGAGEMENT_OK", message: "Attachment deleted." };
 }
 
 
+/**
+ * SSR / server-component helper: issues short-lived signed Storage URLs.
+ * Not a browser-initiated mutation — Origin/CSRF checks are intentionally omitted.
+ * Callers must already enforce ticket ownership / admin permission before invoke.
+ */
 export async function signTicketAttachmentUrls(
   ticketId: string,
 ): Promise<
@@ -643,7 +649,7 @@ export async function submitTicketSatisfactionAction(
   }
 
   revalidateEngagement([`/support/${ticketId}`]);
-  return { ok: true, message: "Thanks for your feedback." };
+  return { ok: true, code: "ENGAGEMENT_OK", message: "Thanks for your feedback." };
 }
 
 export async function setPlayPauseAction(
@@ -693,5 +699,5 @@ export async function refreshLeaderboardAction(): Promise<ActionResult> {
   }
   revalidatePath("/leaderboard");
   revalidatePath("/home");
-  return { ok: true, message: "Leaderboard refreshed." };
+  return { ok: true, code: "ENGAGEMENT_OK", message: "Leaderboard refreshed." };
 }

@@ -260,6 +260,152 @@ describe.skipIf(!dbUp)("dual approval + true concurrency", () => {
     },
     60_000,
   );
+
+  it("exact-threshold net equals threshold completes with a single approver", async () => {
+    const requestId = await seedPendingCreditRequest(500_000);
+    const result = await authRpc(ADMIN_CREDIT, async (c) => {
+      const r = await c.query(
+        `select public.review_credit_request($1, 'approved', 500000, 0, 0, 'exact threshold') as payload`,
+        [requestId],
+      );
+      return r.rows[0].payload as { status: string };
+    });
+    expect(result.status).toBe("approved");
+  });
+
+  it("reject while pending leaves no ledger grant and blocks later approve", async () => {
+    const requestId = await seedPendingCreditRequest(2500);
+    const rejected = await authRpc(ADMIN_CREDIT, async (c) => {
+      const r = await c.query(
+        `select public.review_credit_request($1, 'rejected', 2500, 0, 0, 'reject fixture') as payload`,
+        [requestId],
+      );
+      return r.rows[0].payload as { status: string };
+    });
+    expect(rejected.status).toBe("rejected");
+
+    await expect(
+      authRpc(ADMIN_CREDIT_B, async (c) => {
+        await c.query(
+          `select public.review_credit_request($1, 'approved', 2500, 0, 0, 'after reject')`,
+          [requestId],
+        );
+      }),
+    ).rejects.toThrow(/not pending/i);
+
+    const grants = await asPostgres(async (c) => {
+      const r = await c.query(
+        `select count(*)::int as n from public.gik_ledger
+         where reference_id = $1 and entry_type = 'demo_credit_grant'`,
+        [requestId],
+      );
+      return r.rows[0].n as number;
+    });
+    expect(grants).toBe(0);
+  });
+
+  it("stale approve on already-approved request is rejected", async () => {
+    const requestId = await seedPendingCreditRequest(1500);
+    await authRpc(ADMIN_CREDIT, async (c) => {
+      await c.query(
+        `select public.review_credit_request($1, 'approved', 1500, 0, 0, 'first')`,
+        [requestId],
+      );
+    });
+    await expect(
+      authRpc(ADMIN_CREDIT_B, async (c) => {
+        await c.query(
+          `select public.review_credit_request($1, 'approved', 1500, 0, 0, 'stale')`,
+          [requestId],
+        );
+      }),
+    ).rejects.toThrow(/not pending/i);
+  });
+
+  it(
+    "concurrent second approvals: exactly one grant for above-threshold request",
+    async () => {
+      const requestId = await seedPendingCreditRequest(750_000);
+      await authRpc(ADMIN_CREDIT, async (c) => {
+        const r = await c.query(
+          `select public.review_credit_request($1, 'approved', 750000, 0, 0, 'first') as payload`,
+          [requestId],
+        );
+        expect((r.rows[0].payload as { status: string }).status).toBe(
+          "pending_second_approval",
+        );
+      });
+
+      const ADMIN_CREDIT_C = "00000000-0000-0000-0000-0000000000c5";
+      await commitAsPostgres(async (c) => {
+        await c.query(
+          `insert into auth.users (id, aud, role, email, encrypted_password,
+             raw_user_meta_data, email_confirmed_at, created_at, updated_at)
+           values ($1,'authenticated','authenticated',$2, crypt('demo-only', gen_salt('bf')),
+             jsonb_build_object('nickname', 'rls_admin_credit_c'), now(), now(), now())
+           on conflict (id) do nothing`,
+          [ADMIN_CREDIT_C, "rls_admin_credit_c@example.test"],
+        );
+        await c.query(
+          `insert into public.profiles (id, nickname, status)
+           values ($1, 'rls_admin_credit_c', 'active'::public.player_status)
+           on conflict (id) do nothing`,
+          [ADMIN_CREDIT_C],
+        );
+        await c.query(
+          `insert into public.admin_users (id, is_owner, is_active, requires_2fa, requires_pin)
+           values ($1, false, true, false, false)
+           on conflict (id) do update set is_active = true`,
+          [ADMIN_CREDIT_C],
+        );
+        await c.query(
+          `insert into public.admin_user_permissions (admin_id, permission, granted)
+           values
+             ($1,'credits.view',true),
+             ($1,'credits.adjust',true)
+           on conflict (admin_id, permission) do update set granted = excluded.granted`,
+          [ADMIN_CREDIT_C],
+        );
+      });
+
+      const [rx, ry] = await Promise.allSettled([
+        authRpc(ADMIN_CREDIT_B, async (c) => {
+          const r = await c.query(
+            `select public.review_credit_request($1, 'approved', 750000, 0, 0, 'second-b') as payload`,
+            [requestId],
+          );
+          return r.rows[0].payload as { status: string };
+        }),
+        authRpc(ADMIN_CREDIT_C, async (c) => {
+          const r = await c.query(
+            `select public.review_credit_request($1, 'approved', 750000, 0, 0, 'second-c') as payload`,
+            [requestId],
+          );
+          return r.rows[0].payload as { status: string };
+        }),
+      ]);
+
+      const approved = [rx, ry].filter(
+        (r) => r.status === "fulfilled" && r.value.status === "approved",
+      ).length;
+      const failed = [rx, ry].filter((r) => r.status === "rejected").length;
+      expect(approved).toBe(1);
+      expect(approved + failed).toBe(2);
+
+      const grants = await asPostgres(async (c) => {
+        const r = await c.query(
+          `select count(*)::int as n from public.gik_ledger
+           where reference_id = $1 and entry_type = 'demo_credit_grant'`,
+          [requestId],
+        );
+        return r.rows[0].n as number;
+      });
+      expect(grants).toBe(1);
+    },
+    60_000,
+  );
+
+
 });
 
 describe.skipIf(dbUp)(
