@@ -31,12 +31,8 @@ export default async function LeaderboardPage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  try {
-    await supabase.rpc("refresh_leaderboard_entries");
-  } catch {
-    // Best-effort refresh.
-  }
-
+  // Leaderboard snapshots are rebuilt by service_role / system.settings admins.
+  // Ordinary player sessions only read the cached board.
   const { data: rows } = await supabase
     .from("leaderboard_entries")
     .select("player_id, nickname, avatar_url, metric_value, rank")

@@ -465,6 +465,31 @@ describe.runIf(dbUp)("SECURITY DEFINER RPC hardening", () => {
     }
   });
 
+
+  it("P1: refresh_leaderboard_entries denies ordinary players", async () => {
+    await expect(
+      asPlayer(PLAYER_A, async (c) => {
+        await c.query(`select public.refresh_leaderboard_entries()`);
+      }),
+    ).rejects.toThrow(/system\.settings|service role|insufficient/i);
+  });
+
+  it("P1: get_setting whitelists client-safe keys only", async () => {
+    await asPlayer(PLAYER_A, async (c) => {
+      const ok = await c.query(
+        `select public.get_setting('locale.default', '"en"'::jsonb) as v`,
+      );
+      expect(ok.rows[0].v).toBeTruthy();
+    });
+    await expect(
+      asPlayer(PLAYER_A, async (c) => {
+        await c.query(
+          `select public.get_setting('credits.second_approval_threshold', '0'::jsonb)`,
+        );
+      }),
+    ).rejects.toThrow(/not client-readable|insufficient/i);
+  });
+
   it("P0: mark_contact_verified requires Auth confirmation evidence", async () => {
     const def = await asPostgres(async (c) => {
       const r = await c.query(

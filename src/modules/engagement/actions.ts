@@ -661,9 +661,13 @@ export async function touchPlaySessionAction(): Promise<ActionResult> {
 
 export async function refreshLeaderboardAction(): Promise<ActionResult> {
   const supabase = await createServerSupabaseClient();
+  // Requires system.settings (or service_role). Ordinary players are rejected by RPC.
   const { error } = await supabase.rpc("refresh_leaderboard_entries");
   if (error) {
-    return { ok: false, message: asMessage(error) };
+    return {
+      ok: false,
+      message: "Leaderboard refresh requires admin system.settings access.",
+    };
   }
   revalidatePath("/leaderboard");
   revalidatePath("/home");
