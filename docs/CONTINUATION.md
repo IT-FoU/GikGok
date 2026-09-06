@@ -44,6 +44,7 @@
 - Tip Actions green on `bd220c9` after fixture/deadlock hardenings (Static + DB)
 - Residual chrome i18n: profile settings/deletion, ledger admin review / second approve / filters, create-admin form — EN/LO parity
 - Admin form placeholders wired to EN/LO (`admin.placeholder*` + QA label/notes)
+- COMMENT remaining public SECURITY DEFINER RPCs (staging missing_comment 50→0; ~81 DEFINER / ~63 authenticated EXECUTE)
 
 ## Next actions
 1. Recount Advisors via dashboard when Management API allows (do not claim “fully clean”)
@@ -52,12 +53,13 @@
 4. Owner: SMS provider → Phone OTP
 5. Owner: hosted preview deploy
 6. Do **not** merge to `main` or production without Owner approval
-7. Optional follow-up: style CSP nonce (`style-src` still `unsafe-inline`); deeper DEFINER COMMENT coverage
+7. Optional follow-up: style CSP nonce (`style-src` still `unsafe-inline`); Advisor Management API recount when unblocked
 
 ## Tip Actions
-- Latest tip green: [https://github.com/IT-FoU/GikGok/actions/runs/34032016542](https://github.com/IT-FoU/GikGok/actions/runs/34032016542) — Static PASS + DB PASS on `75ec7b3` (residual chrome i18n)
-- Prior green (fixture/deadlock hardenings): [https://github.com/IT-FoU/GikGok/actions/runs/34031542121](https://github.com/IT-FoU/GikGok/actions/runs/34031542121) on `bd220c9`
+- Latest tip green: [https://github.com/IT-FoU/GikGok/actions/runs/34032807704](https://github.com/IT-FoU/GikGok/actions/runs/34032807704) — Static PASS + DB PASS on `4f97eb7` (admin placeholder i18n)
+- Prior green: [https://github.com/IT-FoU/GikGok/actions/runs/34032267921](https://github.com/IT-FoU/GikGok/actions/runs/34032267921) on `59409e3`; [34032016542](https://github.com/IT-FoU/GikGok/actions/runs/34032016542) on `75ec7b3`; [34031542121](https://github.com/IT-FoU/GikGok/actions/runs/34031542121) on `bd220c9`
 - Prior green (Owner-corrected secret): [https://github.com/IT-FoU/GikGok/actions/runs/34026129961](https://github.com/IT-FoU/GikGok/actions/runs/34026129961) on `2474719`
+
 
 ## Validation snapshot
 - `npm run lint` / `typecheck` / `test` / `build` / `security:check` / `npm audit --omit=dev` — run at tip

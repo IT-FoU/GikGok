@@ -43,6 +43,7 @@ Identify the tested implementation commit with `git rev-parse HEAD` on the branc
 | ID | Severity | Status | Dependency |
 |----|----------|--------|------------|
 | I18N-002 | Medium | Admin tickets/home/MFA + profile/ledger chrome + admin form placeholders wired (EN/LO) | Unit parity + manual spot |
+| DEF-COMMENT-001 | Low–Med | COMMENT remaining public SECURITY DEFINER RPCs (50 missing → 0) | Migration `20260906123000` + staging inventory |
 | ADV-001 | Medium | Advisor Management API 403; exact live WARN/INFO not re-fetched this tip | Owner/API access |
 | CSP-002 | Low–Med | `style-src 'unsafe-inline'` retained | Next/Tailwind style nonce follow-up |
 | E2E-AUTH | High (release) | Authenticated Playwright not run | Staging test credentials |
@@ -64,19 +65,19 @@ Identify the tested implementation commit with `git rev-parse HEAD` on the branc
 | `npm audit --omit=dev` | 0 vulnerabilities |
 | `git diff --check` | PASS |
 | Advisors (Management API) | NOT RUN this tip (403) — last documented Security WARN ~60 intentional DEFINER; INFO remain; Performance WARN ×0 |
-| DEFINER inventory | ~81 public DEFINER; ~63 authenticated EXECUTE; anon EXECUTE 0 |
-| GitHub Actions tip | **PASS** (Static + DB) — [https://github.com/IT-FoU/GikGok/actions/runs/34032016542](https://github.com/IT-FoU/GikGok/actions/runs/34032016542) on tip `75ec7b3` (residual chrome i18n). Prior: [34031542121](https://github.com/IT-FoU/GikGok/actions/runs/34031542121) on `bd220c9`; [34026129961](https://github.com/IT-FoU/GikGok/actions/runs/34026129961) on `2474719`. |
+| DEFINER inventory | ~81 public DEFINER; ~63 authenticated EXECUTE; anon EXECUTE 0; COMMENT coverage complete on public DEFINER (missing_comment 0) |
+| GitHub Actions tip | **PASS** (Static + DB) — [https://github.com/IT-FoU/GikGok/actions/runs/34032807704](https://github.com/IT-FoU/GikGok/actions/runs/34032807704) on tip `4f97eb7` (admin placeholder i18n). Prior: [34032267921](https://github.com/IT-FoU/GikGok/actions/runs/34032267921) on `59409e3`; [34032016542](https://github.com/IT-FoU/GikGok/actions/runs/34032016542) on `75ec7b3`. |
 | Playwright public | PASS (10/10 smoke) |
 | Playwright authenticated | SKIPPED — no credentials |
 | Physical QA | SKIPPED — no devices |
 
 ### Tip Actions
-- Latest green PR Actions (residual chrome i18n): [https://github.com/IT-FoU/GikGok/actions/runs/34032016542](https://github.com/IT-FoU/GikGok/actions/runs/34032016542)
+- Latest green PR Actions (admin placeholder i18n): [https://github.com/IT-FoU/GikGok/actions/runs/34032807704](https://github.com/IT-FoU/GikGok/actions/runs/34032807704)
 - Conclusion: **success** — Static job PASS + DB · RLS/RPC security suite PASS
-- Head SHA at that run: `75ec7b3ba9bc400d765ad122d1407870b7bfc498`
-- Prior green (fixture/deadlock hardenings): [https://github.com/IT-FoU/GikGok/actions/runs/34031542121](https://github.com/IT-FoU/GikGok/actions/runs/34031542121) on `bd220c9`
-- Prior green (Owner-corrected `SUPABASE_DB_URL`): [https://github.com/IT-FoU/GikGok/actions/runs/34026129961](https://github.com/IT-FoU/GikGok/actions/runs/34026129961) on `2474719`
+- Head SHA at that run: `4f97eb79e37e0b11d3e81407fe5f13da51c283e9`
+- Prior greens: [34032267921](https://github.com/IT-FoU/GikGok/actions/runs/34032267921) (`59409e3`), [34032016542](https://github.com/IT-FoU/GikGok/actions/runs/34032016542) (`75ec7b3`), [34031542121](https://github.com/IT-FoU/GikGok/actions/runs/34031542121) (`bd220c9`)
 - Later tip commits may supersede; re-check Actions on the current tip after push.
+
 
 ## Honesty rules applied
 - No automatic orphan retry consumer exists — only manual admin retry.
