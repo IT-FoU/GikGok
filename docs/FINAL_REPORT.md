@@ -69,9 +69,8 @@ Identify the tested implementation commit with `git rev-parse HEAD` on the branc
 | Physical QA | SKIPPED — no devices |
 
 ### Tip Actions
-- Push run: https://github.com/IT-FoU/GikGok/actions/runs/34018994683 (`e7a6a0c`)
-- Static · lint · typecheck · unit · build · security(static): **success**
-- DB · RLS/RPC security suite: **failure** — clear preflight: `SUPABASE_DB_URL` secret missing in GitHub Actions (fail-closed by design)
+- Inspect the latest run on branch `cursor/gikgok-continuous-implementation` (do not hard-code SHA here).
+- Observed pattern at close of this loop: Static job **success**; DB job **failure** on missing `SUPABASE_DB_URL` Actions secret (fail-closed). Local staging `db:test` still PASS.
 
 ## Honesty rules applied
 - No automatic orphan retry consumer exists — only manual admin retry.
