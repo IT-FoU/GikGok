@@ -69,7 +69,7 @@ Identify the tested implementation commit with `git rev-parse HEAD` on the branc
 | Physical QA | SKIPPED — no devices |
 
 ### Tip Actions
-- Push run: https://github.com/IT-FoU/GikGok/actions/runs/34018862185 (`e71a13e`)
+- Push run: https://github.com/IT-FoU/GikGok/actions/runs/34018994683 (`e7a6a0c`)
 - Static · lint · typecheck · unit · build · security(static): **success**
 - DB · RLS/RPC security suite: **failure** — clear preflight: `SUPABASE_DB_URL` secret missing in GitHub Actions (fail-closed by design)
 
