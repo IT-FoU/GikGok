@@ -201,3 +201,17 @@
 | Loop 2 | Ticket attachments upload/delete + signed URLs; avatar crop + magic bytes; partial i18n; CI workflow | FIXED / IN PROGRESS |
 | Remaining | Broader i18n (P1-005), false-confidence tests (P1-006 remainder), docs mismatch (P1-007) | OPEN |
 
+
+
+## Findings ledger (this loop)
+
+| ID | Severity | Finding | Fix | Status |
+|----|----------|---------|-----|--------|
+| A-MFA | CRITICAL | `verify_admin_2fa` minted OTP on AAL2 + arbitrary code | Auth TOTP + AAL2; stub/revoke; PIN separate | FIXED |
+| B-ATT | HIGH | 5MB×3 vs 1MB action body; attachment invariants | `bodySizeLimit` 16mb; triggers; orphan table | FIXED |
+| C-DEF | HIGH | Broad authenticated DEFINER surface | Classify/comment; revoke internals; whitelist settings | PARTIAL→improved |
+| D-I18N | HIGH | Hard-coded EN auth/status; raw action messages | Catalogs + codes + parity tests | PARTIAL |
+| E-TEST | HIGH | 404-as-security; regex-only contact verify; weak daily isolation | Honest smoke; behavioral RPC; A/B snapshots; matrix scaffold | PARTIAL |
+| F-NEXT | MED | middleware deprecation; CSP unsafe-inline; origin spoof | `proxy.ts`; exact origin match; CSP limitation documented | PARTIAL |
+| G-DOCS | MED | Over-checked tasks / stale PR body | Reopen honesty; docs authoritative | IN PROGRESS |
+

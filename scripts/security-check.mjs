@@ -159,7 +159,11 @@ async function dbChecks() {
   }
 }
 
-await dbChecks();
+if (process.env.SECURITY_CHECK_STATIC_ONLY === "1") {
+  notes.push("SECURITY_CHECK_STATIC_ONLY=1 — DB checks intentionally not run in this job.");
+} else {
+  await dbChecks();
+}
 
 // --------------------------------------------------------------------------
 console.log("GIKGOK security:check");
@@ -170,6 +174,12 @@ if (failures.length) {
   process.exit(1);
 }
 if (!dbChecksRan) {
+  if (process.env.SECURITY_CHECK_STATIC_ONLY === "1") {
+    console.log(
+      "\n⚠ security:check STATIC ONLY — DB suite not executed (neutral; not a DB PASS)",
+    );
+    process.exit(0);
+  }
   if (process.env.SECURITY_CHECK_ALLOW_SKIP_DB === "1") {
     console.log(
       "\n⚠ security:check static-only (DB skipped; SECURITY_CHECK_ALLOW_SKIP_DB=1)",

@@ -11,14 +11,16 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  quality:
-    name: Lint · typecheck · test · build · security
+  static-quality:
+    name: Static · lint · typecheck · unit · build · security(static)
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      # Static security checks always run; DB checks may be skipped in CI without secrets.
-      SECURITY_CHECK_ALLOW_SKIP_DB: "1"
       NEXT_TELEMETRY_DISABLED: "1"
+      # Force static-only security check in this job so a green badge cannot be
+      # mistaken for a DB/RLS security PASS.
+      SECURITY_CHECK_ALLOW_SKIP_DB: "1"
+      SECURITY_CHECK_STATIC_ONLY: "1"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -48,6 +50,40 @@ jobs:
           NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example
           NEXT_PUBLIC_APP_URL: http://localhost:3000
 
-      - name: Security check
+      - name: Static security check
         run: npm run security:check
         continue-on-error: false
+
+      - name: Dependency audit
+        run: npm audit --audit-level=high
+
+  db-security:
+    name: DB · RLS/RPC security suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Requires repository secrets. When absent, the job is skipped (neutral),
+    # never reported as a green security PASS.
+    if: ${{ secrets.SUPABASE_DB_URL != '' }}
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+      DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+      SECURITY_CHECK_ALLOW_SKIP_DB: "0"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: DB security check (static + live DB)
+        run: npm run security:check
+
+      - name: DB / RLS / RPC tests
+        run: npm run db:test

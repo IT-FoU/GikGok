@@ -5,6 +5,10 @@ import type { NextConfig } from "next";
  * Production drops 'unsafe-eval'; keep it only outside production for Next tooling.
  */
 const isProd = process.env.NODE_ENV === "production";
+// TEMPORARY LIMITATION: production still allows script-src 'unsafe-inline' because
+// Next.js App Router inline bootstrapping is not yet moved to a nonce/hash strategy
+// in this codebase. 'unsafe-eval' is already dropped in production. Track nonce CSP
+// as a follow-up before claiming a fully locked script policy.
 const scriptSrc = isProd
   ? "script-src 'self' 'unsafe-inline'"
   : "script-src 'self' 'unsafe-inline' 'unsafe-eval'";

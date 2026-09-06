@@ -32,8 +32,8 @@
 - [x] Add indexes, foreign keys, check constraints, enum/status constraints, timestamps, and soft-delete policy where appropriate.
 - [x] Implement Row Level Security for every table and Storage bucket.
 - [x] Add Storage policies for avatar, ticket attachment, and game asset buckets.
-- [x] Generate database types and verify migration up/down or local reset succeeds. (`npm run db:validate`)
-- [x] Write RLS tests proving player isolation and least-privilege administrator access. (`npm run db:test`)
+- [ ] Generate database types and verify migration up/down or local reset succeeds. (`npm run db:validate`)
+- [ ] Write RLS tests proving player isolation and least-privilege administrator access. (`npm run db:test`)
 - [x] Remote staging integration (link / `db push` / seed): applied to `jlpcfatcpymjnjbxmclo` (14 migrations + seed); remote RLS/`security:check` pass; staging test users created. See [docs/database.md](docs/database.md).
 - [x] Security remediation before manual QA: DEFINER privilege hardening, search_path pins, FK indexes, RLS `(select auth.uid())`, advisor cleanup, expanded RPC tests, `sb_secret` 401 root-caused (use `apikey` header / `createClient`). Forward migrations `20260905155508_…` + `20260905160657_…`.
 
@@ -51,7 +51,7 @@
 - [x] Build Profile/Settings page with language, sound volume/pack, graphics settings, and account controls.
 - [x] Add self-service account deletion request flow that preserves required ledger/audit records.
 - [x] Add player status enforcement for active, suspended, and banned accounts.
-- [x] Test login, OTP, reset, profile, avatar, suspension, and account deletion paths.
+- [ ] Test login, OTP, reset, profile, avatar, suspension, and account deletion paths.
 
 ## Phase 3 — Design system, responsive shell, and localization
 
@@ -60,12 +60,12 @@
 - [x] Implement Owner-controlled system accent theme (red/white, blue/white, yellow/gray); prevent player theme changes.
 - [x] Build responsive player shell: phone bottom navigation, tablet compact navigation, desktop layout.
 - [x] Build responsive admin shell with secure `/admin` route and desktop-first data layouts.
-- [x] Implement Lao and English translation catalogs for all user-facing text, validation, empty states, and admin UI.
+- [ ] Implement Lao and English translation catalogs for all user-facing text, validation, empty states, and admin UI.
 - [x] Structure localization so Thai can be added without refactoring.
 - [x] Build accessible shared components: buttons, inputs, dialogs, cards, tables, filters, toasts, loading/error states, and pagination.
 - [x] Implement reduced motion, keyboard navigation, touch targets, focus management, and contrast checks.
 - [x] Build sound manager with Classic Casino, Arcade, Silent, volume, preload/lazy-load strategy, and mute behavior.
-- [x] Validate layouts at phone, tablet, and desktop breakpoints in both languages and both modes.
+- [ ] Validate layouts at phone, tablet, and desktop breakpoints in both languages and both modes.
 
 ## Phase 4 — Ledger, rewards, and credit requests
 

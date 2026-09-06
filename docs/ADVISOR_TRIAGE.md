@@ -62,3 +62,21 @@ Performance Advisor for this overlap is **clean** after that migration.
 - `20260906015729_triage_security_definer_grants_and_search_path.sql`
 - `20260906020608_fix_player_contacts_permissive_select_overlap.sql`
 - `20260906020814_harden_ticket_attachments_delete_and_constraints.sql`
+
+
+## 2026-09-06 DEFINER surface pass (`20260906032157`, `20260906034500`)
+
+Applied to staging `jlpcfatcpymjnjbxmclo` only.
+
+- `refresh_leaderboard_entries()` — admin/`system.settings` or `service_role` only (body gate).
+- `get_setting(text,jsonb)` — player whitelist; full read for `system.settings` / service_role.
+- `assert_admin_sensitive()` — EXECUTE revoked from `authenticated` (internal DEFINER gate).
+- `verify_admin_2fa(text)` — stub retained; EXECUTE revoked from `authenticated`.
+- Comments recorded for remaining intentional authenticated DEFINER RPCs.
+
+### Advisor reporting rule
+
+Always report **WARN** and **INFO** counts separately. Never claim Advisors are
+"fully clean" while INFO items remain. Intentional authenticated DEFINER RPCs are
+expected Security WARNs until product architecture changes.
+

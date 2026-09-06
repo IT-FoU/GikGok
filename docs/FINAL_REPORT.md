@@ -50,3 +50,28 @@ See `docs/CONTINUATION.md` for HEAD and migration watermark.
 ## Production / main
 
 Untouched. Do not merge PR #14 without Owner approval.
+
+
+## Loop update (admin MFA + attachments + DEFINER + i18n + test honesty)
+
+**Overall status:** PARTIAL
+
+### Fixed this loop
+- Admin MFA forge (Auth TOTP/AAL2; OTP mint removed; PIN separated)
+- Ticket attachment limits/invariants/orphan-safe delete
+- DEFINER narrowing + comments/revokes (`20260906032157`, `20260906034500`)
+- Next.js `proxy.ts` migration; exact Origin/Host match; CSP `unsafe-inline` limitation documented
+- Auth/account-status localization + `ActionResult.code` + catalog parity/hard-string tests
+- Smoke honesty for live bet path; behavioral `mark_contact_verified`; daily reward A/B snapshots; permission matrix scaffold
+- CI split: static job cannot be mistaken for DB security PASS
+
+### Remaining by severity
+- HIGH: finish admin chrome / notifications i18n; deepen permission-matrix + approval concurrency tests
+- MED: nonce CSP; broader DEFINER comment coverage for every remaining authenticated RPC
+- WAITING: SMS OTP provider; authenticated Playwright credentials; local Docker Supabase; hosted preview; physical device QA; Owner merge/main/production approval
+
+### Migration watermark
+- Project: `jlpcfatcpymjnjbxmclo`
+- Tip migration: `20260906034500_comment_authenticated_definer_surface.sql`
+- Untouched: `main`, production, other Supabase projects, real-money scope
+
