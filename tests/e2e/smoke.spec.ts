@@ -48,7 +48,15 @@ test.describe("security boundaries", () => {
     await expect(page).toHaveURL(/login/);
   });
 
-  test("legacy /api/games/bet is not a production betting surface", async ({
+  test("unauthenticated play route cannot reach live bet settlement", async ({
+    page,
+  }) => {
+    // Live bets go UI → Server Action → place_and_settle_bet. Prove the gate.
+    await page.goto("/play/fish_prawn_crab");
+    await expect(page).toHaveURL(/login/);
+  });
+
+  test("legacy /api/games/bet route is absent or non-success (not security proof)", async ({
     request,
   }) => {
     const res = await request.post("/api/games/bet", {
@@ -61,12 +69,13 @@ test.describe("security boundaries", () => {
       headers: { Origin: "http://127.0.0.1:3000" },
       maxRedirects: 0,
     });
-    // Production bets use place_and_settle_bet via server actions — not this API.
-    // A 404 here must never be treated as proof the live bet path is secure.
-    expect(
-      [401, 403, 307, 302, 405, 500].includes(res.status()) || res.status() === 404,
-    ).toBeTruthy();
+    // Explicitly NOT treating 404 as authorization evidence for place_and_settle_bet.
     expect(res.status()).not.toBe(200);
+    test.info().annotations.push({
+      type: "note",
+      description:
+        "Legacy bet HTTP status is informational only; live authorization is covered by DB RPC tests.",
+    });
   });
 });
 

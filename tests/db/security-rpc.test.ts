@@ -148,35 +148,38 @@ describe.runIf(dbUp)("SECURITY DEFINER RPC hardening", () => {
   });
 
   it("claim_daily_reward only credits the authenticated caller", async () => {
-    const before = await asPostgres(async (c) => {
-      const r = await c.query(
-        `select coalesce(balance,0)::bigint as balance from public.player_balances where player_id = $1`,
-        [PLAYER_A],
-      );
-      return Number(r.rows[0]?.balance ?? 0);
-    });
+    const snap = async (playerId: string) =>
+      asPostgres(async (c) => {
+        const r = await c.query(
+          `select coalesce(balance,0)::bigint as balance from public.player_balances where player_id = $1`,
+          [playerId],
+        );
+        return Number(r.rows[0]?.balance ?? 0);
+      });
 
+    const beforeA = await snap(PLAYER_A);
+    const beforeB = await snap(PLAYER_B);
+
+    let claimed = false;
     await asPlayer(PLAYER_A, async (c) => {
-      // May already have claimed in a prior test run on the same DB/day — either success or already-claimed is fine.
       try {
         const r = await c.query(`select public.claim_daily_reward() as r`);
-        expect(r.rows[0].r.total_amount).toBeGreaterThan(0);
+        expect(Number(r.rows[0].r.total_amount ?? r.rows[0].r.amount ?? r.rows[0].r.credited ?? 0)).toBeGreaterThan(0);
+        claimed = true;
       } catch (err) {
         expect(String(err)).toMatch(/already claimed/i);
       }
     });
 
-    const afterB = await asPostgres(async (c) => {
-      const r = await c.query(
-        `select coalesce(balance,0)::bigint as balance from public.player_balances where player_id = $1`,
-        [PLAYER_B],
-      );
-      return Number(r.rows[0]?.balance ?? 0);
-    });
-    // Claiming as A must not reduce/alter B via this RPC path in a surprising way;
-    // B's balance is unchanged by A's claim.
-    expect(afterB).toBeGreaterThanOrEqual(0);
-    expect(before).toBeGreaterThanOrEqual(0);
+    const afterA = await snap(PLAYER_A);
+    const afterB = await snap(PLAYER_B);
+
+    expect(afterB).toBe(beforeB);
+    if (claimed) {
+      expect(afterA).toBeGreaterThan(beforeA);
+    } else {
+      expect(afterA).toBe(beforeA);
+    }
   });
 
   it("trigger helpers pin search_path", async () => {
@@ -491,14 +494,58 @@ describe.runIf(dbUp)("SECURITY DEFINER RPC hardening", () => {
   });
 
   it("P0: mark_contact_verified requires Auth confirmation evidence", async () => {
-    const def = await asPostgres(async (c) => {
-      const r = await c.query(
-        `select pg_get_functiondef('public.mark_contact_verified(text,uuid)'::regprocedure) as d`,
+    await asPostgres(async (c) => {
+      await c.query(
+        `update auth.users
+            set email = 'rls_player_a@example.test',
+                email_confirmed_at = null,
+                phone = null,
+                phone_confirmed_at = null
+          where id = $1`,
+        [PLAYER_A],
       );
-      return r.rows[0].d as string;
+      await c.query(
+        `insert into public.player_contacts
+           (player_id, contact_type, value, is_primary, is_verified)
+         values ($1, 'email', 'rls_player_a@example.test', true, false)
+         on conflict do nothing`,
+        [PLAYER_A],
+      );
+      await c.query(
+        `update public.player_contacts
+            set value = 'rls_player_a@example.test',
+                is_verified = false,
+                verified_at = null
+          where player_id = $1 and contact_type = 'email' and is_primary`,
+        [PLAYER_A],
+      );
     });
-    expect(def).toMatch(/email_confirmed_at|phone_confirmed_at/);
+
+    await expect(
+      asPlayer(PLAYER_A, async (c) => {
+        await c.query(`select public.mark_contact_verified('email')`);
+      }),
+    ).rejects.toThrow(/not confirmed/i);
+
+    await asPostgres(async (c) => {
+      await c.query(
+        `update auth.users set email_confirmed_at = now() where id = $1`,
+        [PLAYER_A],
+      );
+    });
+
+    await asPlayer(PLAYER_A, async (c) => {
+      const r = await c.query(`select public.mark_contact_verified('email') as r`);
+      expect(r.rowCount).toBe(1);
+    });
+
+    await expect(
+      asPlayer(PLAYER_A, async (c) => {
+        await c.query(`select public.mark_contact_verified('phone')`);
+      }),
+    ).rejects.toThrow(/no phone|not confirmed|channel must be/i);
   });
+
 });
 
 describe.skipIf(dbUp)("SECURITY DEFINER RPC hardening (skipped: DB unreachable)", () => {
