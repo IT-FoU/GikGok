@@ -18,7 +18,7 @@
 | Permission-matrix behavioral DB tests | VERIFIED (representative families) |
 | CSRF/Origin on mutating server actions | VERIFIED (player/ledger/engagement/game/admin) |
 | CSP script nonce via `src/proxy.ts` | IMPLEMENTED; style still `unsafe-inline` |
-| LO/EN orphan + ActionResult code wiring | PARTIAL (orphan/admin Banner + auth/profile/engagement/ledger ResultMessage); broader admin chrome still English |
+| LO/EN chrome + ActionResult codes | ADVANCED — tickets/home/MFA chrome, notification type labels, admin/engagement/ledger codes; EN/LO parity required |
 | Playwright authenticated E2E | WAITING credentials |
 | Physical device QA | WAITING devices |
 | Phone OTP live | WAITING SMS provider |
@@ -37,13 +37,16 @@
 - Proxy nonce CSP for scripts; static CSP removed from `next.config.ts`
 
 ## Next actions
-1. Finish remaining admin chrome / tickets table / MFA form string coverage (P1 i18n)
-2. Wire more ActionResult codes for engagement/ledger success paths
-3. Recount Advisors via dashboard when Management API allows (do not claim “fully clean”)
-4. Owner: staging auth credentials → Playwright critical journeys
-5. Owner: physical iOS/Android/tablet Light/Dark Lao/English QA
-6. Owner: SMS provider → Phone OTP
-7. Do **not** merge to `main` or production without Owner approval
+1. Recount Advisors via dashboard when Management API allows (do not claim “fully clean”)
+2. Owner: staging auth credentials → Playwright critical journeys
+3. Owner: physical iOS/Android/tablet Light/Dark Lao/English QA
+4. Owner: SMS provider → Phone OTP
+5. Owner: hosted preview deploy
+6. Do **not** merge to `main` or production without Owner approval
+7. Optional follow-up: style CSP nonce (`style-src` still `unsafe-inline`); deeper DEFINER COMMENT coverage
+
+## Tip Actions (Owner-corrected secret)
+- Green run: [https://github.com/IT-FoU/GikGok/actions/runs/34026129961](https://github.com/IT-FoU/GikGok/actions/runs/34026129961) — Static PASS + DB PASS on `2474719`
 
 ## Validation snapshot
 - `npm run lint` / `typecheck` / `test` / `build` / `security:check` / `npm audit --omit=dev` — run at tip

@@ -1,7 +1,7 @@
 # GIKGOK Final Report — continuous implementation (current)
 
 ## Overall
-**Implementable work on this branch is PARTIAL toward release.** Core security repairs for orphans, CSRF, dual-approval tests, and CSP nonces are in place on staging. Release readiness still depends on Owner/external gates (authenticated Playwright, physical QA, SMS OTP, hosted preview, merge approval).
+**Implementable work on this branch is largely COMPLETE toward the audit/repair loop; release readiness remains PARTIAL.** Core security repairs, i18n chrome, deepened DB tests, and CSP nonce consumption are in place on staging. Release readiness still depends on Owner/external gates (authenticated Playwright, physical QA, SMS OTP, hosted preview, merge approval).
 
 ## Product
 Private multi-account **demo GIK** game platform. GIK has **no cash value** — no deposits, payments, wallets, or cash-out.
@@ -40,7 +40,7 @@ Identify the tested implementation commit with `git rev-parse HEAD` on the branc
 ## Remaining (by severity)
 | ID | Severity | Status | Dependency |
 |----|----------|--------|------------|
-| I18N-002 | Medium | Broader admin chrome / MFA forms still English | Implementation continue |
+| I18N-002 | Medium | Admin tickets/home/MFA chrome + notification type labels + ActionResult codes wired (EN/LO) | Unit parity + manual spot |
 | ADV-001 | Medium | Advisor Management API 403; exact live WARN/INFO not re-fetched this tip | Owner/API access |
 | CSP-002 | Low–Med | `style-src 'unsafe-inline'` retained | Next/Tailwind style nonce follow-up |
 | E2E-AUTH | High (release) | Authenticated Playwright not run | Staging test credentials |
@@ -63,14 +63,16 @@ Identify the tested implementation commit with `git rev-parse HEAD` on the branc
 | `git diff --check` | PASS |
 | Advisors (Management API) | NOT RUN this tip (403) — last documented Security WARN ~60 intentional DEFINER; INFO remain; Performance WARN ×0 |
 | DEFINER inventory | ~81 public DEFINER; ~63 authenticated EXECUTE; anon EXECUTE 0 |
-| GitHub Actions tip | Static job **PASS**; DB job **FAIL** preflight — `SUPABASE_DB_URL` repository secret not configured in Actions (local staging DB gates PASS). Static green ≠ DB PASS. |
+| GitHub Actions tip | **PASS** (Static + DB) — [https://github.com/IT-FoU/GikGok/actions/runs/34026129961](https://github.com/IT-FoU/GikGok/actions/runs/34026129961) on tip `2474719` after Owner corrected `SUPABASE_DB_URL` Actions secret. |
 | Playwright public | Run if configured |
 | Playwright authenticated | SKIPPED — no credentials |
 | Physical QA | SKIPPED — no devices |
 
 ### Tip Actions
-- Inspect the latest run on branch `cursor/gikgok-continuous-implementation` (do not hard-code SHA here).
-- Observed pattern at close of this loop: Static job **success**; DB job **failure** on missing `SUPABASE_DB_URL` Actions secret (fail-closed). Local staging `db:test` still PASS.
+- Green PR Actions run (Owner-corrected `SUPABASE_DB_URL`): [https://github.com/IT-FoU/GikGok/actions/runs/34026129961](https://github.com/IT-FoU/GikGok/actions/runs/34026129961)
+- Conclusion: **success** — Static job PASS + DB · RLS/RPC security suite PASS
+- Head SHA at that run: `2474719499ebc47e19dfd1f2e79db70bf0e4ac40`
+- Later tip commits may supersede; re-check Actions on the current tip after push.
 
 ## Honesty rules applied
 - No automatic orphan retry consumer exists — only manual admin retry.
