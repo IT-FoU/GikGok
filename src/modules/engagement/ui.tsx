@@ -335,7 +335,6 @@ export function SupportTicketForm() {
                 : {
                     ok: false,
                     message: `${created.message} Attachment upload failed: ${uploaded.message}`,
-                    data: created.data,
                   },
             );
             if (uploaded.ok) setFiles([]);
