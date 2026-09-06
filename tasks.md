@@ -151,7 +151,7 @@
 - [x] Build QA/Demo Account tools isolated from ordinary player analytics and ledger reporting.
 - [x] Build audit log search/filter/export with actor, action, target, before/after, reason, approval chain, and timestamp.
 - [x] Build reports for players, games, credits, activity, support, and system operations; permission-check every export.
-- [x] Test every permission boundary, approval rule, audit event, maintenance transition, and concurrent admin action.
+- [ ] Test every permission boundary, approval rule, audit event, maintenance transition, and concurrent admin action.
 
 ## Phase 11 — Security, performance, QA, and release
 
