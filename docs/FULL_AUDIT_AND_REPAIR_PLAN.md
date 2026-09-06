@@ -143,13 +143,13 @@
 
 - **Severity:** P1/P2
 - **Affected:** `docs/security-audit.md`, `assertSameOrigin` unused on mutations, CSP `unsafe-eval`, middleware deprecation note for Next 16
-- **Status:** OPEN
+- **Status:** IN PROGRESS (`requireSameOrigin` on bet + ticket uploads; prod CSP drops `unsafe-eval`; audit doc updated; remaining mutators + middleware→proxy still open)
 
 ### P2-001 — Stale continuation / final report metadata
 
 - **Severity:** P2
 - **Affected:** `docs/CONTINUATION.md`, `docs/FINAL_REPORT.md` commit IDs / branch framing
-- **Status:** OPEN
+- **Status:** FIXED (updated to PR #14 + current tip; refresh HEAD after each push)
 
 ### P2-002 — tasks.md over-checked relative to verification evidence
 

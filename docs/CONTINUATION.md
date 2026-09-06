@@ -1,14 +1,18 @@
 # Continuation checkpoint — GIKGOK continuous implementation
 
 ## Branch
-- `cursor/gikgok-continuous-implementation` @ `f5d9bda`
-- PR base: `cursor/supabase-staging-integration-455c`
-- Staging: `jlpcfatcpymjnjbxmclo` (migrations through `20260905210000`)
+- `cursor/gikgok-continuous-implementation` @ `d4a6074` (update after each push)
+- PR [#14](https://github.com/IT-FoU/GikGok/pull/14) (Draft) → `cursor/supabase-staging-integration-455c`
+- Staging: `jlpcfatcpymjnjbxmclo` only (migrations through `20260906020814`)
 
 ## Progress
 | Phase | Status |
 |-------|--------|
-| 0–11 implementable | COMPLETE |
+| 0–11 implementable core | Mostly complete; P1 i18n / docs honesty still open |
+| P0 admin MFA / missions / eligibility / contact verify | VERIFIED on staging |
+| P1 Advisors grant triage + contacts RLS split | VERIFIED (60 intentional Security WARNs documented; Performance clean) |
+| P1 ticket attachments + avatar crop/magic bytes | FIXED (staging migration applied) |
+| CI workflow | ADDED (`.github/workflows/ci.yml`) |
 | Playwright authenticated E2E | WAITING credentials |
 | Physical device QA | WAITING devices |
 | Phone OTP live | WAITING SMS provider |
@@ -16,18 +20,22 @@
 | Hosted preview deploy | WAITING Owner hosting |
 
 ## Last completed
-Phase 11 security headers, PWA, runbook, final report.
+P1 advisor triage, ticket attachment upload/delete + constraints, avatar crop + magic-byte validation, partial Lao/English keys, CI workflow.
 
 ## Next (Owner / follow-up agent)
-1. Provide staging auth credentials → run Playwright critical journeys
-2. Physical iOS/Android/tablet Light/Dark Lao/English QA
-3. Configure SMS provider → complete Phone OTP
-4. Deploy staging web preview if desired
-5. Do **not** merge to `main` or production without Owner approval
+1. Broaden Lao/English coverage (admin + remaining player strings) — P1-005
+2. Align `docs/security-audit.md` with wired controls; CSP `unsafe-eval` review — P1-007
+3. Re-open over-checked `tasks.md` boxes lacking evidence — P2-002
+4. Provide staging auth credentials → Playwright critical journeys
+5. Physical iOS/Android/tablet Light/Dark Lao/English QA
+6. Configure SMS provider → complete Phone OTP
+7. Deploy staging web preview if desired
+8. Do **not** merge to `main` or production without Owner approval
 
 ## Validation (latest)
-- lint / typecheck / test (88) / build / security:check — PASS
-- Local DB scripts — BLOCKED
+- lint / typecheck / unit (89) / build / security:check / db tests (23 pass, 2 skip) / npm audit (0) — PASS
+- Staging Advisors: Security WARN ×60 (intentional RPCs; see `docs/ADVISOR_TRIAGE.md`); Performance WARN ×0
+- Local Docker Supabase — BLOCKED
 
 ## Safe resume
-Only WAITING/BLOCKED items remain. Do not re-apply applied migrations.
+Continue P1-005/P1-007/P2 docs. Do not re-apply applied migrations. Do not touch `main` or other Supabase projects.

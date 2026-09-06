@@ -18,12 +18,14 @@ RLS, API authorization, input schemas, rate limits, secret exposure, headers, up
 | Settlement | Server RPC only; browser never decides balances | Covered |
 | Secrets | `src/lib/env/server.ts` + forbidden public keys list | Covered |
 | Headers | CSP + XFO + nosniff + referrer + permissions-policy | Covered |
-| Uploads | MIME + size validation (avatar / tickets) | Covered |
+| Uploads | MIME + size + **magic-byte** validation (avatar / ticket images); private `ticket-attachments` bucket; max 3 | Covered (P1 repair) |
+| Origin / CSRF | `requireSameOrigin` on bet + ticket attachment mutations | Covered for those paths; expand to remaining mutators as follow-up |
 | Audit | Append-only `audit_log` | Covered |
 | Demo money | No payments/wallets/cash-out features | Enforced by product rules |
 
 ## Residual risks / follow-ups
 
-- Production CSP may need nonce-based `script-src` once inline scripts are fully removed.
-- Authenticated Playwright journeys require a staging Supabase project with seeded Owner admin.
+- Production CSP drops `'unsafe-eval'` (`next.config.ts`); prefer nonce-based `script-src` before release acceptance if inline scripts remain.
+- Security Advisor still WARNs (~60) for intentional authenticated SECURITY DEFINER RPCs — see `docs/ADVISOR_TRIAGE.md` (not “Advisor clean”).
+- Authenticated Playwright journeys require seeded staging credentials (WAITING).
 - `npm audit` should be re-run on every release; treat high+ findings as blockers.

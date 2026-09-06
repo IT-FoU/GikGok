@@ -1,69 +1,52 @@
-# GIKGOK Final Report (Phases 9–11 continuous implementation)
+# GIKGOK Final Report (continuous implementation — audit/repair loop)
 
 ## Product
 
-Private multi-account demo-credit game platform. **GIK has no cash value** — no deposits, payments, wallets, or cash-out.
+Private multi-account **demo GIK** game platform. GIK has **no cash value** — no deposits, payments, wallets, or cash-out.
 
-## Branch
+## Branch / PR
 
-`cursor/phase-9-11-player-admin-security-62a3` (from `cursor/gikgok-continuous-implementation`)
+- Branch: `cursor/gikgok-continuous-implementation`
+- PR: [#14](https://github.com/IT-FoU/GikGok/pull/14) (Draft) → `cursor/supabase-staging-integration-455c`
+- Staging Supabase: **`jlpcfatcpymjnjbxmclo` only** (forward migrations; never remote reset)
 
-Staging Supabase project: **`jlpcfatcpymjnjbxmclo`** (forward migrations only; no remote reset).
+## Latest tip
 
-## Commits (this delivery)
+See `docs/CONTINUATION.md` for HEAD and migration watermark.
 
-| Commit | Summary |
-|--------|---------|
-| `a523b18` | Phase 9 — engagement pages + `20260905200000_player_experience_rpcs` |
-| `4cabb17` | Phase 10 — admin console + `20260905210000_admin_console_rpcs` |
-| `7fa171e` | Phase 11 — security headers, PWA, docs, release prep |
+## Migrations (this repair loop, applied to staging)
 
-## Pages added
+| File | Applied |
+|------|---------|
+| `20260906013529_harden_p0_admin_mfa_missions_eligibility.sql` | yes |
+| `20260906015729_triage_security_definer_grants_and_search_path.sql` | yes |
+| `20260906020608_fix_player_contacts_permissive_select_overlap.sql` | yes |
+| `20260906020814_harden_ticket_attachments_delete_and_constraints.sql` | yes |
 
-**Player:** `/history`, `/notifications`, `/missions`, `/achievements`, `/leaderboard`, `/friends`, `/support`, `/support/[ticketId]` (+ enriched `/home`, responsible-play on `/profile`)
-
-**Admin:** `/admin` dashboard, `/admin/players`, `/admin/admins`, `/admin/announcements`, `/admin/tickets`, `/admin/missions`, `/admin/flags`, `/admin/assets`, `/admin/qa`, `/admin/audit`, `/admin/reports`, `/admin/settings`, `/admin/games/config`, `/admin/games/releases`, `/admin/access-denied`
-
-## Migrations
-
-| File | Applied to staging |
-|------|--------------------|
-| `20260905200000_player_experience_rpcs.sql` | yes (`db push --linked`) |
-| `20260905210000_admin_console_rpcs.sql` | yes (`db push --linked`) |
-
-## Validation (Phase 11 gate)
+## Validation (latest gate)
 
 | Command | Result |
 |---------|--------|
-| `npm run lint` | *(recorded at commit)* |
-| `npm run typecheck` | *(recorded at commit)* |
-| `npm test` | **88** unit tests pass |
-| `npm run build` | pass |
-| `npm run security:check` | pass (static); local Docker DB checks **BLOCKED**/skipped |
-| Playwright | smoke suite present (`tests/e2e/smoke.spec.ts`); authenticated journeys **WAITING** credentials |
-| `npm run db:start` / local Docker | **BLOCKED** in this environment |
-
-## Staging URL
-
-Supabase project ref: `jlpcfatcpymjnjbxmclo`  
-App deploy URL: **not deployed from this agent** — verify `/api/health` after hosting.
+| `npm run lint` | PASS |
+| `npm run typecheck` | PASS |
+| `npm test` | PASS (89) |
+| `npm run build` | PASS |
+| `npm run security:check` | PASS (static + staging DB) |
+| `npm run db:test` | PASS (23) / 2 skipped |
+| `npm audit --omit=dev` | 0 vulnerabilities |
+| Security Advisors | WARN ×60 intentional DEFINER RPCs (documented) |
+| Performance Advisors | WARN ×0 |
+| Playwright authenticated | WAITING credentials |
+| Local Docker Supabase | BLOCKED |
 
 ## WAITING / BLOCKED (do not mark PASS)
 
-- Physical device QA (iOS Safari, Android Chrome, tablet/desktop × Light/Dark × Lao/English) — **WAITING**
-- Live Phone OTP / SMS provider — **WAITING**
-- Authenticated Playwright journeys against seeded staging users — **WAITING** credentials
-- Local Docker Supabase (`db:start` / `db:test`) — **BLOCKED**
-- Production deploy / merge to `main` — **not done** (intentional)
+- Physical device QA — WAITING
+- Live Phone OTP / SMS — WAITING
+- Authenticated Playwright — WAITING credentials
+- Local Docker Supabase — BLOCKED
+- Hosted preview / production / merge to `main` — not done
 
 ## Production / main
 
-**Untouched.** No merge to `main`. No production deploy.
-
-## Key docs
-
-- [README](../README.md)
-- [Runbook](./runbook.md)
-- [Deployment](./deployment.md)
-- [Security audit](./security-audit.md)
-- [CONTINUATION](./CONTINUATION.md)
+Untouched. Do not merge PR #14 without Owner approval.
