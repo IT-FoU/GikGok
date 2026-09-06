@@ -59,7 +59,7 @@ Identify the tested implementation commit with `git rev-parse HEAD` on the branc
 | `npm test` | PASS (95) |
 | `npm run build` | PASS |
 | `npm run security:check` | PASS (static + staging DB) |
-| `npm run db:test` | PASS (focused dual/permission/orphan + full suite; rare parallel deadlock flake in security-rpc under load, passes in isolation) |
+| `npm run db:test` | PASS when serialized (`fileParallelism: false`); prior parallel-file races fixed |
 | `npm audit --omit=dev` | 0 vulnerabilities |
 | `git diff --check` | PASS |
 | Advisors (Management API) | NOT RUN this tip (403) — last documented Security WARN ~60 intentional DEFINER; INFO remain; Performance WARN ×0 |
