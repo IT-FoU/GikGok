@@ -54,7 +54,8 @@
 7. Optional follow-up: style CSP nonce (`style-src` still `unsafe-inline`); deeper DEFINER COMMENT coverage; remaining admin placeholder chrome i18n
 
 ## Tip Actions
-- Latest tip green: [https://github.com/IT-FoU/GikGok/actions/runs/34031542121](https://github.com/IT-FoU/GikGok/actions/runs/34031542121) — Static PASS + DB PASS on `bd220c9` (fixture/deadlock hardenings)
+- Latest tip green: [https://github.com/IT-FoU/GikGok/actions/runs/34032016542](https://github.com/IT-FoU/GikGok/actions/runs/34032016542) — Static PASS + DB PASS on `75ec7b3` (residual chrome i18n)
+- Prior green (fixture/deadlock hardenings): [https://github.com/IT-FoU/GikGok/actions/runs/34031542121](https://github.com/IT-FoU/GikGok/actions/runs/34031542121) on `bd220c9`
 - Prior green (Owner-corrected secret): [https://github.com/IT-FoU/GikGok/actions/runs/34026129961](https://github.com/IT-FoU/GikGok/actions/runs/34026129961) on `2474719`
 
 ## Validation snapshot

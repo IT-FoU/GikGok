@@ -65,15 +65,16 @@ Identify the tested implementation commit with `git rev-parse HEAD` on the branc
 | `git diff --check` | PASS |
 | Advisors (Management API) | NOT RUN this tip (403) — last documented Security WARN ~60 intentional DEFINER; INFO remain; Performance WARN ×0 |
 | DEFINER inventory | ~81 public DEFINER; ~63 authenticated EXECUTE; anon EXECUTE 0 |
-| GitHub Actions tip | **PASS** (Static + DB) — [https://github.com/IT-FoU/GikGok/actions/runs/34031542121](https://github.com/IT-FoU/GikGok/actions/runs/34031542121) on tip `bd220c9` (fixture/deadlock hardenings). Prior green after Owner secret fix: [34026129961](https://github.com/IT-FoU/GikGok/actions/runs/34026129961) on `2474719`. |
+| GitHub Actions tip | **PASS** (Static + DB) — [https://github.com/IT-FoU/GikGok/actions/runs/34032016542](https://github.com/IT-FoU/GikGok/actions/runs/34032016542) on tip `75ec7b3` (residual chrome i18n). Prior: [34031542121](https://github.com/IT-FoU/GikGok/actions/runs/34031542121) on `bd220c9`; [34026129961](https://github.com/IT-FoU/GikGok/actions/runs/34026129961) on `2474719`. |
 | Playwright public | PASS (10/10 smoke) |
 | Playwright authenticated | SKIPPED — no credentials |
 | Physical QA | SKIPPED — no devices |
 
 ### Tip Actions
-- Latest green PR Actions (fixture/deadlock hardenings): [https://github.com/IT-FoU/GikGok/actions/runs/34031542121](https://github.com/IT-FoU/GikGok/actions/runs/34031542121)
+- Latest green PR Actions (residual chrome i18n): [https://github.com/IT-FoU/GikGok/actions/runs/34032016542](https://github.com/IT-FoU/GikGok/actions/runs/34032016542)
 - Conclusion: **success** — Static job PASS + DB · RLS/RPC security suite PASS
-- Head SHA at that run: `bd220c981362b2f620586cdb2f47f3bb6ec1a468`
+- Head SHA at that run: `75ec7b3ba9bc400d765ad122d1407870b7bfc498`
+- Prior green (fixture/deadlock hardenings): [https://github.com/IT-FoU/GikGok/actions/runs/34031542121](https://github.com/IT-FoU/GikGok/actions/runs/34031542121) on `bd220c9`
 - Prior green (Owner-corrected `SUPABASE_DB_URL`): [https://github.com/IT-FoU/GikGok/actions/runs/34026129961](https://github.com/IT-FoU/GikGok/actions/runs/34026129961) on `2474719`
 - Later tip commits may supersede; re-check Actions on the current tip after push.
 
