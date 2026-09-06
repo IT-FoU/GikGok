@@ -41,6 +41,8 @@
 - Serialize Vitest DB workers (`fileParallelism: false`, `maxWorkers: 1`) to stop shared-fixture races
 - CI concurrency: group by branch name (push+PR); DB job queues on `gikgok-staging-db-rls-suite` so parallel workflows cannot race staging fixtures
 - Harden shared staging fixtures: advisory lock + aggressive admin perm restore; profiles-first lock order; deadlock retry on `mark_contact_verified`; restore perms before `has_permission` self-assert
+- Tip Actions green on `bd220c9` after fixture/deadlock hardenings (Static + DB)
+- Residual chrome i18n: profile settings/deletion, ledger admin review / second approve / filters, create-admin form — EN/LO parity
 
 ## Next actions
 1. Recount Advisors via dashboard when Management API allows (do not claim “fully clean”)
@@ -49,7 +51,7 @@
 4. Owner: SMS provider → Phone OTP
 5. Owner: hosted preview deploy
 6. Do **not** merge to `main` or production without Owner approval
-7. Optional follow-up: style CSP nonce (`style-src` still `unsafe-inline`); deeper DEFINER COMMENT coverage; residual admin/ledger/player chrome i18n
+7. Optional follow-up: style CSP nonce (`style-src` still `unsafe-inline`); deeper DEFINER COMMENT coverage; remaining admin placeholder chrome i18n
 
 ## Tip Actions
 - Latest tip green: [https://github.com/IT-FoU/GikGok/actions/runs/34031542121](https://github.com/IT-FoU/GikGok/actions/runs/34031542121) — Static PASS + DB PASS on `bd220c9` (fixture/deadlock hardenings)
