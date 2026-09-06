@@ -1,9 +1,9 @@
 # Continuation checkpoint — GIKGOK continuous implementation
 
 ## Branch
-- `cursor/gikgok-continuous-implementation` @ `53d87d0`
-- PR [#14](https://github.com/IT-FoU/GikGok/pull/14) (Draft) → `cursor/supabase-staging-integration-455c`
-- Staging: `jlpcfatcpymjnjbxmclo` only (migrations through `20260906020814`)
+-  @ 
+-  @ 
+-  @ 
 
 ## Progress
 | Phase | Status |
@@ -33,10 +33,10 @@ P1-005 high-impact Lao/English pass: support/friends/missions/credits/engagement
 8. Do **not** merge to `main` or production without Owner approval
 
 ## Validation (latest)
-- lint / typecheck / unit (89) / build / security:check / db tests (23 pass, 2 skip) / npm audit (0) — PASS
-- Staging Advisors: Security WARN ×60 (intentional RPCs; see `docs/ADVISOR_TRIAGE.md`); Performance WARN ×0
-- Local Docker Supabase — BLOCKED
-- This pass: `npm run typecheck` PASS; `npm test` 89 PASS
+-  @ 
+-  @ 
+-  @ 
+-  @ 
 
 ## Safe resume
 Continue remaining P1-005 / P1-007 / P2 docs. Do not re-apply applied migrations. Do not touch `main` or other Supabase projects.
