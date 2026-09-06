@@ -129,8 +129,8 @@
 
 - **Severity:** P1
 - **Phase / requirement:** Phase 3 — all user-facing strings
-- **Evidence:** Hard-coded English remains in admin actions, errors, engagement notifications from RPCs
-- **Status:** IN PROGRESS (support/profile/common keys wired for ticket + avatar forms and Loading/Empty/Error defaults; Thai reserved via `FUTURE_LOCALES` / no `th.json` yet)
+- **Evidence:** Hard-coded English remains in admin action forms, admin page copy, home/history/leaderboard chrome, RPC/action error messages, and notification title/body payloads
+- **Status:** IN PROGRESS — high-impact pass done for support tickets, friends, missions, credits (player ledger UI), engagement controls (notifications / responsible play / mission claim / friend actions), common Loading/Empty/Error + `titleKey`, admin shell nav labels + aria. `FUTURE_LOCALES` (`th`) preserved. Remaining: broad admin module page strings, home and other player chrome, server/action message localization, DB-sourced notification text.
 
 ### P1-006 — False-confidence tests
 
