@@ -13,6 +13,7 @@ import {
   parseSettingNumber,
   type CreditConfig,
 } from "@/modules/ledger";
+import { T } from "@/modules/localization/t";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -80,14 +81,17 @@ export default async function CreditsPage() {
       <div>
         <p className="text-sm text-[var(--brand-muted)]">
           <Link href="/home" className="underline-offset-4 hover:underline">
-            ← Home
+            <T id="common.backHome" />
           </Link>
         </p>
         <h1 className="font-display text-3xl font-semibold text-[var(--brand-accent)]">
-          Credits & rewards
+          <T id="credits.title" />
         </h1>
         <p className="mt-2 text-[var(--brand-muted)]">
-          Balance {balance.toLocaleString()} GIK · demo credits only
+          <T
+            id="credits.balance"
+            params={{ amount: balance.toLocaleString() }}
+          />
         </p>
       </div>
 
@@ -104,7 +108,7 @@ export default async function CreditsPage() {
 
       <p className="text-sm text-[var(--brand-muted)]">
         <Link href="/ledger" className="underline-offset-4 hover:underline">
-          View ledger history →
+          <T id="credits.viewLedger" />
         </Link>
       </p>
     </main>

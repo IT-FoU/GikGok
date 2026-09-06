@@ -62,6 +62,7 @@ export function AnnouncementDismissForm({
 }: {
   announcementId: string;
 }) {
+  const t = useTranslations();
   const [pending, startTransition] = useTransition();
 
   return (
@@ -73,13 +74,14 @@ export function AnnouncementDismissForm({
       }}
     >
       <Button type="submit" variant="outline" size="sm" disabled={pending}>
-        Dismiss
+        {t("engagement.dismiss")}
       </Button>
     </form>
   );
 }
 
 export function NotificationReadButton({ id }: { id: string }) {
+  const t = useTranslations();
   const [pending, startTransition] = useTransition();
 
   return (
@@ -94,12 +96,13 @@ export function NotificationReadButton({ id }: { id: string }) {
         });
       }}
     >
-      Mark read
+      {t("engagement.markRead")}
     </Button>
   );
 }
 
 export function MarkAllNotificationsButton() {
+  const t = useTranslations();
   const [pending, startTransition] = useTransition();
   const [message, setMessage] = useState<ActionResult | null>(null);
 
@@ -115,7 +118,7 @@ export function MarkAllNotificationsButton() {
           });
         }}
       >
-        Mark all read
+        {t("engagement.markAllRead")}
       </Button>
       <ResultMessage state={message} />
     </div>
@@ -123,6 +126,7 @@ export function MarkAllNotificationsButton() {
 }
 
 export function MissionClaimButton({ missionId }: { missionId: string }) {
+  const t = useTranslations();
   const [pending, startTransition] = useTransition();
   const [message, setMessage] = useState<ActionResult | null>(null);
 
@@ -137,7 +141,7 @@ export function MissionClaimButton({ missionId }: { missionId: string }) {
           });
         }}
       >
-        Claim reward
+        {t("missions.claimReward")}
       </Button>
       <ResultMessage state={message} />
     </div>
@@ -145,6 +149,7 @@ export function MissionClaimButton({ missionId }: { missionId: string }) {
 }
 
 export function FriendRequestForm() {
+  const t = useTranslations();
   const [pending, startTransition] = useTransition();
   const [message, setMessage] = useState<ActionResult | null>(null);
   const [nickname, setNickname] = useState("");
@@ -160,15 +165,17 @@ export function FriendRequestForm() {
       }}
     >
       <div className="space-y-2">
-        <Label htmlFor="friend-nickname">Friend nickname</Label>
+        <Label htmlFor="friend-nickname">{t("friends.nickname")}</Label>
         <Input
           id="friend-nickname"
           value={nickname}
           onChange={(event) => setNickname(event.target.value)}
-          placeholder="Player nickname"
+          placeholder={t("friends.nicknamePlaceholder")}
         />
       </div>
-      <Button type="submit" disabled={pending}>Send request</Button>
+      <Button type="submit" disabled={pending}>
+        {t("friends.sendRequest")}
+      </Button>
       <ResultMessage state={message} />
     </form>
   );
@@ -181,6 +188,7 @@ export function FriendshipActions({
   friendshipId: string;
   canAccept: boolean;
 }) {
+  const t = useTranslations();
   const [pending, startTransition] = useTransition();
 
   const act = (action: "accept" | "block" | "remove") => {
@@ -198,7 +206,7 @@ export function FriendshipActions({
           disabled={pending}
           onClick={() => act("accept")}
         >
-          Accept
+          {t("friends.accept")}
         </Button>
       ) : null}
       <Button
@@ -208,7 +216,7 @@ export function FriendshipActions({
         disabled={pending}
         onClick={() => act("block")}
       >
-        Block
+        {t("friends.block")}
       </Button>
       <Button
         type="button"
@@ -217,13 +225,14 @@ export function FriendshipActions({
         disabled={pending}
         onClick={() => act("remove")}
       >
-        Remove
+        {t("friends.remove")}
       </Button>
     </div>
   );
 }
 
 export function CreateInviteButton() {
+  const t = useTranslations();
   const [pending, startTransition] = useTransition();
   const [code, setCode] = useState<string | null>(null);
   const [message, setMessage] = useState<ActionResult | null>(null);
@@ -244,7 +253,7 @@ export function CreateInviteButton() {
           });
         }}
       >
-        Create invite code
+        {t("friends.createInvite")}
       </Button>
       {code ? (
         <p className="font-mono text-sm text-[var(--brand-accent)]">{code}</p>
@@ -334,7 +343,9 @@ export function SupportTicketForm() {
                   }
                 : {
                     ok: false,
-                    message: `${created.message} Attachment upload failed: ${uploaded.message}`,
+                    message: `${created.message} ${t("support.attachmentUploadFailed", {
+                      error: uploaded.message,
+                    })}`,
                   },
             );
             if (uploaded.ok) setFiles([]);
@@ -431,7 +442,9 @@ export function TicketReplyForm({ ticketId }: { ticketId: string }) {
                   }
                 : {
                     ok: false,
-                    message: `Reply saved, but attachments failed: ${uploaded.message}`,
+                    message: t("support.replyAttachmentsFailed", {
+                      error: uploaded.message,
+                    }),
                   },
             );
             if (uploaded.ok) {
@@ -521,6 +534,7 @@ export function TicketAttachmentGallery({
 }
 
 export function TicketSatisfactionForm({ ticketId }: { ticketId: string }) {
+  const t = useTranslations();
   const [score, setScore] = useState(5);
   const [comment, setComment] = useState("");
   const [pending, startTransition] = useTransition();
@@ -538,9 +552,9 @@ export function TicketSatisfactionForm({ ticketId }: { ticketId: string }) {
         });
       }}
     >
-      <h2 className="font-medium">Rate support</h2>
+      <h2 className="font-medium">{t("support.rateSupport")}</h2>
       <div className="space-y-2">
-        <Label htmlFor="score">Score (1–5)</Label>
+        <Label htmlFor="score">{t("support.score")}</Label>
         <Input
           id="score"
           type="number"
@@ -551,7 +565,7 @@ export function TicketSatisfactionForm({ ticketId }: { ticketId: string }) {
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="comment">Comment (optional)</Label>
+        <Label htmlFor="comment">{t("support.commentOptional")}</Label>
         <textarea
           id="comment"
           value={comment}
@@ -560,7 +574,9 @@ export function TicketSatisfactionForm({ ticketId }: { ticketId: string }) {
           className="w-full rounded-[var(--radius-md)] border border-[var(--brand-border)] bg-transparent px-3 py-2 text-sm"
         />
       </div>
-      <Button type="submit" disabled={pending}>Submit feedback</Button>
+      <Button type="submit" disabled={pending}>
+        {t("support.submitFeedback")}
+      </Button>
       <ResultMessage state={result} />
     </form>
   );
@@ -575,6 +591,7 @@ export function ResponsiblePlaySection({
   sessionStartedAt: string | null;
   playPausedUntil: string | null;
 }) {
+  const t = useTranslations();
   const [pending, startTransition] = useTransition();
   const [message, setMessage] = useState<ActionResult | null>(null);
   const [nowMs] = useState(() => Date.now());
@@ -596,21 +613,27 @@ export function ResponsiblePlaySection({
 
   return (
     <section className="space-y-4 border border-[var(--brand-border)] p-4">
-      <h2 className="font-display text-xl font-medium">Responsible play</h2>
+      <h2 className="font-display text-xl font-medium">
+        {t("engagement.responsiblePlay")}
+      </h2>
       <p className="text-sm text-[var(--brand-muted)]">{config.demo_notice}</p>
       {sessionStartedAt ? (
         <p className="text-sm">
-          Session: {formatSessionDuration(sessionStartedAt, now)}
+          {t("engagement.session", {
+            duration: formatSessionDuration(sessionStartedAt, now),
+          })}
           {breakDue ? (
             <span className="ml-2 text-amber-200">
-              — consider taking a break
+              {t("engagement.considerBreak")}
             </span>
           ) : null}
         </p>
       ) : null}
       {paused ? (
         <p className="text-sm text-amber-200">
-          Play paused until {new Date(playPausedUntil!).toLocaleString()}
+          {t("engagement.playPausedUntil", {
+            until: new Date(playPausedUntil!).toLocaleString(),
+          })}
         </p>
       ) : null}
       <div className="flex flex-wrap gap-2">
@@ -623,7 +646,9 @@ export function ResponsiblePlaySection({
             disabled={pending}
             onClick={() => pause(days)}
           >
-            Pause {days} day{days === 1 ? "" : "s"}
+            {days === 1
+              ? t("engagement.pauseDays", { days })
+              : t("engagement.pauseDaysPlural", { days })}
           </Button>
         ))}
         <Button
@@ -633,13 +658,13 @@ export function ResponsiblePlaySection({
           disabled={pending || !paused}
           onClick={() => pause(0)}
         >
-          Clear pause
+          {t("engagement.clearPause")}
         </Button>
       </div>
       <ResultMessage state={message} />
       <p className="text-xs text-[var(--brand-muted)]">
         <Link href="/guide" className="underline-offset-4 hover:underline">
-          Game guide
+          {t("engagement.gameGuide")}
         </Link>
       </p>
     </section>

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { EmptyState } from "@/components/ui/states";
 import { MissionClaimButton } from "@/modules/engagement/ui";
 import { missionClaimable } from "@/modules/engagement/helpers";
+import { T } from "@/modules/localization/t";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -38,20 +39,19 @@ export default async function MissionsPage() {
       <div>
         <p className="text-sm text-[var(--brand-muted)]">
           <Link href="/home" className="underline-offset-4 hover:underline">
-            ← Home
+            <T id="common.backHome" />
           </Link>
         </p>
         <h1 className="font-display text-3xl font-semibold text-[var(--brand-accent)]">
-          Missions
+          <T id="missions.title" />
         </h1>
         <p className="mt-2 text-sm text-[var(--brand-muted)]">
-          Optional missions — never required to play every game. Rewards are
-          demo GIK.
+          <T id="missions.body" />
         </p>
       </div>
 
       {!missions?.length ? (
-        <EmptyState title="No missions available" />
+        <EmptyState titleKey="missions.empty" />
       ) : (
         <ul className="space-y-4">
           {missions.map((mission) => {
@@ -79,13 +79,19 @@ export default async function MissionsPage() {
                       </p>
                     ) : null}
                     <p className="mt-2 text-sm">
-                      Progress {count}/{mission.goal_target} · Reward{" "}
-                      {mission.reward_amount.toLocaleString()} GIK
+                      <T
+                        id="missions.progress"
+                        params={{
+                          count,
+                          target: mission.goal_target,
+                          amount: mission.reward_amount.toLocaleString(),
+                        }}
+                      />
                       {game?.key ? ` · ${game.key}` : ` · ${mission.scope}`}
                     </p>
                     {claimed ? (
                       <p className="mt-1 text-sm text-[var(--brand-accent)]">
-                        Reward claimed
+                        <T id="missions.rewardClaimed" />
                       </p>
                     ) : null}
                   </div>

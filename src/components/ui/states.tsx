@@ -67,19 +67,24 @@ export function ErrorState({
 
 export function EmptyState({
   title,
+  titleKey,
   description,
+  descriptionKey,
 }: {
   title?: string;
+  titleKey?: string;
   description?: string;
+  descriptionKey?: string;
 }) {
   const t = useTranslations();
+  const resolvedTitle = title ?? (titleKey ? t(titleKey) : t("common.empty"));
+  const resolvedDescription =
+    description ?? (descriptionKey ? t(descriptionKey) : undefined);
   return (
     <div className="surface flex min-h-32 flex-col items-start justify-center gap-2 p-5">
-      <h2 className="font-display text-lg font-semibold">
-        {title ?? t("common.empty")}
-      </h2>
-      {description ? (
-        <p className="text-sm text-[var(--brand-muted)]">{description}</p>
+      <h2 className="font-display text-lg font-semibold">{resolvedTitle}</h2>
+      {resolvedDescription ? (
+        <p className="text-sm text-[var(--brand-muted)]">{resolvedDescription}</p>
       ) : null}
     </div>
   );

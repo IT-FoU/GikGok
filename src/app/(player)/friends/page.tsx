@@ -7,6 +7,7 @@ import {
   FriendRequestForm,
   FriendshipActions,
 } from "@/modules/engagement/ui";
+import { T } from "@/modules/localization/t";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -55,42 +56,48 @@ export default async function FriendsPage() {
       <div>
         <p className="text-sm text-[var(--brand-muted)]">
           <Link href="/home" className="underline-offset-4 hover:underline">
-            ← Home
+            <T id="common.backHome" />
           </Link>
         </p>
         <h1 className="font-display text-3xl font-semibold text-[var(--brand-accent)]">
-          Friends
+          <T id="friends.title" />
         </h1>
         <p className="mt-2 text-sm text-[var(--brand-muted)]">
-          Privacy-safe nickname invites. Feature-flag controlled.
+          <T id="friends.body" />
         </p>
       </div>
 
       {!friendsEnabled ? (
         <EmptyState
-          title="Friends are disabled"
-          description="Enable the friends_invites feature flag to use this module."
+          titleKey="friends.disabledTitle"
+          descriptionKey="friends.disabledBody"
         />
       ) : (
         <>
           <section className="border border-[var(--brand-border)] p-4">
-            <h2 className="font-medium">Add friend</h2>
+            <h2 className="font-medium">
+              <T id="friends.addFriend" />
+            </h2>
             <div className="mt-3">
               <FriendRequestForm />
             </div>
           </section>
 
           <section className="border border-[var(--brand-border)] p-4">
-            <h2 className="font-medium">Invite code</h2>
+            <h2 className="font-medium">
+              <T id="friends.inviteCode" />
+            </h2>
             <div className="mt-3">
               <CreateInviteButton />
             </div>
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-medium">Your friendships</h2>
+            <h2 className="font-medium">
+              <T id="friends.yourFriendships" />
+            </h2>
             {!friendships?.length ? (
-              <EmptyState title="No friendships yet" />
+              <EmptyState titleKey="friends.empty" />
             ) : (
               <ul className="space-y-3">
                 {friendships.map((friendship) => {
@@ -106,7 +113,9 @@ export default async function FriendsPage() {
                     >
                       <div>
                         <p className="font-medium">
-                          {nicknameMap.get(otherId) ?? "Player"}
+                          {nicknameMap.get(otherId) ?? (
+                            <T id="friends.player" />
+                          )}
                         </p>
                         <p className="text-sm capitalize text-[var(--brand-muted)]">
                           {friendship.status}

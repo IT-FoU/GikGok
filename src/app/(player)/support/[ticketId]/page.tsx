@@ -7,6 +7,7 @@ import {
   TicketSatisfactionForm,
 } from "@/modules/engagement/ui";
 import { signTicketAttachmentUrls } from "@/modules/engagement/actions";
+import { T } from "@/modules/localization/t";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -58,7 +59,7 @@ export default async function SupportTicketPage({
       <div>
         <p className="text-sm text-[var(--brand-muted)]">
           <Link href="/support" className="underline-offset-4 hover:underline">
-            ← Support
+            <T id="support.backToSupport" />
           </Link>
         </p>
         <h1 className="font-display text-2xl font-semibold text-[var(--brand-accent)]">
@@ -70,7 +71,9 @@ export default async function SupportTicketPage({
       </div>
 
       <section className="space-y-3">
-        <h2 className="font-medium">Messages</h2>
+        <h2 className="font-medium">
+          <T id="support.messages" />
+        </h2>
         <ul className="space-y-3">
           {(messages ?? []).map((message) => (
             <li
@@ -82,8 +85,12 @@ export default async function SupportTicketPage({
               }`}
             >
               <p className="text-xs text-[var(--brand-muted)]">
-                {message.author_role === "admin" ? "Staff" : "You"} ·{" "}
-                {new Date(message.created_at).toLocaleString()}
+                {message.author_role === "admin" ? (
+                  <T id="support.staff" />
+                ) : (
+                  <T id="support.you" />
+                )}{" "}
+                · {new Date(message.created_at).toLocaleString()}
               </p>
               <p className="mt-2 whitespace-pre-wrap text-sm">{message.body}</p>
               <div className="mt-3">
@@ -106,7 +113,10 @@ export default async function SupportTicketPage({
       ) : null}
       {ticket.satisfaction_rating ? (
         <p className="text-sm text-[var(--brand-muted)]">
-          Satisfaction: {ticket.satisfaction_rating}/5
+          <T
+            id="support.satisfaction"
+            params={{ score: ticket.satisfaction_rating }}
+          />
         </p>
       ) : null}
     </main>

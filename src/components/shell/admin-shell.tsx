@@ -52,7 +52,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             </p>
             <p className="text-xs text-[var(--brand-muted)]">{t("admin.title")}</p>
           </div>
-          <nav className="space-y-1" aria-label="Admin navigation">
+          <nav className="space-y-1" aria-label={t("admin.navAria")}>
             {ADMIN_NAV.map((link) => {
               const Icon = ICON_BY_HREF[link.href] ?? LayoutDashboard;
               const active =
@@ -95,7 +95,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </div>
           <nav
             className="mt-3 flex gap-2 overflow-x-auto lg:hidden"
-            aria-label="Admin compact navigation"
+            aria-label={t("admin.navCompactAria")}
           >
             {ADMIN_NAV.map((link) => (
               <Link

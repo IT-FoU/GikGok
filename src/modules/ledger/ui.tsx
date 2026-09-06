@@ -20,6 +20,7 @@ import {
   reviewCreditRequestAction,
   secondApproveCreditRequestAction,
 } from "@/modules/ledger/actions";
+import { useTranslations } from "@/modules/localization/provider";
 import type { ActionResult } from "@/modules/player/auth-shared";
 
 function ResultMessage({ state }: { state: ActionResult | null }) {
@@ -48,6 +49,7 @@ export function DailyCheckInCard({
   balance: number;
   claimedToday: boolean;
 }) {
+  const t = useTranslations();
   const [pending, startTransition] = useTransition();
   const [message, setMessage] = useState<ActionResult | null>(null);
   const [countdown, setCountdown] = useState(() =>
@@ -65,14 +67,24 @@ export function DailyCheckInCard({
 
   const days = useMemo(() => Array.from({ length: 7 }, (_, i) => i + 1), []);
 
+  const streakSuffix = claimedToday
+    ? ` · ${t("credits.nextCheckIn", { countdown })}`
+    : blockedByBalance
+      ? ` · ${t("credits.unavailableBalance", {
+          max: config.daily_reward_max_balance.toLocaleString(),
+        })}`
+      : ` · ${t("credits.readyToClaim")}`;
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Daily check-in</CardTitle>
+        <CardTitle>{t("credits.dailyTitle")}</CardTitle>
         <CardDescription>
-          Base {config.daily_base_amount.toLocaleString()} GIK · every 3rd day +
-          {config.daily_streak_day3_bonus.toLocaleString()} · every 7th day +
-          {config.daily_streak_day7_bonus.toLocaleString()}
+          {t("credits.dailyDescription", {
+            base: config.daily_base_amount.toLocaleString(),
+            day3: config.daily_streak_day3_bonus.toLocaleString(),
+            day7: config.daily_streak_day7_bonus.toLocaleString(),
+          })}
         </CardDescription>
       </CardHeader>
 
@@ -92,12 +104,8 @@ export function DailyCheckInCard({
       </div>
 
       <p className="mb-3 text-sm text-[var(--brand-muted)]">
-        Current streak: {streakDay}
-        {claimedToday
-          ? ` · Next check-in in ${countdown} (UTC)`
-          : blockedByBalance
-            ? ` · Unavailable while balance is above ${config.daily_reward_max_balance.toLocaleString()} GIK`
-            : " · Ready to claim"}
+        {t("credits.currentStreak", { days: streakDay })}
+        {streakSuffix}
       </p>
 
       <ResultMessage state={message} />
@@ -117,13 +125,18 @@ export function DailyCheckInCard({
           });
         }}
       >
-        {pending ? "Claiming…" : claimedToday ? "Claimed today" : "Claim daily reward"}
+        {pending
+          ? t("credits.claiming")
+          : claimedToday
+            ? t("credits.claimedToday")
+            : t("credits.claimDaily")}
       </Button>
     </Card>
   );
 }
 
 export function CreditRequestForm() {
+  const t = useTranslations();
   const [state, action, pending] = useActionState(
     createCreditRequestAction,
     null,
@@ -132,14 +145,12 @@ export function CreditRequestForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Request demo credits</CardTitle>
-        <CardDescription>
-          Simulated ledger request only — not a payment or cash-out.
-        </CardDescription>
+        <CardTitle>{t("credits.requestTitle")}</CardTitle>
+        <CardDescription>{t("credits.requestBody")}</CardDescription>
       </CardHeader>
       <form action={action} className="space-y-3">
         <div className="space-y-2">
-          <Label htmlFor="amount">Amount (GIK)</Label>
+          <Label htmlFor="amount">{t("credits.amount")}</Label>
           <Input
             id="amount"
             name="amount"
@@ -150,12 +161,12 @@ export function CreditRequestForm() {
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="note">Note (optional)</Label>
+          <Label htmlFor="note">{t("credits.noteOptional")}</Label>
           <Input id="note" name="note" maxLength={200} />
         </div>
         <ResultMessage state={state} />
         <Button type="submit" disabled={pending}>
-          {pending ? "Submitting…" : "Submit request"}
+          {pending ? t("credits.submitting") : t("credits.submitRequest")}
         </Button>
       </form>
     </Card>
@@ -173,18 +184,21 @@ export function CreditRequestList({
     created_at: string;
   }>;
 }) {
+  const t = useTranslations();
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [message, setMessage] = useState<ActionResult | null>(null);
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Your credit requests</CardTitle>
+        <CardTitle>{t("credits.yourRequests")}</CardTitle>
       </CardHeader>
       <ResultMessage state={message} />
       <ul className="space-y-3">
         {requests.length === 0 ? (
-          <li className="text-sm text-[var(--brand-muted)]">No requests yet.</li>
+          <li className="text-sm text-[var(--brand-muted)]">
+            {t("credits.noRequests")}
+          </li>
         ) : (
           requests.map((request) => (
             <li
@@ -213,7 +227,7 @@ export function CreditRequestList({
                     setPendingId(null);
                   }}
                 >
-                  Cancel
+                  {t("credits.cancel")}
                 </Button>
               ) : null}
             </li>

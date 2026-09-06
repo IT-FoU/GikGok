@@ -6,6 +6,7 @@ import {
   MarkAllNotificationsButton,
   NotificationReadButton,
 } from "@/modules/engagement/ui";
+import { T } from "@/modules/localization/t";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -30,18 +31,18 @@ export default async function NotificationsPage() {
         <div>
           <p className="text-sm text-[var(--brand-muted)]">
             <Link href="/home" className="underline-offset-4 hover:underline">
-              ← Home
+              <T id="common.backHome" />
             </Link>
           </p>
           <h1 className="font-display text-3xl font-semibold text-[var(--brand-accent)]">
-            Notifications
+            <T id="notifications.title" />
           </h1>
         </div>
         <MarkAllNotificationsButton />
       </div>
 
       {!notifications?.length ? (
-        <EmptyState title="No notifications yet" />
+        <EmptyState titleKey="notifications.empty" />
       ) : (
         <ul className="space-y-3">
           {notifications.map((notification) => (

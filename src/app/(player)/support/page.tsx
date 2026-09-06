@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { EmptyState } from "@/components/ui/states";
 import { SupportTicketForm } from "@/modules/engagement/ui";
+import { T } from "@/modules/localization/t";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -25,23 +26,25 @@ export default async function SupportPage() {
       <div>
         <p className="text-sm text-[var(--brand-muted)]">
           <Link href="/home" className="underline-offset-4 hover:underline">
-            ← Home
+            <T id="common.backHome" />
           </Link>
         </p>
         <h1 className="font-display text-3xl font-semibold text-[var(--brand-accent)]">
-          Support
+          <T id="support.title" />
         </h1>
         <p className="mt-2 text-sm text-[var(--brand-muted)]">
-          Demo platform support — no real-money issues.
+          <T id="support.body" />
         </p>
       </div>
 
       <SupportTicketForm />
 
       <section className="space-y-3">
-        <h2 className="font-medium">Your tickets</h2>
+        <h2 className="font-medium">
+          <T id="support.yourTickets" />
+        </h2>
         {!tickets?.length ? (
-          <EmptyState title="No tickets yet" />
+          <EmptyState titleKey="support.noTickets" />
         ) : (
           <ul className="space-y-2">
             {tickets.map((ticket) => (
