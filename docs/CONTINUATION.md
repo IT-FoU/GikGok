@@ -1,7 +1,7 @@
 # Continuation checkpoint — GIKGOK continuous implementation
 
 ## Branch
-- `cursor/gikgok-continuous-implementation` @ `873e627`
+- `cursor/gikgok-continuous-implementation` @ `81793c2`
 - PR [#14](https://github.com/IT-FoU/GikGok/pull/14) (Draft) → `cursor/supabase-staging-integration-455c`
 - Staging: `jlpcfatcpymjnjbxmclo` only (migrations through `20260906020814`)
 
