@@ -11,14 +11,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # -------------------------------------------------------------------------
+  # Always runs. A green badge here is STATIC ONLY — never treat as DB PASS.
+  # -------------------------------------------------------------------------
   static-quality:
     name: Static · lint · typecheck · unit · build · security(static)
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
       NEXT_TELEMETRY_DISABLED: "1"
-      # Force static-only security check in this job so a green badge cannot be
-      # mistaken for a DB/RLS security PASS.
       SECURITY_CHECK_ALLOW_SKIP_DB: "1"
       SECURITY_CHECK_STATIC_ONLY: "1"
     steps:
@@ -52,24 +53,42 @@ jobs:
 
       - name: Static security check
         run: npm run security:check
-        continue-on-error: false
 
       - name: Dependency audit
         run: npm audit --audit-level=high
 
+  # -------------------------------------------------------------------------
+  # Live staging DB/RLS/RPC — trusted same-repo contexts only.
+  # Never use secrets in job-level `if` (GitHub rejects that).
+  # Fork PRs: this job is SKIPPED / NOT RUN (neutral).
+  # Same-repo push/PR without SUPABASE_DB_URL: FAIL with clear preflight.
+  # -------------------------------------------------------------------------
   db-security:
     name: DB · RLS/RPC security suite
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    # Requires repository secrets. When absent, the job is skipped (neutral),
-    # never reported as a green security PASS.
-    if: ${{ secrets.SUPABASE_DB_URL != '' }}
+    if: >-
+      github.event_name == 'push' ||
+      github.event.pull_request.head.repo.full_name == github.repository
     env:
       NEXT_TELEMETRY_DISABLED: "1"
+      # Promote secret presence to env (allowed); do NOT use secrets.* in `if`.
+      HAS_SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL != '' }}
       SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
       DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
       SECURITY_CHECK_ALLOW_SKIP_DB: "0"
+      SECURITY_CHECK_STATIC_ONLY: "0"
     steps:
+      - name: Preflight staging DB credentials
+        run: |
+          if [ "${HAS_SUPABASE_DB_URL}" != "true" ]; then
+            echo "::error::SUPABASE_DB_URL repository secret is not configured."
+            echo "DB/RLS/RPC security suite cannot run without staging credentials."
+            echo "Static-quality may still be green — that is NOT a DB security PASS."
+            exit 1
+          fi
+          echo "SUPABASE_DB_URL is configured for trusted same-repo context."
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -82,7 +101,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: DB security check (static + live DB)
+      - name: DB security check (static + live staging DB)
         run: npm run security:check
 
       - name: DB / RLS / RPC tests
