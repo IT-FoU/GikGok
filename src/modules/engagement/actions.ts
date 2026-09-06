@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 
 import {
+  TICKET_ATTACHMENT_MAX_COUNT,
+  TICKET_ATTACHMENT_TOTAL_MAX_BYTES,
   UPLOAD_MAX_BYTES,
   requireSameOrigin,
   validateImageMagicBytes,
@@ -14,11 +16,25 @@ import type { ActionResult } from "@/modules/player/auth-shared";
 
 type TicketCategory = Database["public"]["Enums"]["ticket_category"];
 
-const TICKET_ATTACHMENT_MAX = 3;
+const TICKET_ATTACHMENT_MAX = TICKET_ATTACHMENT_MAX_COUNT;
 const TICKET_ATTACHMENT_BUCKET = "ticket-attachments";
 
 function asMessage(error: { message: string } | null): string {
-  return error?.message ?? "Unexpected error";
+  const raw = error?.message ?? "Unexpected error";
+  const lower = raw.toLowerCase();
+  if (lower.includes("at most 3") || lower.includes("attachment")) {
+    return "Attachment limit or validation failed.";
+  }
+  if (lower.includes("closed") || lower.includes("resolved")) {
+    return "This ticket is closed.";
+  }
+  if (lower.includes("message_id") || lower.includes("belong")) {
+    return "Attachment message does not match this ticket.";
+  }
+  if (lower.includes("permission") || lower.includes("row-level")) {
+    return "You do not have access to this attachment.";
+  }
+  return "Request could not be completed.";
 }
 
 function extensionForMime(mime: string): string {
@@ -59,6 +75,32 @@ function revalidateEngagement(extra: string[] = []) {
     revalidatePath(path);
   }
 }
+
+
+async function recordStorageOrphan(
+  supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
+  input: {
+    objectPath: string;
+    source: string;
+    sourceId?: string | null;
+    error?: string | null;
+  },
+): Promise<void> {
+  // Table added by forward migration; generated Database types lag until regen.
+  const client = supabase as unknown as {
+    from: (relation: string) => {
+      insert: (row: Record<string, unknown>) => Promise<{ error: { message: string } | null }>;
+    };
+  };
+  await client.from("storage_orphan_objects").insert({
+    bucket_id: TICKET_ATTACHMENT_BUCKET,
+    object_path: input.objectPath,
+    source: input.source,
+    source_id: input.sourceId ?? null,
+    last_error: input.error ?? null,
+  });
+}
+
 
 export async function markAnnouncementReadAction(
   id: string,
@@ -307,6 +349,14 @@ export async function uploadTicketAttachmentsAction(
     };
   }
 
+  const totalBytes = files.reduce((sum, file) => sum + file.size, 0);
+  if (totalBytes > TICKET_ATTACHMENT_TOTAL_MAX_BYTES) {
+    return {
+      ok: false,
+      message: `Total attachment size must be at most ${TICKET_ATTACHMENT_MAX} × 5 MB.`,
+    };
+  }
+
   const supabase = await createServerSupabaseClient();
   const {
     data: { user },
@@ -315,15 +365,32 @@ export async function uploadTicketAttachmentsAction(
     return { ok: false, message: "Sign in required." };
   }
 
+  const { data: ticket, error: ticketError } = await supabase
+    .from("support_tickets")
+    .select("id, status, player_id")
+    .eq("id", ticketId)
+    .maybeSingle();
+  if (ticketError) return { ok: false, message: asMessage(ticketError) };
+  if (!ticket) return { ok: false, message: "Ticket not found." };
+  if (ticket.status === "closed" || ticket.status === "resolved") {
+    return { ok: false, message: "This ticket is closed." };
+  }
+
+  const { data: message, error: messageError } = await supabase
+    .from("ticket_messages")
+    .select("id, ticket_id")
+    .eq("id", messageId)
+    .maybeSingle();
+  if (messageError) return { ok: false, message: asMessage(messageError) };
+  if (!message || message.ticket_id !== ticketId) {
+    return { ok: false, message: "Attachment message does not match this ticket." };
+  }
+
   const { count, error: countError } = await supabase
     .from("ticket_attachments")
     .select("id", { count: "exact", head: true })
     .eq("ticket_id", ticketId);
-
-  if (countError) {
-    return { ok: false, message: asMessage(countError) };
-  }
-
+  if (countError) return { ok: false, message: asMessage(countError) };
   const existing = count ?? 0;
   if (existing + files.length > TICKET_ATTACHMENT_MAX) {
     return {
@@ -333,6 +400,34 @@ export async function uploadTicketAttachmentsAction(
   }
 
   const uploaded: Array<{ id: string; storage_path: string }> = [];
+  const uploadedPaths: string[] = [];
+
+  async function rollbackUploaded() {
+    if (uploaded.length > 0) {
+      await supabase
+        .from("ticket_attachments")
+        .delete()
+        .in(
+          "id",
+          uploaded.map((row) => row.id),
+        );
+    }
+    if (uploadedPaths.length > 0) {
+      const { error: removeError } = await supabase.storage
+        .from(TICKET_ATTACHMENT_BUCKET)
+        .remove(uploadedPaths);
+      if (removeError) {
+        for (const objectPath of uploadedPaths) {
+          await recordStorageOrphan(supabase, {
+            objectPath: objectPath,
+            source: "ticket_attachment_upload_rollback",
+            sourceId: ticketId,
+            error: removeError.message,
+          });
+        }
+      }
+    }
+  }
 
   for (const file of files) {
     const bytes = await file.arrayBuffer();
@@ -343,11 +438,13 @@ export async function uploadTicketAttachmentsAction(
       maxBytes: UPLOAD_MAX_BYTES.ticketAttachment,
     });
     if (!magic.ok) {
+      await rollbackUploaded();
       return { ok: false, message: magic.message };
     }
 
     const safeBase = sanitizeFileBase(file.name);
     const storagePath = `${ticketId}/${user.id}/${Date.now()}-${safeBase}.${extensionForMime(magic.mime)}`;
+    const safeFileName = `${safeBase}.${extensionForMime(magic.mime)}`.slice(0, 255);
 
     const { error: uploadError } = await supabase.storage
       .from(TICKET_ATTACHMENT_BUCKET)
@@ -355,10 +452,11 @@ export async function uploadTicketAttachmentsAction(
         contentType: magic.mime,
         upsert: false,
       });
-
     if (uploadError) {
+      await rollbackUploaded();
       return { ok: false, message: asMessage(uploadError) };
     }
+    uploadedPaths.push(storagePath);
 
     const { data: row, error: insertError } = await supabase
       .from("ticket_attachments")
@@ -366,7 +464,7 @@ export async function uploadTicketAttachmentsAction(
         ticket_id: ticketId,
         message_id: messageId,
         storage_path: storagePath,
-        file_name: file.name || `attachment.${extensionForMime(magic.mime)}`,
+        file_name: safeFileName,
         mime_type: magic.mime,
         size_bytes: file.size,
         uploaded_by: user.id,
@@ -375,10 +473,18 @@ export async function uploadTicketAttachmentsAction(
       .single();
 
     if (insertError) {
-      await supabase.storage
+      await rollbackUploaded();
+      const { error: removeError } = await supabase.storage
         .from(TICKET_ATTACHMENT_BUCKET)
-        .remove([storagePath])
-        .catch(() => undefined);
+        .remove([storagePath]);
+      if (removeError) {
+        await recordStorageOrphan(supabase, {
+            objectPath: storagePath,
+            source: "ticket_attachment_insert_failure",
+            sourceId: ticketId,
+            error: removeError.message,
+          });
+      }
       return { ok: false, message: asMessage(insertError) };
     }
 
@@ -432,16 +538,30 @@ export async function deleteTicketAttachmentAction(
     return { ok: false, message: asMessage(deleteError) };
   }
 
-  await supabase.storage
+  const { error: storageError } = await supabase.storage
     .from(TICKET_ATTACHMENT_BUCKET)
-    .remove([row.storage_path])
-    .catch(() => undefined);
+    .remove([row.storage_path]);
+
+  if (storageError) {
+    await recordStorageOrphan(supabase, {
+            objectPath: row.storage_path,
+            source: "ticket_attachment_delete",
+            sourceId: row.id,
+            error: storageError.message,
+          });
+    revalidateEngagement([`/support/${row.ticket_id}`, "/admin/tickets"]);
+    return {
+      ok: false,
+      message:
+        "Attachment metadata removed, but file cleanup failed. An admin retry was queued.",
+    };
+  }
 
   revalidateEngagement([`/support/${row.ticket_id}`, "/admin/tickets"]);
   return { ok: true, message: "Attachment deleted." };
 }
 
-/** Create short-lived signed URLs for ticket attachment thumbnails. */
+
 export async function signTicketAttachmentUrls(
   ticketId: string,
 ): Promise<

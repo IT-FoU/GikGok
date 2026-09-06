@@ -72,6 +72,17 @@ describe("security helpers", () => {
         { appUrl: "http://localhost:3000", nodeEnv: "production" },
       ),
     ).toThrow(/cross-origin/i);
+
+    const spoof = assertSameOrigin(
+      {
+        headers: headers({
+          origin: "https://localhost:3000.evil.example",
+          host: "localhost:3000",
+        }),
+      },
+      { appUrl: null, nodeEnv: "production" },
+    );
+    expect(spoof.ok).toBe(false);
   });
 
   it("validates uploads and sanitizes unsafe messages", () => {
@@ -117,6 +128,20 @@ describe("security helpers", () => {
     ).toBe(false);
   });
 });
+
+
+  it("rejects substring host spoofing when appUrl is unset", () => {
+    const spoof = assertSameOrigin(
+      {
+        headers: headers({
+          origin: "https://localhost:3000.evil.example",
+          host: "localhost:3000",
+        }),
+      },
+      { appUrl: null, nodeEnv: "production" },
+    );
+    expect(spoof.ok).toBe(false);
+  });
 
 describe("graphics fallback", () => {
   it("falls back to 2d without WebGL", () => {

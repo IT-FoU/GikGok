@@ -24,6 +24,11 @@ export const UPLOAD_MAX_BYTES = {
   ticketAttachment: 5 * 1024 * 1024,
 } as const;
 
+/** Product max: 3 images × 5 MiB (also mirrored in next.config serverActions.bodySizeLimit). */
+export const TICKET_ATTACHMENT_MAX_COUNT = 3;
+export const TICKET_ATTACHMENT_TOTAL_MAX_BYTES =
+  TICKET_ATTACHMENT_MAX_COUNT * UPLOAD_MAX_BYTES.ticketAttachment;
+
 export type OriginCheckResult =
   | { ok: true }
   | { ok: false; reason: "missing_origin" | "mismatch" };
@@ -70,10 +75,18 @@ export function assertSameOrigin(
     }
   }
 
-  // Without NEXT_PUBLIC_APP_URL, accept only when Origin host matches Host header.
+  // Without NEXT_PUBLIC_APP_URL, accept only exact Origin host[:port] == Host.
   const host = request.headers.get("host");
-  if (host && candidate.includes(host)) {
-    return { ok: true };
+  if (host) {
+    try {
+      const candidateUrl = new URL(candidate);
+      const candidateHost = candidateUrl.host; // hostname:port
+      if (candidateHost.toLowerCase() === host.toLowerCase()) {
+        return { ok: true };
+      }
+    } catch {
+      return { ok: false, reason: "mismatch" };
+    }
   }
 
   return { ok: false, reason: "mismatch" };

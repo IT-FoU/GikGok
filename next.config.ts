@@ -40,6 +40,12 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   experimental: {
     optimizePackageImports: ["lucide-react"],
+    // Ticket attachments advertise 3 × 5 MiB images. Bound the Server Action
+    // multipart body to that product maximum plus form overhead (do not lower
+    // the product limit to Next's 1 MB default).
+    serverActions: {
+      bodySizeLimit: "16mb",
+    },
   },
   async headers() {
     return [
