@@ -1,13 +1,22 @@
 import { Pool, type PoolClient } from "pg";
 
 /**
- * Local Supabase Postgres connection for RLS/database tests.
- * Uses the standard local dev connection string unless overridden.
+ * Postgres connection for RLS/database tests.
+ * Prefers SUPABASE_DB_URL / DATABASE_URL; otherwise builds a staging pooler
+ * URL when SUPABASE_DB_PASSWORD is present; else local Supabase.
  */
-export const LOCAL_DB_URL =
-  process.env.SUPABASE_DB_URL ??
-  process.env.DATABASE_URL ??
-  "postgresql://postgres:postgres@127.0.0.1:54322/postgres";
+function resolveDbUrl(): string {
+  if (process.env.SUPABASE_DB_URL) return process.env.SUPABASE_DB_URL;
+  if (process.env.DATABASE_URL) return process.env.DATABASE_URL;
+  if (process.env.SUPABASE_DB_PASSWORD) {
+    const ref = process.env.SUPABASE_PROJECT_REF ?? "jlpcfatcpymjnjbxmclo";
+    const pw = encodeURIComponent(process.env.SUPABASE_DB_PASSWORD);
+    return `postgresql://postgres.${ref}:${pw}@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres`;
+  }
+  return "postgresql://postgres:postgres@127.0.0.1:54322/postgres";
+}
+
+export const LOCAL_DB_URL = resolveDbUrl();
 
 export const PLAYER_A = "00000000-0000-0000-0000-0000000000a1";
 export const PLAYER_B = "00000000-0000-0000-0000-0000000000b2";
@@ -17,7 +26,13 @@ let pool: Pool | undefined;
 
 export function getPool(): Pool {
   if (!pool) {
-    pool = new Pool({ connectionString: LOCAL_DB_URL, max: 4 });
+    pool = new Pool({
+      connectionString: LOCAL_DB_URL,
+      max: 4,
+      ssl: LOCAL_DB_URL.includes("supabase.com")
+        ? { rejectUnauthorized: false }
+        : undefined,
+    });
   }
   return pool;
 }
@@ -29,7 +44,7 @@ export async function closePool(): Promise<void> {
   }
 }
 
-/** True when the local database is reachable. */
+/** True when the database is reachable. */
 export async function isDbReachable(): Promise<boolean> {
   try {
     const client = await getPool().connect();
@@ -42,9 +57,8 @@ export async function isDbReachable(): Promise<boolean> {
 }
 
 /**
- * Run `fn` inside a transaction impersonating the `authenticated` role with the
- * given JWT subject, then ROLLBACK. This is how Supabase evaluates RLS:
- * `auth.uid()` reads `request.jwt.claims.sub`.
+ * Run `fn` inside a transaction impersonating `authenticated` with the given
+ * JWT subject, then ROLLBACK.
  */
 export async function asPlayer<T>(
   sub: string,
@@ -64,7 +78,7 @@ export async function asPlayer<T>(
   }
 }
 
-/** Run `fn` as the privileged `postgres` role (bypasses RLS), then ROLLBACK. */
+/** Run `fn` as privileged postgres (bypasses RLS), then ROLLBACK. */
 export async function asPostgres<T>(
   fn: (client: PoolClient) => Promise<T>,
 ): Promise<T> {
@@ -78,7 +92,7 @@ export async function asPostgres<T>(
   }
 }
 
-/** Idempotently create the fixture users, an admin, and some ledger/notifications. */
+/** Idempotently create fixture users, admin, verified contacts, and seed ledger. */
 export async function ensureFixtures(): Promise<void> {
   const client = await getPool().connect();
   try {
@@ -96,36 +110,74 @@ export async function ensureFixtures(): Promise<void> {
          on conflict (id) do nothing`,
         [id, email, nickname],
       );
+
+      await client.query(
+        `insert into public.profiles (id, nickname, status)
+         values ($1, $2, 'active'::public.player_status)
+         on conflict (id) do update
+         set nickname = excluded.nickname,
+             status = 'active'::public.player_status`,
+        [id, nickname],
+      );
     }
 
-    // Promote the admin and grant a couple of granular permissions (no owner).
     await client.query(
-      `insert into public.admin_users (id, is_owner, is_active)
-       values ($1, false, true)
+      `insert into public.admin_users (id, is_owner, is_active, requires_2fa, requires_pin)
+       values ($1, false, true, false, false)
        on conflict (id) do update set is_active = true`,
       [ADMIN_CREDIT],
     );
-    await client.query(
-      `insert into public.admin_user_permissions (admin_id, permission, granted)
-       values ($1,'credits.view',true), ($1,'players.view',true)
-       on conflict (admin_id, permission) do update set granted = excluded.granted`,
-      [ADMIN_CREDIT],
-    );
 
-    // Give each player a welcome-credit ledger entry (balance via trigger).
+    try {
+      await client.query(
+        `insert into public.admin_user_permissions (admin_id, permission, granted)
+         values ($1,'credits.view',true), ($1,'players.view',true)
+         on conflict (admin_id, permission) do update set granted = excluded.granted`,
+        [ADMIN_CREDIT],
+      );
+    } catch {
+      // optional on some schema revisions
+    }
+
     for (const id of [PLAYER_A, PLAYER_B]) {
       const existing = await client.query(
-        `select 1 from public.gik_ledger where player_id = $1 and entry_type = 'welcome_credit'`,
+        `select 1 from public.gik_ledger where player_id = $1 and entry_type = 'welcome_credit' limit 1`,
         [id],
       );
-      if (existing.rowCount === 0) {
+      if ((existing.rowCount ?? 0) === 0) {
         await client.query(
-          `insert into public.gik_ledger
-             (player_id, entry_type, amount, balance_after, source, reason)
-           values ($1,'welcome_credit',50000,0,'seed','fixture')`,
+          `select public.append_ledger_entry(
+             $1,
+             'welcome_credit'::public.ledger_entry_type,
+             50000,
+             'seed',
+             null,
+             $1,
+             'fixture welcome credit',
+             '{}'::jsonb
+           )`,
           [id],
         );
       }
+
+      const email =
+        id === PLAYER_A ? "rls_player_a@example.test" : "rls_player_b@example.test";
+      await client.query(
+        `insert into public.player_contacts
+           (player_id, contact_type, value, is_primary, is_verified, verified_at)
+         select $1, 'email'::public.contact_type, $2, true, true, now()
+         where not exists (
+           select 1 from public.player_contacts where player_id = $1 and is_primary
+         )`,
+        [id, email],
+      );
+      await client.query(
+        `update public.player_contacts
+         set is_verified = true, verified_at = coalesce(verified_at, now()), value = $2
+         where player_id = $1 and is_primary`,
+        [id, email],
+      );
+
       await client.query(
         `insert into public.notifications (player_id, type, title, body)
          select $1,'system','fixture','hello'

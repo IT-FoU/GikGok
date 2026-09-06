@@ -1,7 +1,9 @@
 "use server";
 
+import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 
+import { requireSameOrigin } from "@/lib/security";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { Json } from "@/lib/supabase/types";
 import type { ActionResult } from "@/modules/player/auth-shared";
@@ -32,6 +34,18 @@ export async function placeBetAction(input: {
   mode?: SettlementMode;
   controlledResult?: Record<string, unknown> | null;
 }): Promise<ActionResult> {
+  try {
+    requireSameOrigin(
+      { headers: await headers() },
+      { allowMissingInDev: true },
+    );
+  } catch (e) {
+    return {
+      ok: false,
+      message: e instanceof Error ? e.message : "Origin check failed.",
+    };
+  }
+
   if (!isGameId(input.gameId)) {
     return { ok: false, message: "Unknown game." };
   }
@@ -101,19 +115,8 @@ export async function placeBetAction(input: {
     return { ok: false, message: asMessage(error) };
   }
 
-  // Best-effort engagement hooks (never fail the settled bet).
-  try {
-    await supabase.rpc("record_mission_progress", { p_game_key: gameId });
-    const payload = (data ?? {}) as { is_win?: boolean };
-    if (payload.is_win) {
-      await supabase.rpc("unlock_achievement", { p_key: "first_win" });
-    }
-    if (input.stake >= 10_000) {
-      await supabase.rpc("unlock_achievement", { p_key: "high_roller" });
-    }
-  } catch {
-    // ignore engagement side-effects
-  }
+  // Mission/achievement progress is applied inside place_and_settle_bet
+  // (apply_settled_bet_engagement). Clients must not call those RPCs.
 
   revalidatePath("/home");
   revalidatePath("/credits");

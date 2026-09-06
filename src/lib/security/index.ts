@@ -1,6 +1,6 @@
 /**
  * Security helpers: origin checks, file validation, secret-scan patterns.
- * Used by API routes and unit tests — no offensive tooling.
+ * Used by API routes, server actions, and unit tests — no offensive tooling.
  */
 
 export const SECURITY_MODULE = "security" as const;
@@ -77,6 +77,23 @@ export function assertSameOrigin(
   }
 
   return { ok: false, reason: "mismatch" };
+}
+
+/** Throws when the request Origin/Referer is not same-origin with the app. */
+export function requireSameOrigin(
+  request: {
+    headers: { get(name: string): string | null };
+  },
+  options?: Parameters<typeof assertSameOrigin>[1],
+): void {
+  const result = assertSameOrigin(request, options);
+  if (!result.ok) {
+    throw new Error(
+      result.reason === "missing_origin"
+        ? "Missing Origin/Referer on mutating request."
+        : "Cross-origin mutating request blocked.",
+    );
+  }
 }
 
 export function validateUploadFile(input: {

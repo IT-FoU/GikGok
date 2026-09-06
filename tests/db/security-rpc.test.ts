@@ -10,6 +10,7 @@ import {
   asPostgres,
   closePool,
   ensureFixtures,
+  getPool,
   isDbReachable,
 } from "./helpers";
 
@@ -195,6 +196,117 @@ describe.runIf(dbUp)("SECURITY DEFINER RPC hardening", () => {
     for (const row of rows) {
       expect(row.proconfig?.some((c: string) => c.startsWith("search_path="))).toBe(true);
     }
+  });
+
+  it("P0: authenticated cannot execute record_mission_progress or unlock_achievement", async () => {
+    await expect(
+      asPlayer(PLAYER_A, async (c) => {
+        await c.query(`select public.record_mission_progress('fish_prawn_crab')`);
+      }),
+    ).rejects.toThrow(/permission denied|internal-only|internal only/i);
+
+    await expect(
+      asPlayer(PLAYER_A, async (c) => {
+        await c.query(`select public.unlock_achievement('first_win')`);
+      }),
+    ).rejects.toThrow(/permission denied|internal-only|internal only/i);
+  });
+
+  it("P0: verify_admin_2fa rejects 000000 and does not accept demo codes", async () => {
+    const def = await asPostgres(async (c) => {
+      const r = await c.query(
+        `select pg_get_functiondef('public.verify_admin_2fa(text)'::regprocedure) as d`,
+      );
+      return r.rows[0].d as string;
+    });
+    expect(def).toMatch(/000000/);
+    expect(def).not.toMatch(/demo-totp|accept the last 6/i);
+
+    // Even as an admin fixture, fixed codes must fail closed.
+    await asPostgres(async (c) => {
+      await c.query(
+        `insert into public.admin_users (id, is_owner, is_active, requires_2fa, requires_pin)
+         values ($1, false, true, true, false)
+         on conflict (id) do update
+         set is_active = true, requires_2fa = true`,
+        [ADMIN_CREDIT],
+      );
+      await c.query(
+        `insert into public.admin_security (admin_id, totp_enabled)
+         values ($1, true)
+         on conflict (admin_id) do update set totp_enabled = true`,
+        [ADMIN_CREDIT],
+      );
+    });
+
+    const ok = await asPlayer(ADMIN_CREDIT, async (c) => {
+      const r = await c.query(`select public.verify_admin_2fa('000000') as ok`);
+      return r.rows[0].ok as boolean;
+    }).catch((e: Error) => {
+      // Fail-closed raise is also acceptable.
+      expect(String(e.message)).toMatch(/2fa|mfa|enroll|required|attempt/i);
+      return false;
+    });
+    expect(ok).toBe(false);
+  });
+
+  it("P0: assert_admin_sensitive fails closed when requires_2fa without enrollment", async () => {
+    await asPostgres(async (c) => {
+      await c.query(
+        `insert into public.admin_users (id, is_owner, is_active, requires_2fa, requires_pin)
+         values ($1, false, true, true, false)
+         on conflict (id) do update
+         set is_active = true, requires_2fa = true, requires_pin = false`,
+        [ADMIN_CREDIT],
+      );
+      await c.query(
+        `insert into public.admin_security (admin_id, totp_enabled, totp_secret)
+         values ($1, false, null)
+         on conflict (admin_id) do update
+         set totp_enabled = false, totp_secret = null`,
+        [ADMIN_CREDIT],
+      );
+    });
+
+    await expect(
+      asPlayer(ADMIN_CREDIT, async (c) => {
+        await c.query(`select public.assert_admin_sensitive()`);
+      }),
+    ).rejects.toThrow(/2fa|mfa|enroll|required/i);
+  });
+
+  it("P0: assert_play_allowed rejects suspended profiles", async () => {
+    const client = await getPool().connect();
+    try {
+      await client.query(
+        `update public.profiles set status = 'suspended'::public.player_status where id = $1`,
+        [PLAYER_A],
+      );
+
+      await expect(
+        asPlayer(PLAYER_A, async (c) => {
+          await c.query(`select public.assert_play_allowed()`);
+        }),
+      ).rejects.toThrow(/not allowed|suspended|active|status/i);
+    } finally {
+      await client
+        .query(
+          `update public.profiles set status = 'active'::public.player_status where id = $1`,
+          [PLAYER_A],
+        )
+        .catch(() => undefined);
+      client.release();
+    }
+  });
+
+  it("P0: mark_contact_verified requires Auth confirmation evidence", async () => {
+    const def = await asPostgres(async (c) => {
+      const r = await c.query(
+        `select pg_get_functiondef('public.mark_contact_verified(text,uuid)'::regprocedure) as d`,
+      );
+      return r.rows[0].d as string;
+    });
+    expect(def).toMatch(/email_confirmed_at|phone_confirmed_at/);
   });
 });
 

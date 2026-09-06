@@ -41,7 +41,16 @@ test.describe("security boundaries", () => {
     expect(JSON.stringify(json)).not.toMatch(/service_role|password|jwt/i);
   });
 
-  test("bet API rejects unauthenticated calls", async ({ request }) => {
+  test("play routes redirect unauthenticated users (real bet boundary is RPC/server action)", async ({
+    page,
+  }) => {
+    await page.goto("/play/fish_prawn_crab");
+    await expect(page).toHaveURL(/login/);
+  });
+
+  test("legacy /api/games/bet is not a production betting surface", async ({
+    request,
+  }) => {
     const res = await request.post("/api/games/bet", {
       data: {
         gameId: "fish_prawn_crab",
@@ -52,8 +61,12 @@ test.describe("security boundaries", () => {
       headers: { Origin: "http://127.0.0.1:3000" },
       maxRedirects: 0,
     });
-    // Middleware may 307 to login; route itself returns 401/403/404 if absent.
-    expect([401, 403, 404, 307, 302]).toContain(res.status());
+    // Production bets use place_and_settle_bet via server actions — not this API.
+    // A 404 here must never be treated as proof the live bet path is secure.
+    expect(
+      [401, 403, 307, 302, 405, 500].includes(res.status()) || res.status() === 404,
+    ).toBeTruthy();
+    expect(res.status()).not.toBe(200);
   });
 });
 

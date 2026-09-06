@@ -4,6 +4,7 @@ import {
   assertSameOrigin,
   findExposedSecretKeys,
   FORBIDDEN_BROWSER_ENV_KEYS,
+  requireSameOrigin,
   sanitizeUserErrorMessage,
   validateUploadFile,
 } from "@/lib/security";
@@ -57,6 +58,18 @@ describe("security helpers", () => {
       { appUrl: "http://localhost:3000", nodeEnv: "production" },
     );
     expect(bad.ok).toBe(false);
+
+    expect(() =>
+      requireSameOrigin(
+        {
+          headers: headers({
+            origin: "https://evil.example",
+            host: "localhost:3000",
+          }),
+        },
+        { appUrl: "http://localhost:3000", nodeEnv: "production" },
+      ),
+    ).toThrow(/cross-origin/i);
   });
 
   it("validates uploads and sanitizes unsafe messages", () => {

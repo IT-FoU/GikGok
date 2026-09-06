@@ -71,7 +71,14 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (user && (pathname === "/home" || pathname.startsWith("/profile"))) {
+  // Convenience redirects only — DB RPCs remain authoritative.
+  const playerAppPath =
+    user &&
+    !isPublicPath(pathname) &&
+    !pathname.startsWith("/admin") &&
+    !pathname.startsWith("/api/");
+
+  if (playerAppPath) {
     const { data } = await supabase.rpc("get_player_access_state", {
       p_user_id: user.id,
     });
@@ -83,7 +90,7 @@ export async function middleware(request: NextRequest) {
       has_profile?: boolean;
     };
 
-    if (!access.has_profile) {
+    if (!access.has_profile && pathname !== "/register") {
       const url = request.nextUrl.clone();
       url.pathname = "/register";
       return NextResponse.redirect(url);
@@ -110,7 +117,11 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url);
     }
 
-    if (!access.verified) {
+    if (
+      !access.verified &&
+      pathname !== "/verify" &&
+      pathname !== "/register"
+    ) {
       const url = request.nextUrl.clone();
       url.pathname = "/verify";
       return NextResponse.redirect(url);

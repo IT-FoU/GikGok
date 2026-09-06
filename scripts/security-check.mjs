@@ -76,14 +76,26 @@ const DB_URL =
   process.env.DATABASE_URL ??
   "postgresql://postgres:postgres@127.0.0.1:54322/postgres";
 
+let dbChecksRan = false;
+
 async function dbChecks() {
   const client = new pg.Client({ connectionString: DB_URL, connectionTimeoutMillis: 3000 });
   try {
     await client.connect();
   } catch {
-    notes.push("Local database unreachable — skipped DB security checks (run `supabase start`).");
+    notes.push(
+      "Database unreachable — DB security checks SKIPPED (not a release PASS).",
+    );
+    if (process.env.SECURITY_CHECK_ALLOW_SKIP_DB === "1") {
+      notes.push("SECURITY_CHECK_ALLOW_SKIP_DB=1 — skip tolerated for local/dev.");
+      return;
+    }
+    failures.push(
+      "DB security checks did not run. Set SUPABASE_DB_URL/DATABASE_URL, or SECURITY_CHECK_ALLOW_SKIP_DB=1 for local-only runs.",
+    );
     return;
   }
+  dbChecksRan = true;
   try {
     const noRls = await client.query(`
       select c.relname
@@ -157,4 +169,8 @@ if (failures.length) {
   for (const f of failures) console.error(`  ✗ ${f}`);
   process.exit(1);
 }
-console.log("\n✓ security:check passed");
+if (!dbChecksRan) {
+  console.log("\n⚠ security:check static-only (DB skipped) — not a release PASS");
+  process.exit(2);
+}
+console.log("\n✓ security:check passed (static + DB)");

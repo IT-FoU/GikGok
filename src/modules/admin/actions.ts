@@ -45,23 +45,64 @@ export async function verifyAdminPinAction(formData: FormData): Promise<ActionRe
 
 export async function setAdmin2faAction(formData: FormData): Promise<ActionResult> {
   const enabled = String(formData.get("enabled") ?? "") === "true";
-  const secret = String(formData.get("secret") ?? "").trim() || null;
   const supabase = await createServerSupabaseClient();
+
+  if (enabled) {
+    // Enrollment / verification of the TOTP factor must use Supabase Auth MFA.
+    // This RPC only flips the admin_security flag after a verified factor exists.
+    const factors = await supabase.auth.mfa.listFactors();
+    if (factors.error) return { ok: false, message: asMessage(factors.error) };
+    const verified = (factors.data?.totp ?? []).some((f) => f.status === "verified");
+    if (!verified) {
+      return {
+        ok: false,
+        message:
+          "Enroll and verify Supabase Auth TOTP MFA before enabling admin 2FA.",
+      };
+    }
+  }
+
   const { error } = await supabase.rpc("set_admin_2fa", {
     p_enabled: enabled,
-    p_secret: secret,
+    p_secret: null,
   });
   if (error) return { ok: false, message: asMessage(error) };
   revalidateAdmin("/admin/settings");
   return {
     ok: true,
-    message: enabled ? "2FA enabled (demo secret)." : "2FA disabled.",
+    message: enabled
+      ? "Admin 2FA enabled (Supabase Auth MFA)."
+      : "Admin 2FA disabled.",
   };
 }
 
 export async function verifyAdmin2faAction(formData: FormData): Promise<ActionResult> {
-  const code = String(formData.get("otp") ?? "");
+  const code = String(formData.get("otp") ?? "").trim();
+  if (!/^\d{6}$/.test(code) || code === "000000") {
+    return { ok: false, message: "Invalid 2FA code." };
+  }
+
   const supabase = await createServerSupabaseClient();
+
+  // Challenge + verify against Supabase Auth MFA so the JWT reaches aal2.
+  const factors = await supabase.auth.mfa.listFactors();
+  if (factors.error) return { ok: false, message: asMessage(factors.error) };
+  const totp = (factors.data?.totp ?? []).find((f) => f.status === "verified");
+  if (!totp) {
+    return { ok: false, message: "No verified TOTP factor enrolled." };
+  }
+
+  const challenge = await supabase.auth.mfa.challenge({ factorId: totp.id });
+  if (challenge.error) return { ok: false, message: asMessage(challenge.error) };
+
+  const verified = await supabase.auth.mfa.verify({
+    factorId: totp.id,
+    challengeId: challenge.data.id,
+    code,
+  });
+  if (verified.error) return { ok: false, message: asMessage(verified.error) };
+
+  // Record a short-lived sensitive-action confirmation for this session.
   const { data, error } = await supabase.rpc("verify_admin_2fa", { p_code: code });
   if (error) return { ok: false, message: asMessage(error) };
   return data
