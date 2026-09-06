@@ -63,10 +63,15 @@ Identify the tested implementation commit with `git rev-parse HEAD` on the branc
 | `git diff --check` | PASS |
 | Advisors (Management API) | NOT RUN this tip (403) — last documented Security WARN ~60 intentional DEFINER; INFO remain; Performance WARN ×0 |
 | DEFINER inventory | ~81 public DEFINER; ~63 authenticated EXECUTE; anon EXECUTE 0 |
-| GitHub Actions tip | See PR checks / Actions for pushed SHA (static green ≠ DB PASS) |
+| GitHub Actions tip | Static job **PASS**; DB job **FAIL** preflight — `SUPABASE_DB_URL` repository secret not configured in Actions (local staging DB gates PASS). Static green ≠ DB PASS. |
 | Playwright public | Run if configured |
 | Playwright authenticated | SKIPPED — no credentials |
 | Physical QA | SKIPPED — no devices |
+
+### Tip Actions
+- Push run: https://github.com/IT-FoU/GikGok/actions/runs/34018862185 (`e71a13e`)
+- Static · lint · typecheck · unit · build · security(static): **success**
+- DB · RLS/RPC security suite: **failure** — clear preflight: `SUPABASE_DB_URL` secret missing in GitHub Actions (fail-closed by design)
 
 ## Honesty rules applied
 - No automatic orphan retry consumer exists — only manual admin retry.
