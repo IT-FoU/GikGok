@@ -11,8 +11,13 @@ export default defineConfig({
     environment: "node",
     globals: true,
     include: ["tests/db/**/*.{test,spec}.ts"],
-    testTimeout: 30000,
-    hookTimeout: 30000,
+    // Shared staging fixtures (PLAYER_A / ADMIN_CREDIT) are mutated with COMMITs
+    // in several suites. Parallel files race on credit_requests_one_open,
+    // admin_user_permissions, and player_contacts → flaky CI. Serialize.
+    fileParallelism: false,
+    maxWorkers: 1,
+    testTimeout: 60_000,
+    hookTimeout: 60_000,
   },
   resolve: {
     alias: {

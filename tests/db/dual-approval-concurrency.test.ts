@@ -17,6 +17,14 @@ const dbUp = await isDbReachable();
 
 async function seedPendingCreditRequest(amount: number): Promise<string> {
   return commitAsPostgres(async (c) => {
+    // Lock any open row for this player so concurrent suites cannot race the
+    // partial unique index credit_requests_one_open (pending per player_id).
+    await c.query(
+      `select id from public.credit_requests
+       where player_id = $1 and status = 'pending'
+       for update`,
+      [PLAYER_A],
+    );
     await c.query(
       `update public.credit_requests set status = 'cancelled'
        where player_id = $1 and status = 'pending'`,
