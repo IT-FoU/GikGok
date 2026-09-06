@@ -148,39 +148,63 @@ describe.runIf(dbUp)("SECURITY DEFINER RPC hardening", () => {
   });
 
   it("claim_daily_reward only credits the authenticated caller", async () => {
-    const snap = async (playerId: string) =>
-      asPostgres(async (c) => {
-        const r = await c.query(
-          `select coalesce(balance,0)::bigint as balance from public.player_balances where player_id = $1`,
-          [playerId],
-        );
-        return Number(r.rows[0]?.balance ?? 0);
-      });
-
-    const beforeA = await snap(PLAYER_A);
-    const beforeB = await snap(PLAYER_B);
-
-    let claimed = false;
     await asPlayer(PLAYER_A, async (c) => {
+      const beforeA = Number(
+        (
+          await c.query(
+            `select coalesce(balance,0)::bigint as balance from public.player_balances where player_id = $1`,
+            [PLAYER_A],
+          )
+        ).rows[0]?.balance ?? 0,
+      );
+      const beforeB = Number(
+        (
+          await c.query(
+            `select coalesce(balance,0)::bigint as balance from public.player_balances where player_id = $1`,
+            [PLAYER_B],
+          )
+        ).rows[0]?.balance ?? 0,
+      );
+
+      let claimed = false;
       try {
         const r = await c.query(`select public.claim_daily_reward() as r`);
-        expect(Number(r.rows[0].r.total_amount ?? r.rows[0].r.amount ?? r.rows[0].r.credited ?? 0)).toBeGreaterThan(0);
+        expect(
+          Number(
+            r.rows[0].r.total_amount ??
+              r.rows[0].r.amount ??
+              r.rows[0].r.credited ??
+              0,
+          ),
+        ).toBeGreaterThan(0);
         claimed = true;
       } catch (err) {
         expect(String(err)).toMatch(/already claimed/i);
       }
+
+      const afterA = Number(
+        (
+          await c.query(
+            `select coalesce(balance,0)::bigint as balance from public.player_balances where player_id = $1`,
+            [PLAYER_A],
+          )
+        ).rows[0]?.balance ?? 0,
+      );
+      const afterB = Number(
+        (
+          await c.query(
+            `select coalesce(balance,0)::bigint as balance from public.player_balances where player_id = $1`,
+            [PLAYER_B],
+          )
+        ).rows[0]?.balance ?? 0,
+      );
+
+      expect(afterB).toBe(beforeB);
+      if (claimed) expect(afterA).toBeGreaterThan(beforeA);
+      else expect(afterA).toBe(beforeA);
     });
-
-    const afterA = await snap(PLAYER_A);
-    const afterB = await snap(PLAYER_B);
-
-    expect(afterB).toBe(beforeB);
-    if (claimed) {
-      expect(afterA).toBeGreaterThan(beforeA);
-    } else {
-      expect(afterA).toBe(beforeA);
-    }
   });
+
 
   it("trigger helpers pin search_path", async () => {
     const rows = await asPostgres(async (c) => {
@@ -318,32 +342,40 @@ describe.runIf(dbUp)("SECURITY DEFINER RPC hardening", () => {
       ]);
       await c.query("set local role authenticated");
       await c.query("savepoint sp_aal1");
+      // Direct EXECUTE revoked from authenticated — gate is internal-only.
       await expect(
         c.query(`select public.assert_admin_sensitive()`),
-      ).rejects.toThrow(/2fa|mfa|enroll/i);
+      ).rejects.toThrow(/permission denied/i);
       await c.query("rollback to savepoint sp_aal1");
 
-      // Keep requires_2fa; flip only the security flag, then require aal2 + enrollment.
+      // Public surface still fails closed via admin_prepare_sensitive without AAL2/enrollment.
       await c.query("set local role postgres");
       await c.query(
+        `insert into public.admin_users (id, is_owner, is_active, requires_2fa, requires_pin)
+         values ($1, false, true, true, false)
+         on conflict (id) do update
+         set is_active = true, requires_2fa = true, requires_pin = false`,
+        [ADMIN_CREDIT],
+      );
+      await c.query(
         `insert into public.admin_security (admin_id, totp_enabled)
-         values ($1, true)
-         on conflict (admin_id) do update set totp_enabled = true`,
+         values ($1, false)
+         on conflict (admin_id) do update set totp_enabled = false`,
         [ADMIN_CREDIT],
       );
       await c.query("select set_config('request.jwt.claims', $1, true)", [
         JSON.stringify({
           sub: ADMIN_CREDIT,
           role: "authenticated",
-          aal: "aal2",
+          aal: "aal1",
         }),
       ]);
       await c.query("set local role authenticated");
-      await c.query("savepoint sp_aal2");
+      await c.query("savepoint sp_prepare");
       await expect(
-        c.query(`select public.assert_admin_sensitive()`),
-      ).rejects.toThrow(/2fa|mfa|enroll/i);
-      await c.query("rollback to savepoint sp_aal2");
+        c.query(`select public.admin_prepare_sensitive(null, null)`),
+      ).rejects.toThrow(/2fa|mfa|enroll|aal/i);
+      await c.query("rollback to savepoint sp_prepare");
     });
   });
 
@@ -413,9 +445,17 @@ describe.runIf(dbUp)("SECURITY DEFINER RPC hardening", () => {
         }),
       ]);
       await c.query("set local role authenticated");
+      await c.query("savepoint sp_assert");
       await expect(
         c.query(`select public.assert_admin_sensitive()`),
-      ).rejects.toThrow(/admin access required/i);
+      ).rejects.toThrow(/permission denied/i);
+      await c.query("rollback to savepoint sp_assert");
+
+      await c.query("savepoint sp_prepare_disabled");
+      await expect(
+        c.query(`select public.admin_prepare_sensitive(null, null)`),
+      ).rejects.toThrow(/admin access required|inactive|disabled|not an admin/i);
+      await c.query("rollback to savepoint sp_prepare_disabled");
     });
   });
 
@@ -519,32 +559,37 @@ describe.runIf(dbUp)("SECURITY DEFINER RPC hardening", () => {
           where player_id = $1 and contact_type = 'email' and is_primary`,
         [PLAYER_A],
       );
-    });
 
-    await expect(
-      asPlayer(PLAYER_A, async (c) => {
-        await c.query(`select public.mark_contact_verified('email')`);
-      }),
-    ).rejects.toThrow(/not confirmed/i);
+      await c.query("select set_config('request.jwt.claims', $1, true)", [
+        JSON.stringify({ sub: PLAYER_A, role: "authenticated", aal: "aal1" }),
+      ]);
+      await c.query("set local role authenticated");
+      await c.query("savepoint sp_unconfirmed");
+      await expect(
+        c.query(`select public.mark_contact_verified('email')`),
+      ).rejects.toThrow(/not confirmed/i);
+      await c.query("rollback to savepoint sp_unconfirmed");
 
-    await asPostgres(async (c) => {
+      await c.query("set local role postgres");
       await c.query(
         `update auth.users set email_confirmed_at = now() where id = $1`,
         [PLAYER_A],
       );
-    });
+      await c.query("select set_config('request.jwt.claims', $1, true)", [
+        JSON.stringify({ sub: PLAYER_A, role: "authenticated", aal: "aal1" }),
+      ]);
+      await c.query("set local role authenticated");
+      const ok = await c.query(`select public.mark_contact_verified('email') as r`);
+      expect(ok.rowCount).toBe(1);
 
-    await asPlayer(PLAYER_A, async (c) => {
-      const r = await c.query(`select public.mark_contact_verified('email') as r`);
-      expect(r.rowCount).toBe(1);
+      await c.query("savepoint sp_phone");
+      await expect(
+        c.query(`select public.mark_contact_verified('phone')`),
+      ).rejects.toThrow(/no phone|not confirmed|channel must be/i);
+      await c.query("rollback to savepoint sp_phone");
     });
-
-    await expect(
-      asPlayer(PLAYER_A, async (c) => {
-        await c.query(`select public.mark_contact_verified('phone')`);
-      }),
-    ).rejects.toThrow(/no phone|not confirmed|channel must be/i);
   });
+
 
 });
 

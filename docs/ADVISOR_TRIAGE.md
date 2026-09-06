@@ -79,3 +79,15 @@ Applied to staging `jlpcfatcpymjnjbxmclo` only.
 Always report **WARN** and **INFO** counts separately. Never claim Advisors are
 "fully clean" while INFO items remain. Intentional authenticated DEFINER RPCs are
 expected Security WARNs until product architecture changes.
+
+
+## Advisor recount (2026-09-06 after `20260906034500`)
+
+Staging project `jlpcfatcpymjnjbxmclo` via Management API:
+
+| Advisor | WARN | INFO | Notes |
+|---------|------|------|-------|
+| Security | **60** | **4** | WARN = intentional authenticated SECURITY DEFINER RPCs (`authenticated_security_definer_function_executable`). INFO = `rls_enabled_no_policy` on internal admin tables without client policies. |
+| Performance | **0** | **71** | No WARN. INFO includes unused indexes / unindexed FKs — not claimed "fully clean". |
+
+Never report Advisors as fully clean while INFO items remain.

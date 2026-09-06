@@ -60,22 +60,21 @@ describe.skipIf(!dbUp)("app_permission matrix", () => {
         `update public.admin_users set is_active = false where id = $1`,
         [ADMIN_CREDIT],
       );
-    });
-    await expect(
-      asPlayer(ADMIN_CREDIT, async (c) => {
-        const r = await c.query(
-          `select public.has_permission('players.view'::public.app_permission, auth.uid()) as ok`,
-        );
-        expect(r.rows[0].ok).toBe(false);
-      }),
-    ).resolves.toBeUndefined();
-    await asPostgres(async (c) => {
-      await c.query(
-        `update public.admin_users set is_active = true where id = $1`,
-        [ADMIN_CREDIT],
+      await c.query("select set_config('request.jwt.claims', $1, true)", [
+        JSON.stringify({
+          sub: ADMIN_CREDIT,
+          role: "authenticated",
+          aal: "aal1",
+        }),
+      ]);
+      await c.query("set local role authenticated");
+      const r = await c.query(
+        `select public.has_permission('players.view'::public.app_permission, auth.uid()) as ok`,
       );
+      expect(r.rows[0].ok).toBe(false);
     });
   });
+
 });
 
 describe.skipIf(dbUp)("app_permission matrix (skipped: DB unreachable)", () => {
