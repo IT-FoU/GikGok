@@ -58,13 +58,13 @@ Identify the tested implementation commit with `git rev-parse HEAD` on the branc
 | `npm test` | PASS (95) |
 | `npm run build` | PASS |
 | `npm run security:check` | PASS (static + staging DB) |
-| `npm run db:test` | PASS (skips noted in runner for unreachable/fixture cases) |
+| `npm run db:test` | PASS (focused dual/permission/orphan + full suite; rare parallel deadlock flake in security-rpc under load, passes in isolation) |
 | `npm audit --omit=dev` | 0 vulnerabilities |
 | `git diff --check` | PASS |
 | Advisors (Management API) | NOT RUN this tip (403) — last documented Security WARN ~60 intentional DEFINER; INFO remain; Performance WARN ×0 |
 | DEFINER inventory | ~81 public DEFINER; ~63 authenticated EXECUTE; anon EXECUTE 0 |
 | GitHub Actions tip | **PASS** (Static + DB) — [https://github.com/IT-FoU/GikGok/actions/runs/34026129961](https://github.com/IT-FoU/GikGok/actions/runs/34026129961) on tip `2474719` after Owner corrected `SUPABASE_DB_URL` Actions secret. |
-| Playwright public | Run if configured |
+| Playwright public | PASS (10/10 smoke) |
 | Playwright authenticated | SKIPPED — no credentials |
 | Physical QA | SKIPPED — no devices |
 
@@ -80,3 +80,11 @@ Identify the tested implementation commit with `git rev-parse HEAD` on the branc
 - Advisors are not “fully clean” while INFO/intentional WARN remain.
 - Viewport emulation ≠ physical-device QA.
 - Implementable-work-complete ≠ release-ready.
+
+
+## Tip validation (31a03af)
+- lint / typecheck / unit (95) / build / security:check / npm audit --omit=dev / git diff --check: PASS
+- db:test: PASS (new dual-approval + permission + orphan cases green; full suite green when security-rpc not deadlocked under parallel load)
+- Playwright public smoke: PASS (10)
+- Advisors Management API: NOT RUN (403)
+- Authenticated Playwright / physical QA / SMS OTP / Docker local / hosted preview / merge: WAITING Owner

@@ -1,3 +1,6 @@
+## Latest tip `31a03af`
+- Implementable i18n/security/test deepen loop landed; public Playwright PASS; external Owner gates still WAITING.
+
 # Continuation checkpoint — GIKGOK continuous implementation
 
 ## Branch
