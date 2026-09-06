@@ -1,11 +1,23 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 
+import { requireSameOrigin } from "@/lib/security";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { Json } from "@/lib/supabase/types";
 import { pinSchemaValid, REPORT_TYPES, type ReportType } from "@/modules/admin";
+import { requireAdminSession } from "@/modules/admin/guards";
 import type { ActionResult } from "@/modules/player/auth-shared";
+
+const TICKET_ATTACHMENT_BUCKET = "ticket-attachments";
+
+async function assertMutatingOrigin() {
+  requireSameOrigin(
+    { headers: await headers() },
+    { allowMissingInDev: true },
+  );
+}
 
 function asMessage(error: { message: string } | null): string {
   const raw = error?.message ?? "Unexpected error";
@@ -492,5 +504,107 @@ export async function exportReportAction(formData: FormData): Promise<ActionResu
     ok: true,
     message: `Exported ${reportType} report.`,
     data: data as Record<string, unknown>,
+  };
+}
+
+/**
+ * Manual admin retry for Storage orphans.
+ * There is no automatic scheduler consumer — this is the only cleanup path.
+ * Orphan rows alone do not authorize deletion; claim/validate RPCs re-check
+ * path provenance and active attachment references first.
+ */
+export async function retryStorageOrphanCleanupAction(
+  formData: FormData,
+): Promise<ActionResult> {
+  await assertMutatingOrigin();
+  await requireAdminSession("tickets.manage");
+
+  const rawLimit = Number(formData.get("limit") ?? 10);
+  const limit = Number.isFinite(rawLimit)
+    ? Math.min(25, Math.max(1, Math.floor(rawLimit)))
+    : 10;
+
+  const supabase = await createServerSupabaseClient();
+  // Generated Database types lag behind forward migrations for these RPCs.
+  const rpc = supabase.rpc.bind(supabase) as unknown as (
+    fn: string,
+    args?: Record<string, unknown>,
+  ) => PromiseLike<{ data: unknown; error: { message: string } | null }>;
+
+  const { data, error } = await rpc("claim_storage_orphan_retry_batch", {
+    p_limit: limit,
+  });
+  if (error) return { ok: false, message: asMessage(error) };
+
+  const batch = (Array.isArray(data) ? data : []) as Array<{
+    id: string;
+    bucket_id: string;
+    object_path: string;
+    attempts?: number;
+  }>;
+
+  let resolved = 0;
+  let failed = 0;
+
+  for (const item of batch) {
+    if (
+      item.bucket_id !== TICKET_ATTACHMENT_BUCKET ||
+      typeof item.object_path !== "string" ||
+      !item.object_path
+    ) {
+      await rpc("mark_storage_orphan_retry_failed", {
+        p_orphan_id: item.id,
+        p_error: "untrusted bucket or path after claim",
+      });
+      failed += 1;
+      continue;
+    }
+
+    // Re-validate immediately before Storage delete (orphan row is never enough).
+    const { error: validateError } = await rpc(
+      "validate_storage_orphan_for_deletion",
+      { p_orphan_id: item.id },
+    );
+    if (validateError) {
+      await rpc("mark_storage_orphan_retry_failed", {
+        p_orphan_id: item.id,
+        p_error: validateError.message,
+      });
+      failed += 1;
+      continue;
+    }
+
+    const { error: removeError } = await supabase.storage
+      .from(TICKET_ATTACHMENT_BUCKET)
+      .remove([item.object_path]);
+
+    if (removeError) {
+      await rpc("mark_storage_orphan_retry_failed", {
+        p_orphan_id: item.id,
+        p_error: removeError.message,
+      });
+      failed += 1;
+      continue;
+    }
+
+    const { error: resolveError } = await rpc("mark_storage_orphan_resolved", {
+      p_orphan_id: item.id,
+      p_note: "manual admin retry",
+    });
+    if (resolveError) {
+      failed += 1;
+      continue;
+    }
+    resolved += 1;
+  }
+
+  revalidateAdmin("/admin/tickets", "/admin/audit");
+  return {
+    ok: failed === 0,
+    message:
+      batch.length === 0
+        ? "No eligible storage orphans ready for manual retry."
+        : `Manual orphan cleanup: ${resolved} resolved, ${failed} failed, ${batch.length} claimed.`,
+    data: { claimed: batch.length, resolved, failed },
   };
 }

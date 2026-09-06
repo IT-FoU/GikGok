@@ -32,6 +32,7 @@ import {
   upsertMissionAction,
   verifyAdmin2faAction,
   verifyAdminPinAction,
+  retryStorageOrphanCleanupAction,
 } from "./actions";
 
 function Banner({ result }: { result: ActionResult | null }) {
@@ -376,6 +377,32 @@ export function TicketStatusForm({
       <Input name="reply" placeholder="Staff reply (optional)" />
       <Button type="submit" disabled={pending}>
         Update ticket
+      </Button>
+      <Banner result={result} />
+    </form>
+  );
+}
+
+export function StorageOrphanRetryForm() {
+  const { pending, result, onSubmit } = useActionForm(
+    retryStorageOrphanCleanupAction,
+  );
+  return (
+    <form className="space-y-3" onSubmit={onSubmit}>
+      <p className="text-sm text-[var(--brand-muted)]">
+        Manual Storage orphan cleanup. There is no automatic retry consumer —
+        run this after attachment delete/upload cleanup failures.
+      </p>
+      <Input
+        name="limit"
+        type="number"
+        min={1}
+        max={25}
+        defaultValue={10}
+        aria-label="Batch limit"
+      />
+      <Button type="submit" disabled={pending} variant="secondary">
+        Retry orphan cleanup
       </Button>
       <Banner result={result} />
     </form>

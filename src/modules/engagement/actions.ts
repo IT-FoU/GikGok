@@ -81,24 +81,32 @@ async function recordStorageOrphan(
   supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
   input: {
     objectPath: string;
-    source: string;
+    source:
+      | "ticket_attachment_delete"
+      | "ticket_attachment_upload_rollback"
+      | "ticket_attachment_insert_failure"
+      | "ticket_attachment_admin_retry";
     sourceId?: string | null;
     error?: string | null;
   },
 ): Promise<void> {
-  // Table added by forward migration; generated Database types lag until regen.
+  // Prefer hardened RPC — direct table INSERT is revoked for authenticated.
   const client = supabase as unknown as {
-    from: (relation: string) => {
-      insert: (row: Record<string, unknown>) => Promise<{ error: { message: string } | null }>;
-    };
+    rpc: (
+      fn: string,
+      args: Record<string, unknown>,
+    ) => Promise<{ error: { message: string } | null }>;
   };
-  await client.from("storage_orphan_objects").insert({
-    bucket_id: TICKET_ATTACHMENT_BUCKET,
-    object_path: input.objectPath,
-    source: input.source,
-    source_id: input.sourceId ?? null,
-    last_error: input.error ?? null,
+  const { error } = await client.rpc("record_storage_orphan", {
+    p_bucket: TICKET_ATTACHMENT_BUCKET,
+    p_path: input.objectPath,
+    p_source: input.source,
+    p_source_id: input.sourceId ?? null,
+    p_error: input.error ?? null,
   });
+  if (error) {
+    console.error("record_storage_orphan failed", error.message);
+  }
 }
 
 
@@ -443,7 +451,8 @@ export async function uploadTicketAttachmentsAction(
     }
 
     const safeBase = sanitizeFileBase(file.name);
-    const storagePath = `${ticketId}/${user.id}/${Date.now()}-${safeBase}.${extensionForMime(magic.mime)}`;
+    const unique = crypto.randomUUID();
+    const storagePath = `${ticketId}/${user.id}/${unique}-${safeBase}.${extensionForMime(magic.mime)}`;
     const safeFileName = `${safeBase}.${extensionForMime(magic.mime)}`.slice(0, 255);
 
     const { error: uploadError } = await supabase.storage
@@ -553,7 +562,7 @@ export async function deleteTicketAttachmentAction(
     return {
       ok: false,
       message:
-        "Attachment metadata removed, but file cleanup failed. An admin retry was queued.",
+        "Attachment metadata removed, but file cleanup failed. An administrator can retry cleanup from the tickets console.",
     };
   }
 

@@ -21,6 +21,8 @@ export const LOCAL_DB_URL = resolveDbUrl();
 export const PLAYER_A = "00000000-0000-0000-0000-0000000000a1";
 export const PLAYER_B = "00000000-0000-0000-0000-0000000000b2";
 export const ADMIN_CREDIT = "00000000-0000-0000-0000-0000000000c3";
+/** Second credits.adjust admin for dual-approval / concurrency tests. */
+export const ADMIN_CREDIT_B = "00000000-0000-0000-0000-0000000000c4";
 
 let pool: Pool | undefined;
 
@@ -28,7 +30,7 @@ export function getPool(): Pool {
   if (!pool) {
     pool = new Pool({
       connectionString: LOCAL_DB_URL,
-      max: 4,
+      max: 8,
       ssl: LOCAL_DB_URL.includes("supabase.com")
         ? { rejectUnauthorized: false }
         : undefined,
@@ -93,6 +95,41 @@ export async function asPostgres<T>(
   }
 }
 
+/**
+ * Open a dedicated authenticated connection (caller owns begin/commit/rollback).
+ * Used for true multi-connection concurrency tests.
+ */
+export async function openAuthenticatedClient(
+  sub: string,
+  claims: Record<string, unknown> = {},
+): Promise<PoolClient> {
+  const client = await getPool().connect();
+  await client.query("begin");
+  await client.query("select set_config('request.jwt.claims', $1, true)", [
+    JSON.stringify({ sub, role: "authenticated", aal: "aal1", ...claims }),
+  ]);
+  await client.query("set local role authenticated");
+  return client;
+}
+
+/** Privileged setup that COMMITs (for concurrency fixtures that must be visible). */
+export async function commitAsPostgres<T>(
+  fn: (client: PoolClient) => Promise<T>,
+): Promise<T> {
+  const client = await getPool().connect();
+  try {
+    await client.query("begin");
+    const result = await fn(client);
+    await client.query("commit");
+    return result;
+  } catch (error) {
+    await client.query("rollback").catch(() => undefined);
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
 /** Idempotently create fixture users, admin, verified contacts, and seed ledger. */
 export async function ensureFixtures(): Promise<void> {
   const client = await getPool().connect();
@@ -102,6 +139,7 @@ export async function ensureFixtures(): Promise<void> {
       [PLAYER_A, "rls_player_a@example.test", "rls_player_a"],
       [PLAYER_B, "rls_player_b@example.test", "rls_player_b"],
       [ADMIN_CREDIT, "rls_admin_credit@example.test", "rls_admin_credit"],
+      [ADMIN_CREDIT_B, "rls_admin_credit_b@example.test", "rls_admin_credit_b"],
     ] as const) {
       await client.query(
         `insert into auth.users (id, aud, role, email, encrypted_password,
@@ -122,22 +160,28 @@ export async function ensureFixtures(): Promise<void> {
       );
     }
 
-    await client.query(
-      `insert into public.admin_users (id, is_owner, is_active, requires_2fa, requires_pin)
-       values ($1, false, true, false, false)
-       on conflict (id) do update set is_active = true`,
-      [ADMIN_CREDIT],
-    );
-
-    try {
+    for (const adminId of [ADMIN_CREDIT, ADMIN_CREDIT_B]) {
       await client.query(
-        `insert into public.admin_user_permissions (admin_id, permission, granted)
-         values ($1,'credits.view',true), ($1,'players.view',true)
-         on conflict (admin_id, permission) do update set granted = excluded.granted`,
-        [ADMIN_CREDIT],
+        `insert into public.admin_users (id, is_owner, is_active, requires_2fa, requires_pin)
+         values ($1, false, true, false, false)
+         on conflict (id) do update set is_active = true`,
+        [adminId],
       );
-    } catch {
-      // optional on some schema revisions
+
+      try {
+        await client.query(
+          `insert into public.admin_user_permissions (admin_id, permission, granted)
+           values
+             ($1,'credits.view',true),
+             ($1,'credits.adjust',true),
+             ($1,'players.view',true),
+             ($1,'tickets.manage',true)
+           on conflict (admin_id, permission) do update set granted = excluded.granted`,
+          [adminId],
+        );
+      } catch {
+        // optional on some schema revisions
+      }
     }
 
     for (const id of [PLAYER_A, PLAYER_B]) {
