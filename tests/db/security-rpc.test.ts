@@ -212,6 +212,34 @@ describe.runIf(dbUp)("SECURITY DEFINER RPC hardening", () => {
     ).rejects.toThrow(/permission denied|internal-only|internal only/i);
   });
 
+  it("P1: authenticated cannot execute internal admin/round helpers", async () => {
+    await expect(
+      asPlayer(PLAYER_A, async (c) => {
+        await c.query(`select public.assert_admin_auth_rate_limit('otp')`);
+      }),
+    ).rejects.toThrow(/permission denied/i);
+
+    await expect(
+      asPlayer(PLAYER_A, async (c) => {
+        await c.query(
+          `select public.open_game_round('fish_prawn_crab', 'random'::public.game_mode, '{}'::jsonb)`,
+        );
+      }),
+    ).rejects.toThrow(/permission denied/i);
+
+    await expect(
+      asPlayer(PLAYER_A, async (c) => {
+        await c.query(`select public.ensure_player_round('fish_prawn_crab')`);
+      }),
+    ).rejects.toThrow(/permission denied/i);
+
+    await expect(
+      asPlayer(PLAYER_A, async (c) => {
+        await c.query(`select public.admin_session_id()`);
+      }),
+    ).rejects.toThrow(/permission denied/i);
+  });
+
   it("P0: verify_admin_2fa rejects 000000 and does not accept demo codes", async () => {
     const def = await asPostgres(async (c) => {
       const r = await c.query(

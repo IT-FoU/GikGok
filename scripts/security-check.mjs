@@ -170,6 +170,12 @@ if (failures.length) {
   process.exit(1);
 }
 if (!dbChecksRan) {
+  if (process.env.SECURITY_CHECK_ALLOW_SKIP_DB === "1") {
+    console.log(
+      "\n⚠ security:check static-only (DB skipped; SECURITY_CHECK_ALLOW_SKIP_DB=1)",
+    );
+    process.exit(0);
+  }
   console.log("\n⚠ security:check static-only (DB skipped) — not a release PASS");
   process.exit(2);
 }

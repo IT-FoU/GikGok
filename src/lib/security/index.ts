@@ -104,13 +104,78 @@ export function validateUploadFile(input: {
 }): { ok: true } | { ok: false; message: string } {
   const allowed = input.allowedMime ?? ALLOWED_UPLOAD_MIME;
   const max = input.maxBytes ?? UPLOAD_MAX_BYTES.avatar;
-  if (!allowed.includes(input.type)) {
+  if (!(allowed as readonly string[]).includes(input.type)) {
     return { ok: false, message: "Unsupported file type." };
   }
   if (input.size <= 0 || input.size > max) {
     return { ok: false, message: `File must be between 1 byte and ${max} bytes.` };
   }
   return { ok: true };
+}
+
+export type DetectedImageMime = (typeof ALLOWED_UPLOAD_MIME)[number];
+
+/** Sniff JPEG/PNG/WebP magic bytes; ignore caller-supplied Content-Type. */
+export function detectImageMimeFromBytes(
+  bytes: ArrayBuffer | Uint8Array,
+): DetectedImageMime | null {
+  const view = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  if (view.length < 12) return null;
+
+  if (view[0] === 0xff && view[1] === 0xd8 && view[2] === 0xff) {
+    return "image/jpeg";
+  }
+  if (
+    view[0] === 0x89 &&
+    view[1] === 0x50 &&
+    view[2] === 0x4e &&
+    view[3] === 0x47 &&
+    view[4] === 0x0d &&
+    view[5] === 0x0a &&
+    view[6] === 0x1a &&
+    view[7] === 0x0a
+  ) {
+    return "image/png";
+  }
+  if (
+    view[0] === 0x52 &&
+    view[1] === 0x49 &&
+    view[2] === 0x46 &&
+    view[3] === 0x46 &&
+    view[8] === 0x57 &&
+    view[9] === 0x45 &&
+    view[10] === 0x42 &&
+    view[11] === 0x50
+  ) {
+    return "image/webp";
+  }
+  return null;
+}
+
+export function validateImageMagicBytes(input: {
+  bytes: ArrayBuffer | Uint8Array;
+  claimedType?: string | null;
+  size: number;
+  maxBytes?: number;
+}): { ok: true; mime: DetectedImageMime } | { ok: false; message: string } {
+  const max = input.maxBytes ?? UPLOAD_MAX_BYTES.avatar;
+  if (input.size <= 0 || input.size > max) {
+    return { ok: false, message: `File must be between 1 byte and ${max} bytes.` };
+  }
+  const mime = detectImageMimeFromBytes(input.bytes);
+  if (!mime) {
+    return {
+      ok: false,
+      message: "File content is not a valid JPEG, PNG, or WebP image.",
+    };
+  }
+  if (input.claimedType && input.claimedType !== mime) {
+    return {
+      ok: false,
+      message: "Declared file type does not match image content.",
+    };
+  }
+  return { ok: true, mime };
 }
 
 /** Detect accidental secret-looking keys in a flat env-like object. */

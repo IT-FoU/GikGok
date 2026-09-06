@@ -1,10 +1,11 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useTranslations } from "@/modules/localization/provider";
 import { AVATAR_PRESETS, type ActionResult } from "@/modules/player/auth-shared";
 
 type AuthAction = (
@@ -80,18 +81,182 @@ export function ProfileForm({
   );
 }
 
+const AVATAR_EXPORT_SIZE = 512;
+
+async function cropImageToSquareBlob(
+  source: HTMLImageElement,
+  zoom: number,
+  offsetX: number,
+  offsetY: number,
+  mime: string,
+): Promise<Blob> {
+  const canvas = document.createElement("canvas");
+  canvas.width = AVATAR_EXPORT_SIZE;
+  canvas.height = AVATAR_EXPORT_SIZE;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    throw new Error("Canvas unavailable");
+  }
+
+  const minSide = Math.min(source.naturalWidth, source.naturalHeight);
+  const cropSide = Math.max(32, minSide / zoom);
+  const maxOffsetX = Math.max(0, source.naturalWidth - cropSide);
+  const maxOffsetY = Math.max(0, source.naturalHeight - cropSide);
+  const sx = Math.min(maxOffsetX, Math.max(0, (maxOffsetX * (offsetX + 50)) / 100));
+  const sy = Math.min(maxOffsetY, Math.max(0, (maxOffsetY * (offsetY + 50)) / 100));
+
+  ctx.drawImage(
+    source,
+    sx,
+    sy,
+    cropSide,
+    cropSide,
+    0,
+    0,
+    AVATAR_EXPORT_SIZE,
+    AVATAR_EXPORT_SIZE,
+  );
+
+  const exportMime = mime === "image/png" || mime === "image/webp" ? mime : "image/jpeg";
+  return await new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) reject(new Error("Crop export failed"));
+        else resolve(blob);
+      },
+      exportMime,
+      0.92,
+    );
+  });
+}
+
 export function AvatarUploadForm({ action }: { action: AuthAction }) {
+  const t = useTranslations();
   const [state, formAction, pending] = useActionState(action, null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [sourceMime, setSourceMime] = useState("image/jpeg");
+  const [zoom, setZoom] = useState(1);
+  const [offsetX, setOffsetX] = useState(0);
+  const [offsetY, setOffsetY] = useState(0);
+  const imageRef = useRef<HTMLImageElement | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
 
   return (
-    <form action={formAction} className="space-y-3">
+    <form
+      action={async (formData) => {
+        const image = imageRef.current;
+        if (!image || !previewUrl) {
+          formAction(formData);
+          return;
+        }
+        try {
+          const blob = await cropImageToSquareBlob(
+            image,
+            zoom,
+            offsetX,
+            offsetY,
+            sourceMime,
+          );
+          const extension =
+            sourceMime === "image/png"
+              ? "png"
+              : sourceMime === "image/webp"
+                ? "webp"
+                : "jpg";
+          const cropped = new File([blob], `avatar.${extension}`, {
+            type: blob.type || sourceMime,
+          });
+          formData.set("avatar", cropped);
+        } catch {
+          // Fall through with original file if crop fails.
+        }
+        formAction(formData);
+      }}
+      className="space-y-3"
+    >
       <div className="space-y-2">
-        <Label htmlFor="avatar">Upload JPG/PNG/WebP (max 2 MB)</Label>
-        <Input id="avatar" name="avatar" type="file" accept="image/jpeg,image/png,image/webp" required />
+        <Label htmlFor="avatar">{t("profile.avatarUploadHint")}</Label>
+        <Input
+          id="avatar"
+          name="avatar"
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          required
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
+            if (!file) {
+              setPreviewUrl(null);
+              return;
+            }
+            setSourceMime(file.type || "image/jpeg");
+            setZoom(1);
+            setOffsetX(0);
+            setOffsetY(0);
+            setPreviewUrl(URL.createObjectURL(file));
+          }}
+        />
       </div>
+      {previewUrl ? (
+        <div className="space-y-3">
+          <div className="mx-auto h-40 w-40 overflow-hidden border border-[var(--brand-border)]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              ref={imageRef}
+              src={previewUrl}
+              alt={t("profile.avatarPreview")}
+              className="h-full w-full object-cover"
+              style={{
+                transform: `scale(${zoom}) translate(${offsetX}%, ${offsetY}%)`,
+                transformOrigin: "center center",
+              }}
+            />
+          </div>
+          <div className="grid gap-2 sm:grid-cols-3">
+            <label className="space-y-1 text-xs text-[var(--brand-muted)]">
+              {t("profile.avatarZoom")}
+              <Input
+                type="range"
+                min={1}
+                max={3}
+                step={0.05}
+                value={zoom}
+                onChange={(event) => setZoom(Number(event.target.value))}
+              />
+            </label>
+            <label className="space-y-1 text-xs text-[var(--brand-muted)]">
+              {t("profile.avatarPanX")}
+              <Input
+                type="range"
+                min={-40}
+                max={40}
+                step={1}
+                value={offsetX}
+                onChange={(event) => setOffsetX(Number(event.target.value))}
+              />
+            </label>
+            <label className="space-y-1 text-xs text-[var(--brand-muted)]">
+              {t("profile.avatarPanY")}
+              <Input
+                type="range"
+                min={-40}
+                max={40}
+                step={1}
+                value={offsetY}
+                onChange={(event) => setOffsetY(Number(event.target.value))}
+              />
+            </label>
+          </div>
+        </div>
+      ) : null}
       <Message state={state} />
       <Button type="submit" variant="secondary" disabled={pending}>
-        {pending ? "Uploading…" : "Upload avatar"}
+        {pending ? t("profile.avatarUploading") : t("profile.avatarUpload")}
       </Button>
     </form>
   );

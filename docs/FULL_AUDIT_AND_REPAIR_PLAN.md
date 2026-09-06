@@ -97,46 +97,47 @@
 - **Root cause:** Broad EXECUTE grants to `authenticated`.
 - **Planned fix:** Classify public vs internal; revoke internal; document intentional player/admin RPCs; pin `search_path` (already mostly pinned).
 - **Regression tests:** anon execute empty; internal helpers denied to authenticated.
-- **Migration:** yes (with P0 + follow-up grant triage)
-- **Status:** OPEN
-- **Commit:** _(pending)_
+- **Migration:** yes (`20260906015729_triage_security_definer_grants_and_search_path.sql` + P0)
+- **Status:** VERIFIED (internals revoked; ~60 intentional authenticated WARNs documented in `docs/ADVISOR_TRIAGE.md`; DB tests assert deny for rate-limit / round / session helpers)
+- **Commit:** _(this branch)_
 
 ### P1-002 — Performance Advisor: multiple permissive policies
 
 - **Severity:** P1
 - **Phase / requirement:** Phase 1 — RLS performance
 - **Affected:** contacts table policies (advisor metadata)
-- **Evidence:** 1 Performance WARN
+- **Evidence:** 1 Performance WARN (SELECT overlap)
 - **Planned fix:** consolidate policies after confirming table name/policies
-- **Status:** OPEN
+- **Migration:** `20260906020608_fix_player_contacts_permissive_select_overlap.sql`
+- **Status:** VERIFIED (Performance Advisor clean after contacts policy split; see `docs/ADVISOR_TRIAGE.md`)
 
 ### P1-003 — Support ticket image attachments incomplete
 
 - **Severity:** P1
 - **Phase / requirement:** Phase 9 — attachments max 3, private bucket, validation
 - **Evidence:** Schema/bucket exist; player UI/upload path and magic-byte validation incomplete vs claims in `docs/security-audit.md`
-- **Status:** OPEN
+- **Status:** FIXED (upload/delete actions, magic-byte validation, Support/TicketReply forms, signed URL thumbnails on player + admin; migration `20260906020814_harden_ticket_attachments_delete_and_constraints.sql`)
 
 ### P1-004 — Avatar crop / content validation incomplete
 
 - **Severity:** P1
 - **Phase / requirement:** Phase 2 — avatar upload/crop/validation
 - **Evidence:** Upload uses client MIME; no real crop workflow / magic-byte check end-to-end
-- **Status:** OPEN
+- **Status:** FIXED (square crop preview in `AvatarUploadForm`; server `validateImageMagicBytes` in `uploadAvatarAction`)
 
 ### P1-005 — Lao/English localization gaps
 
 - **Severity:** P1
 - **Phase / requirement:** Phase 3 — all user-facing strings
 - **Evidence:** Hard-coded English remains in admin actions, errors, engagement notifications from RPCs
-- **Status:** OPEN
+- **Status:** IN PROGRESS (support/profile/common keys wired for ticket + avatar forms and Loading/Empty/Error defaults; Thai reserved via `FUTURE_LOCALES` / no `th.json` yet)
 
 ### P1-006 — False-confidence tests
 
 - **Severity:** P1
 - **Phase / requirement:** Phase 11 — QA
 - **Affected:** `tests/e2e/smoke.spec.ts` posts `/api/games/bet` and accepts 404; `security:check` PASSes when DB skipped; thin admin permission tests; missing Phase 9–11 DB RPC abuse tests; no CI workflows
-- **Status:** OPEN
+- **Status:** IN PROGRESS (`.github/workflows/ci.yml` added with lint/typecheck/unit/build/`security:check`; DB skip only via `SECURITY_CHECK_ALLOW_SKIP_DB=1`)
 
 ### P1-007 — Security docs/controls mismatch
 
@@ -196,5 +197,7 @@
 | Loop 1 | E2E false-positive bet 404 test replaced | Done |
 | Loop 1 | `security:check` no longer PASSes when DB skipped | Done (exit 2) |
 | Loop 1 | Middleware status gates broadened | Done (convenience only) |
-| Remaining | P1 Advisors triage, attachments/crop/i18n, CI workflows, docs sync | OPEN |
+| Loop 2 | Advisor triage docs + contacts policy split + ticket attachment delete constraints | Done |
+| Loop 2 | Ticket attachments upload/delete + signed URLs; avatar crop + magic bytes; partial i18n; CI workflow | FIXED / IN PROGRESS |
+| Remaining | Broader i18n (P1-005), false-confidence tests (P1-006 remainder), docs mismatch (P1-007) | OPEN |
 

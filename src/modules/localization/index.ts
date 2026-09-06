@@ -3,7 +3,7 @@ import lo from "./messages/lo.json";
 
 export type AppLocale = "lo" | "en";
 
-/** Reserved for future Thai catalog without refactoring module boundaries. */
+/** Reserved for future Thai catalog (`th.json`) without refactoring module boundaries. */
 export const FUTURE_LOCALES = ["th"] as const;
 export type FutureLocale = (typeof FUTURE_LOCALES)[number];
 

@@ -4,6 +4,10 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import {
+  UPLOAD_MAX_BYTES,
+  validateImageMagicBytes,
+} from "@/lib/security";
+import {
   deletionRequestSchema,
   loginSchema,
   mapAuthConflictMessage,
@@ -13,7 +17,6 @@ import {
   resetPasswordSchema,
   resetRequestSchema,
   settingsUpdateSchema,
-  validateAvatarFile,
 } from "@/modules/player/auth";
 import type { ActionResult } from "@/modules/player/auth-shared";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -426,7 +429,13 @@ export async function uploadAvatarAction(
     return { ok: false, message: "Choose an image file." };
   }
 
-  const validation = validateAvatarFile({ type: file.type, size: file.size });
+  const bytes = await file.arrayBuffer();
+  const validation = validateImageMagicBytes({
+    bytes,
+    claimedType: file.type || null,
+    size: file.size,
+    maxBytes: UPLOAD_MAX_BYTES.avatar,
+  });
   if (!validation.ok) {
     return { ok: false, message: validation.message };
   }
@@ -441,16 +450,16 @@ export async function uploadAvatarAction(
   }
 
   const extension =
-    file.type === "image/png"
+    validation.mime === "image/png"
       ? "png"
-      : file.type === "image/webp"
+      : validation.mime === "image/webp"
         ? "webp"
         : "jpg";
   const path = `${user.id}/avatar.${extension}`;
 
   const { error: uploadError } = await supabase.storage
     .from("avatars")
-    .upload(path, file, { upsert: true, contentType: file.type });
+    .upload(path, bytes, { upsert: true, contentType: validation.mime });
 
   if (uploadError) {
     return { ok: false, message: uploadError.message };

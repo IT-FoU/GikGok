@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import {
-  useActionState,
   useEffect,
   useMemo,
   useState,
@@ -12,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useTranslations } from "@/modules/localization/provider";
 import {
   claimMissionRewardAction,
   createInviteAction,
@@ -25,6 +25,7 @@ import {
   setPlayPauseAction,
   submitTicketSatisfactionAction,
   touchPlaySessionAction,
+  uploadTicketAttachmentsAction,
 } from "@/modules/engagement/actions";
 import {
   formatSessionDuration,
@@ -32,6 +33,8 @@ import {
   type ResponsiblePlayConfig,
 } from "@/modules/engagement/helpers";
 import type { ActionResult } from "@/modules/player/auth-shared";
+
+const MAX_TICKET_ATTACHMENTS = 3;
 
 function ResultMessage({ state }: { state: ActionResult | null }) {
   if (!state?.message) return null;
@@ -251,38 +254,122 @@ export function CreateInviteButton() {
   );
 }
 
-export function SupportTicketForm() {
-  const [state, formAction, pending] = useActionState(
-    async (_prev: ActionResult | null, formData: FormData) =>
-      createSupportTicketAction(formData),
-    null,
+function TicketAttachmentInput({
+  id,
+  files,
+  onChange,
+}: {
+  id: string;
+  files: File[];
+  onChange: (files: File[]) => void;
+}) {
+  const t = useTranslations();
+  return (
+    <div className="space-y-2">
+      <Label htmlFor={id}>{t("support.attachments")}</Label>
+      <Input
+        id={id}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        multiple
+        onChange={(event) => {
+          const next = Array.from(event.target.files ?? []).slice(
+            0,
+            MAX_TICKET_ATTACHMENTS,
+          );
+          onChange(next);
+        }}
+      />
+      <p className="text-xs text-[var(--brand-muted)]">
+        {t("support.attachmentsHint")}
+      </p>
+      {files.length > 0 ? (
+        <ul className="text-xs text-[var(--brand-muted)]">
+          {files.map((file) => (
+            <li key={`${file.name}-${file.size}`}>{file.name}</li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
   );
+}
+
+export function SupportTicketForm() {
+  const t = useTranslations();
+  const [files, setFiles] = useState<File[]>([]);
+  const [pending, startTransition] = useTransition();
+  const [state, setState] = useState<ActionResult | null>(null);
 
   return (
-    <form action={formAction} className="flex flex-col gap-3 border border-[var(--brand-border)] p-4">
-      <h2 className="font-medium">New ticket</h2>
+    <form
+      className="flex flex-col gap-3 border border-[var(--brand-border)] p-4"
+      onSubmit={(event) => {
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        startTransition(async () => {
+          const created = await createSupportTicketAction(formData);
+          if (!created.ok) {
+            setState(created);
+            return;
+          }
+
+          const ticketId = String(created.data?.id ?? "");
+          const messageId = String(created.data?.messageId ?? "");
+          if (files.length > 0 && ticketId && messageId) {
+            const uploadData = new FormData();
+            for (const file of files.slice(0, MAX_TICKET_ATTACHMENTS)) {
+              uploadData.append("attachments", file);
+            }
+            const uploaded = await uploadTicketAttachmentsAction(
+              ticketId,
+              messageId,
+              uploadData,
+            );
+            setState(
+              uploaded.ok
+                ? {
+                    ok: true,
+                    message: `${created.message} ${uploaded.message}`,
+                    data: created.data,
+                  }
+                : {
+                    ok: false,
+                    message: `${created.message} Attachment upload failed: ${uploaded.message}`,
+                    data: created.data,
+                  },
+            );
+            if (uploaded.ok) setFiles([]);
+            return;
+          }
+
+          setState(created);
+          setFiles([]);
+        });
+      }}
+    >
+      <h2 className="font-medium">{t("support.newTicket")}</h2>
       <div className="space-y-2">
-        <Label htmlFor="category">Category</Label>
+        <Label htmlFor="category">{t("support.category")}</Label>
         <select
           id="category"
           name="category"
           className="w-full rounded-[var(--radius-md)] border border-[var(--brand-border)] bg-transparent px-3 py-2 text-sm"
           defaultValue="general"
         >
-          <option value="general">General</option>
-          <option value="account">Account</option>
-          <option value="credits">Credits</option>
-          <option value="games">Games</option>
-          <option value="technical">Technical</option>
-          <option value="other">Other</option>
+          <option value="general">{t("support.categories.general")}</option>
+          <option value="account">{t("support.categories.account")}</option>
+          <option value="credits">{t("support.categories.credits")}</option>
+          <option value="games">{t("support.categories.games")}</option>
+          <option value="technical">{t("support.categories.technical")}</option>
+          <option value="other">{t("support.categories.other")}</option>
         </select>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="subject">Subject</Label>
+        <Label htmlFor="subject">{t("support.subject")}</Label>
         <Input id="subject" name="subject" required minLength={3} />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="message">Message</Label>
+        <Label htmlFor="message">{t("support.message")}</Label>
         <textarea
           id="message"
           name="message"
@@ -292,14 +379,23 @@ export function SupportTicketForm() {
           className="w-full rounded-[var(--radius-md)] border border-[var(--brand-border)] bg-transparent px-3 py-2 text-sm"
         />
       </div>
-      <Button type="submit" disabled={pending}>Submit ticket</Button>
+      <TicketAttachmentInput
+        id="ticket-attachments"
+        files={files}
+        onChange={setFiles}
+      />
+      <Button type="submit" disabled={pending}>
+        {pending ? t("support.submitting") : t("support.submit")}
+      </Button>
       <ResultMessage state={state} />
     </form>
   );
 }
 
 export function TicketReplyForm({ ticketId }: { ticketId: string }) {
+  const t = useTranslations();
   const [message, setMessage] = useState("");
+  const [files, setFiles] = useState<File[]>([]);
   const [pending, startTransition] = useTransition();
   const [result, setResult] = useState<ActionResult | null>(null);
 
@@ -310,12 +406,51 @@ export function TicketReplyForm({ ticketId }: { ticketId: string }) {
         event.preventDefault();
         startTransition(async () => {
           const response = await replySupportTicketAction(ticketId, message);
+          if (!response.ok) {
+            setResult(response);
+            return;
+          }
+
+          const messageId = String(
+            response.data?.messageId ?? response.data?.id ?? "",
+          );
+          if (files.length > 0 && messageId) {
+            const uploadData = new FormData();
+            for (const file of files.slice(0, MAX_TICKET_ATTACHMENTS)) {
+              uploadData.append("attachments", file);
+            }
+            const uploaded = await uploadTicketAttachmentsAction(
+              ticketId,
+              messageId,
+              uploadData,
+            );
+            setResult(
+              uploaded.ok
+                ? {
+                    ok: true,
+                    message: `${response.message} ${uploaded.message}`,
+                  }
+                : {
+                    ok: false,
+                    message: `Reply saved, but attachments failed: ${uploaded.message}`,
+                  },
+            );
+            if (uploaded.ok) {
+              setMessage("");
+              setFiles([]);
+            }
+            return;
+          }
+
           setResult(response);
-          if (response.ok) setMessage("");
+          if (response.ok) {
+            setMessage("");
+            setFiles([]);
+          }
         });
       }}
     >
-      <Label htmlFor="reply">Reply</Label>
+      <Label htmlFor="reply">{t("support.reply")}</Label>
       <textarea
         id="reply"
         value={message}
@@ -323,11 +458,66 @@ export function TicketReplyForm({ ticketId }: { ticketId: string }) {
         rows={3}
         className="w-full rounded-[var(--radius-md)] border border-[var(--brand-border)] bg-transparent px-3 py-2 text-sm"
       />
+      <TicketAttachmentInput
+        id="reply-attachments"
+        files={files}
+        onChange={setFiles}
+      />
       <Button type="submit" disabled={pending || message.trim().length < 1}>
-        Send reply
+        {pending ? t("support.sending") : t("support.sendReply")}
       </Button>
       <ResultMessage state={result} />
     </form>
+  );
+}
+
+export function TicketAttachmentGallery({
+  items,
+}: {
+  items: Array<{
+    id: string;
+    file_name: string;
+    signedUrl: string | null;
+  }>;
+}) {
+  const t = useTranslations();
+  if (items.length === 0) return null;
+
+  return (
+    <section className="space-y-2">
+      <h2 className="font-medium">{t("support.attachments")}</h2>
+      <ul className="flex flex-wrap gap-3">
+        {items.map((item) => (
+          <li key={item.id} className="w-28 space-y-1">
+            {item.signedUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={item.signedUrl}
+                alt={item.file_name}
+                className="h-24 w-28 object-cover"
+              />
+            ) : (
+              <div className="flex h-24 w-28 items-center justify-center border border-[var(--brand-border)] text-xs text-[var(--brand-muted)]">
+                {t("support.attachmentUnavailable")}
+              </div>
+            )}
+            <p className="truncate text-xs text-[var(--brand-muted)]">
+              {item.file_name}
+            </p>
+            {item.signedUrl ? (
+              <a
+                href={item.signedUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs underline-offset-4 hover:underline"
+              >
+                {t("support.openAttachment")}
+              </a>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 

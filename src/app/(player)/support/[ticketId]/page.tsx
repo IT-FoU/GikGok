@@ -2,9 +2,11 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import {
+  TicketAttachmentGallery,
   TicketReplyForm,
   TicketSatisfactionForm,
 } from "@/modules/engagement/ui";
+import { signTicketAttachmentUrls } from "@/modules/engagement/actions";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -21,7 +23,7 @@ export default async function SupportTicketPage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [{ data: ticket }, { data: messages }] = await Promise.all([
+  const [{ data: ticket }, { data: messages }, attachments] = await Promise.all([
     supabase
       .from("support_tickets")
       .select("*")
@@ -33,6 +35,7 @@ export default async function SupportTicketPage({
       .select("id, author_id, author_role, body, created_at")
       .eq("ticket_id", ticketId)
       .order("created_at", { ascending: true }),
+    signTicketAttachmentUrls(ticketId),
   ]);
 
   if (!ticket) notFound();
@@ -41,6 +44,14 @@ export default async function SupportTicketPage({
   const showSatisfaction =
     (ticket.status === "resolved" || ticket.status === "closed") &&
     ticket.satisfaction_rating == null;
+
+  const attachmentsByMessage = new Map<string, typeof attachments>();
+  for (const attachment of attachments) {
+    const key = attachment.message_id ?? "__ticket__";
+    const list = attachmentsByMessage.get(key) ?? [];
+    list.push(attachment);
+    attachmentsByMessage.set(key, list);
+  }
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-6">
@@ -75,10 +86,19 @@ export default async function SupportTicketPage({
                 {new Date(message.created_at).toLocaleString()}
               </p>
               <p className="mt-2 whitespace-pre-wrap text-sm">{message.body}</p>
+              <div className="mt-3">
+                <TicketAttachmentGallery
+                  items={attachmentsByMessage.get(message.id) ?? []}
+                />
+              </div>
             </li>
           ))}
         </ul>
       </section>
+
+      <TicketAttachmentGallery
+        items={attachmentsByMessage.get("__ticket__") ?? []}
+      />
 
       {canReply ? <TicketReplyForm ticketId={ticket.id} /> : null}
       {showSatisfaction ? (
