@@ -65,15 +65,16 @@ Identify the tested implementation commit with `git rev-parse HEAD` on the branc
 | `git diff --check` | PASS |
 | Advisors (Management API) | NOT RUN this tip (403) — last documented Security WARN ~60 intentional DEFINER; INFO remain; Performance WARN ×0 |
 | DEFINER inventory | ~81 public DEFINER; ~63 authenticated EXECUTE; anon EXECUTE 0 |
-| GitHub Actions tip | **PASS** (Static + DB) — [https://github.com/IT-FoU/GikGok/actions/runs/34026129961](https://github.com/IT-FoU/GikGok/actions/runs/34026129961) on tip `2474719` after Owner corrected `SUPABASE_DB_URL` Actions secret. |
+| GitHub Actions tip | **PASS** (Static + DB) — [https://github.com/IT-FoU/GikGok/actions/runs/34031542121](https://github.com/IT-FoU/GikGok/actions/runs/34031542121) on tip `bd220c9` (fixture/deadlock hardenings). Prior green after Owner secret fix: [34026129961](https://github.com/IT-FoU/GikGok/actions/runs/34026129961) on `2474719`. |
 | Playwright public | PASS (10/10 smoke) |
 | Playwright authenticated | SKIPPED — no credentials |
 | Physical QA | SKIPPED — no devices |
 
 ### Tip Actions
-- Green PR Actions run (Owner-corrected `SUPABASE_DB_URL`): [https://github.com/IT-FoU/GikGok/actions/runs/34026129961](https://github.com/IT-FoU/GikGok/actions/runs/34026129961)
+- Latest green PR Actions (fixture/deadlock hardenings): [https://github.com/IT-FoU/GikGok/actions/runs/34031542121](https://github.com/IT-FoU/GikGok/actions/runs/34031542121)
 - Conclusion: **success** — Static job PASS + DB · RLS/RPC security suite PASS
-- Head SHA at that run: `2474719499ebc47e19dfd1f2e79db70bf0e4ac40`
+- Head SHA at that run: `bd220c981362b2f620586cdb2f47f3bb6ec1a468`
+- Prior green (Owner-corrected `SUPABASE_DB_URL`): [https://github.com/IT-FoU/GikGok/actions/runs/34026129961](https://github.com/IT-FoU/GikGok/actions/runs/34026129961) on `2474719`
 - Later tip commits may supersede; re-check Actions on the current tip after push.
 
 ## Honesty rules applied

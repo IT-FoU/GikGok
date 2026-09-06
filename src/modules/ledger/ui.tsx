@@ -259,6 +259,7 @@ export function AdminReviewForm({
     reason?: string;
   };
 }) {
+  const t = useTranslations();
   const [state, action, pending] = useActionState(
     reviewCreditRequestAction,
     null,
@@ -286,7 +287,7 @@ export function AdminReviewForm({
       <input type="hidden" name="requestId" value={requestId} />
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor={`gross-${requestId}`}>Gross GIK</Label>
+          <Label htmlFor={`gross-${requestId}`}>{t("credits.grossGik")}</Label>
           <Input
             id={`gross-${requestId}`}
             name="grossAmount"
@@ -297,7 +298,7 @@ export function AdminReviewForm({
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor={`bonus-${requestId}`}>Bonus GIK</Label>
+          <Label htmlFor={`bonus-${requestId}`}>{t("credits.bonusGik")}</Label>
           <Input
             id={`bonus-${requestId}`}
             name="bonusAmount"
@@ -308,7 +309,7 @@ export function AdminReviewForm({
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor={`fee-mode-${requestId}`}>Simulation fee mode</Label>
+          <Label htmlFor={`fee-mode-${requestId}`}>{t("credits.feeMode")}</Label>
           <select
             id={`fee-mode-${requestId}`}
             name="feeMode"
@@ -318,14 +319,14 @@ export function AdminReviewForm({
             }
             className="flex h-11 w-full rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-[var(--brand-surface)] px-3 text-sm"
           >
-            <option value="">None</option>
-            <option value="percent">Percent</option>
-            <option value="amount">Amount (converted to %)</option>
+            <option value="">{t("credits.feeNone")}</option>
+            <option value="percent">{t("credits.feePercent")}</option>
+            <option value="amount">{t("credits.feeAmountOption")}</option>
           </select>
         </div>
         <div className="space-y-2">
           <Label htmlFor={`fee-value-${requestId}`}>
-            {feeMode === "amount" ? "Fee amount (GIK)" : "Fee percent"}
+            {feeMode === "amount" ? t("credits.feeAmountGik") : t("credits.feePercentLabel")}
           </Label>
           <Input
             id={`fee-value-${requestId}`}
@@ -339,10 +340,10 @@ export function AdminReviewForm({
         </div>
       </div>
       <p className="text-sm text-[var(--brand-muted)]">
-        Fee {fee.toLocaleString()} · Net {net.toLocaleString()} GIK (simulated)
+        {t("credits.feeNetSimulated", { fee: fee.toLocaleString(), net: net.toLocaleString() })}
       </p>
       <div className="space-y-2">
-        <Label htmlFor={`reason-${requestId}`}>Reason</Label>
+        <Label htmlFor={`reason-${requestId}`}>{t("common.reason")}</Label>
         <Input
           id={`reason-${requestId}`}
           name="reason"
@@ -353,7 +354,7 @@ export function AdminReviewForm({
       </div>
       <div className="flex flex-wrap gap-2">
         <Button type="submit" name="decision" value="approved" disabled={pending}>
-          Approve
+          {t("credits.approve")}
         </Button>
         <Button
           type="submit"
@@ -362,7 +363,7 @@ export function AdminReviewForm({
           variant="outline"
           disabled={pending}
         >
-          Reject
+          {t("credits.reject")}
         </Button>
       </div>
       <ResultMessage state={state} />
@@ -387,6 +388,7 @@ export function SecondApproveForm({
   bonus: number;
   reason: string;
 }) {
+  const t = useTranslations();
   const [state, action, pending] = useActionState(
     secondApproveCreditRequestAction,
     null,
@@ -401,11 +403,11 @@ export function SecondApproveForm({
       <input type="hidden" name="bonusAmount" value={bonus} />
       <input type="hidden" name="reason" value={reason} />
       <p className="text-sm text-[var(--brand-muted)]">
-        Confirm second approval · gross {gross.toLocaleString()} · fee{" "}
+        {t("credits.secondApproveSummary", { gross: gross.toLocaleString(), feePercent, bonus: bonus.toLocaleString() })}
         {feePercent}% · bonus {bonus.toLocaleString()}
       </p>
       <Button type="submit" disabled={pending}>
-        {pending ? "Approving…" : "Second approve"}
+        {pending ? t("common.approving") : t("credits.secondApprove")}
       </Button>
       <ResultMessage state={state} />
     </form>
@@ -417,14 +419,15 @@ export function LedgerFilters({
 }: {
   active: "all" | "credit" | "debit";
 }) {
+  const t = useTranslations();
   const filters = [
-    { value: "all", label: "All" },
-    { value: "credit", label: "Credits" },
-    { value: "debit", label: "Debits" },
+    { value: "all", label: t("credits.filterAll") },
+    { value: "credit", label: t("credits.filterCredits") },
+    { value: "debit", label: t("credits.filterDebits") },
   ] as const;
 
   return (
-    <div className="flex flex-wrap gap-2" role="navigation" aria-label="Ledger filters">
+    <div className="flex flex-wrap gap-2" role="navigation" aria-label={t("credits.filtersAria")}>
       {filters.map((item) => (
         <Link
           key={item.value}

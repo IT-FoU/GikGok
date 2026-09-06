@@ -180,12 +180,13 @@ export function AdminSecurityForms() {
 }
 
 export function CreateAdminForm({ roles }: { roles: Array<{ code: string; name: string }> }) {
+  const t = useTranslations();
   const { pending, result, onSubmit } = useActionForm(createAdminAccountAction);
   return (
     <form className="space-y-3" onSubmit={onSubmit}>
-      <h3 className="font-medium">Create admin</h3>
-      <Input name="userId" placeholder="Auth user UUID" required />
-      <Input name="displayName" placeholder="Display name" required />
+      <h3 className="font-medium">{t("admin.createAdmin.title")}</h3>
+      <Input name="userId" placeholder={t("admin.createAdmin.userIdPlaceholder")} required />
+      <Input name="displayName" placeholder={t("admin.createAdmin.displayNamePlaceholder")} required />
       <select
         name="roleCode"
         className="w-full rounded-md border border-[var(--brand-border)] bg-[var(--brand-surface)] px-3 py-2 text-sm"
@@ -199,12 +200,10 @@ export function CreateAdminForm({ roles }: { roles: Array<{ code: string; name: 
       </select>
       <label className="flex items-center gap-2 text-sm">
         <input type="checkbox" name="isOwner" value="true" />
-        Owner (owner-only)
+        {t("admin.createAdmin.ownerLabel")}
       </label>
       <SensitiveFields />
-      <Button type="submit" disabled={pending}>
-        Create
-      </Button>
+      <Button type="submit" disabled={pending}>{t("admin.createAdmin.submit")}</Button>
       <Banner result={result} />
     </form>
   );

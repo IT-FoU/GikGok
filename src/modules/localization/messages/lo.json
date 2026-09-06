@@ -126,7 +126,20 @@
     "language": "ພາສາ",
     "soundPack": "ຊຸດສຽງ",
     "graphics": "ກຣາຟິກ",
-    "quality": "ຄຸນນະພາບ"
+    "quality": "ຄຸນນະພາບ",
+    "nickname": "ຊື່ຫຼິ້ນ",
+    "presetAvatar": "ອາວະຕາທີ່ກຳນົດໄວ້",
+    "saveProfile": "ບັນທຶກໂປຣໄຟລ",
+    "saveSettings": "ບັນທຶກການຕັ້ງຄ່າ",
+    "shadows": "ເງົາ",
+    "effects": "ເອັບເຟັກ",
+    "reduceMotion": "ຫຼຸດການເຄື່ອນໄຫວ",
+    "deletionBody": "ຂໍລຶບບັນຊີ. ບັນທຶກ ledger ແລະ audit ຈະຖືກເກັບໄວ້. ບໍ່ສາມາດຖອນ ຫຼື ໂອນເຄຣດິດທົດສອບໄດ້.",
+    "deletionReason": "ເຫດຜົນ (ບໍ່ບັງຄັບ)",
+    "deletionConfirm": "ຂ້ອຍເຂົ້າໃຈວ່ານີ້ແມ່ນການຂໍລຶບບັນຊີ",
+    "requestDeletion": "ຂໍລຶບບັນຊີ",
+    "volume": "ລະດັບສຽງ",
+    "fpsCap": "ຈຳກັດ FPS"
   },
   "support": {
     "title": "ຊ່ວຍເຫຼືອ",
@@ -213,7 +226,24 @@
     "submitRequest": "ສົ່ງຄຳຂໍ",
     "yourRequests": "ຄຳຂໍຄຣດິດຂອງທ່ານ",
     "noRequests": "ຍັງບໍ່ມີຄຳຂໍ.",
-    "cancel": "ຍົກເລີກ"
+    "cancel": "ຍົກເລີກ",
+    "grossGik": "GIK ລວມ",
+    "bonusGik": "GIK ໂບນັສ",
+    "feeMode": "ໂໝດຄ່າທຳນຽມຈຳລອງ",
+    "feeNone": "ບໍ່ມີ",
+    "feePercent": "ເປີເຊັນ",
+    "feeAmountOption": "ຈຳນວນ (ແປງເປັນ %)",
+    "feeAmountGik": "ຄ່າທຳນຽມ (GIK)",
+    "feePercentLabel": "ເປີເຊັນຄ່າທຳນຽມ",
+    "feeNetSimulated": "ຄ່າທຳນຽມ {fee} · ສຸດທິ {net} GIK (ຈຳລອງ)",
+    "approve": "ອະນຸມັດ",
+    "reject": "ປະຕິເສດ",
+    "secondApprove": "ອະນຸມັດຄັ້ງທີສອງ",
+    "secondApproveSummary": "ຢືນຢັນອະນຸມັດຄັ້ງທີສອງ · ລວມ {gross} · ຄ່າທຳນຽມ {feePercent}% · ໂບນັສ {bonus}",
+    "filtersAria": "ຕົວກອງ ledger",
+    "filterAll": "ທັງໝົດ",
+    "filterCredits": "ເຄຣດິດ",
+    "filterDebits": "ເດບິດ"
   },
   "engagement": {
     "dismiss": "ປິດ",
@@ -341,7 +371,32 @@
       "statusClosed": "ປິດ",
       "replyPlaceholder": "ຄຳຕອບພະນັກງານ (ທາງເລືອກ)",
       "updateCta": "ອັບເດດຕິກເກັດ"
-    }
+    },
+    "createAdmin": {
+      "title": "ສ້າງແອັດມິນ",
+      "userIdPlaceholder": "UUID ຜູ້ໃຊ້ Auth",
+      "displayNamePlaceholder": "ຊື່ສະແດງ",
+      "ownerLabel": "ເຈົ້າຂອງ (ເຈົ້າຂອງເທົ່ານັ້ນ)",
+      "submit": "ສ້າງ"
+    },
+    "placeholderReason": "ເຫດຜົນ",
+    "placeholderReasonRequired": "ເຫດຜົນ (ຈຳເປັນ)",
+    "placeholderTitleEn": "ຫົວຂໍ້ (EN)",
+    "placeholderTitleLo": "ຫົວຂໍ້ (LO)",
+    "placeholderBodyEn": "ເນື້ອຫາ (EN)",
+    "placeholderBodyLo": "ເນື້ອຫາ (LO)",
+    "placeholderCode": "ລະຫັດ",
+    "placeholderTitle": "ຫົວຂໍ້",
+    "placeholderDescription": "ລາຍລະອຽດ",
+    "placeholderBadgeAssetKey": "ລະຫັດຊັບສິນ badge",
+    "placeholderJsonPayload": "JSON payload ທາງເລືອກ ເຊັ່ນ {}",
+    "placeholderJsonValue": "ຄ່າ JSON ເຊັ່ນ 5000 ຫຼື \"green\"",
+    "placeholderMaintenanceMessage": "ຂໍ້ຄວາມບຳລຸງຮັກສາ",
+    "placeholderAssetKey": "ລະຫັດຊັບສິນ",
+    "placeholderStoragePath": "ເສັ້ນທາງ Storage",
+    "placeholderPlayerId": "UUID ຜູ້ຫຼິ້ນ",
+    "placeholderOtp": "ລະຫັດ 6 ຕົວ",
+    "placeholderPinLength": "4–12"
   },
   "status": {
     "suspendedTitle": "ບັນຊີຖືກລະງັບ",
@@ -369,7 +424,13 @@
     "previous": "ກ່ອນໜ້າ",
     "search": "ຄົ້ນຫາ",
     "filter": "ກັ່ນຕອງ",
-    "noResults": "ບໍ່ພົບຜົນລັບ"
+    "noResults": "ບໍ່ພົບຜົນລັບ",
+    "saving": "ກຳລັງບັນທຶກ…",
+    "submitting": "ກຳລັງສົ່ງ…",
+    "approving": "ກຳລັງອະນຸມັດ…",
+    "create": "ສ້າງ",
+    "reason": "ເຫດຜົນ",
+    "reasonRequired": "ເຫດຜົນ (ຈຳເປັນ)"
   },
   "validation": {
     "required": "ຈຳເປັນຕ້ອງໃສ່",

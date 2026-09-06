@@ -42,12 +42,13 @@ export function ProfileForm({
   nickname: string;
   avatarPresetId: string | null;
 }) {
+  const t = useTranslations();
   const [state, formAction, pending] = useActionState(action, null);
 
   return (
     <form action={formAction} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="nickname">Nickname</Label>
+        <Label htmlFor="nickname">{t("profile.nickname")}</Label>
         <Input
           id="nickname"
           name="nickname"
@@ -58,7 +59,7 @@ export function ProfileForm({
         />
       </div>
       <fieldset className="space-y-2">
-        <legend className="text-sm font-medium">Preset avatar</legend>
+        <legend className="text-sm font-medium">{t("profile.presetAvatar")}</legend>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {AVATAR_PRESETS.map((preset) => (
             <label
@@ -81,7 +82,7 @@ export function ProfileForm({
       </fieldset>
       <Message state={state} />
       <Button type="submit" disabled={pending}>
-        {pending ? "Saving…" : "Save profile"}
+        {pending ? t("common.saving") : t("profile.saveProfile")}
       </Button>
     </form>
   );
@@ -285,13 +286,14 @@ export function SettingsForm({
     reduceMotion: boolean;
   };
 }) {
+  const t = useTranslations();
   const [state, formAction, pending] = useActionState(action, null);
 
   return (
     <form action={formAction} className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="language">Language</Label>
+          <Label htmlFor="language">{t("profile.language")}</Label>
           <select
             id="language"
             name="language"
@@ -303,20 +305,22 @@ export function SettingsForm({
           </select>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="soundPack">Sound pack</Label>
+          <Label htmlFor="soundPack">{t("profile.soundPack")}</Label>
           <select
             id="soundPack"
             name="soundPack"
             defaultValue={defaults.soundPack}
             className="flex h-11 w-full rounded-xl border border-[var(--brand-border)] bg-[var(--brand-surface)] px-3 text-sm"
           >
-            <option value="classic_casino">Classic Casino</option>
-            <option value="arcade">Arcade</option>
-            <option value="silent">Silent</option>
+            <option value="classic_casino">{t("sound.classic")}</option>
+            <option value="arcade">{t("sound.arcade")}</option>
+            <option value="silent">{t("sound.silent")}</option>
           </select>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="soundVolume">Volume ({defaults.soundVolume}%)</Label>
+          <Label htmlFor="soundVolume">
+            {t("profile.volume")} ({defaults.soundVolume}%)
+          </Label>
           <Input
             id="soundVolume"
             name="soundVolume"
@@ -328,7 +332,7 @@ export function SettingsForm({
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="graphicsMode">Graphics</Label>
+          <Label htmlFor="graphicsMode">{t("profile.graphics")}</Label>
           <select
             id="graphicsMode"
             name="graphicsMode"
@@ -341,7 +345,7 @@ export function SettingsForm({
           </select>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="graphicsQuality">Quality</Label>
+          <Label htmlFor="graphicsQuality">{t("profile.quality")}</Label>
           <select
             id="graphicsQuality"
             name="graphicsQuality"
@@ -354,7 +358,7 @@ export function SettingsForm({
           </select>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="fpsCap">FPS cap</Label>
+          <Label htmlFor="fpsCap">{t("profile.fpsCap")}</Label>
           <select
             id="fpsCap"
             name="fpsCap"
@@ -373,17 +377,17 @@ export function SettingsForm({
           [
             {
               name: "shadowsEnabled",
-              label: "Shadows",
+              label: t("profile.shadows"),
               checked: defaults.shadowsEnabled,
             },
             {
               name: "effectsEnabled",
-              label: "Effects",
+              label: t("profile.effects"),
               checked: defaults.effectsEnabled,
             },
             {
               name: "reduceMotion",
-              label: "Reduce motion",
+              label: t("profile.reduceMotion"),
               checked: defaults.reduceMotion,
             },
           ] as const
@@ -400,32 +404,30 @@ export function SettingsForm({
       </div>
       <Message state={state} />
       <Button type="submit" disabled={pending}>
-        {pending ? "Saving…" : "Save settings"}
+        {pending ? t("common.saving") : t("profile.saveSettings")}
       </Button>
     </form>
   );
 }
 
 export function DeletionForm({ action }: { action: AuthAction }) {
+  const t = useTranslations();
   const [state, formAction, pending] = useActionState(action, null);
 
   return (
     <form action={formAction} className="space-y-3 rounded-xl border border-red-500/40 p-4">
-      <p className="text-sm text-[var(--brand-muted)]">
-        Request account deletion. Ledger and audit records are preserved. This
-        cannot cash out or transfer demo credits.
-      </p>
+      <p className="text-sm text-[var(--brand-muted)]">{t("profile.deletionBody")}</p>
       <div className="space-y-2">
-        <Label htmlFor="reason">Reason (optional)</Label>
+        <Label htmlFor="reason">{t("profile.deletionReason")}</Label>
         <Input id="reason" name="reason" maxLength={500} />
       </div>
       <label className="flex items-center gap-2 text-sm">
         <input type="checkbox" name="confirm" required />
-        I understand this requests account deletion
+        {t("profile.deletionConfirm")}
       </label>
       <Message state={state} />
       <Button type="submit" variant="outline" disabled={pending}>
-        {pending ? "Submitting…" : "Request deletion"}
+        {pending ? t("common.submitting") : t("profile.requestDeletion")}
       </Button>
     </form>
   );

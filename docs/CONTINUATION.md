@@ -43,17 +43,17 @@
 - Harden shared staging fixtures: advisory lock + aggressive admin perm restore; profiles-first lock order; deadlock retry on `mark_contact_verified`; restore perms before `has_permission` self-assert
 
 ## Next actions
-1. Confirm tip Actions green after fixture/deadlock hardenings (Static + DB)
-2. Recount Advisors via dashboard when Management API allows (do not claim “fully clean”)
-3. Owner: staging auth credentials → Playwright critical journeys
-4. Owner: physical iOS/Android/tablet Light/Dark Lao/English QA
-5. Owner: SMS provider → Phone OTP
-6. Owner: hosted preview deploy
-7. Do **not** merge to `main` or production without Owner approval
-8. Optional follow-up: style CSP nonce (`style-src` still `unsafe-inline`); deeper DEFINER COMMENT coverage; residual admin/ledger chrome i18n
+1. Recount Advisors via dashboard when Management API allows (do not claim “fully clean”)
+2. Owner: staging auth credentials → Playwright critical journeys
+3. Owner: physical iOS/Android/tablet Light/Dark Lao/English QA
+4. Owner: SMS provider → Phone OTP
+5. Owner: hosted preview deploy
+6. Do **not** merge to `main` or production without Owner approval
+7. Optional follow-up: style CSP nonce (`style-src` still `unsafe-inline`); deeper DEFINER COMMENT coverage; residual admin/ledger/player chrome i18n
 
-## Tip Actions (Owner-corrected secret)
-- Green run: [https://github.com/IT-FoU/GikGok/actions/runs/34026129961](https://github.com/IT-FoU/GikGok/actions/runs/34026129961) — Static PASS + DB PASS on `2474719`
+## Tip Actions
+- Latest tip green: [https://github.com/IT-FoU/GikGok/actions/runs/34031542121](https://github.com/IT-FoU/GikGok/actions/runs/34031542121) — Static PASS + DB PASS on `bd220c9` (fixture/deadlock hardenings)
+- Prior green (Owner-corrected secret): [https://github.com/IT-FoU/GikGok/actions/runs/34026129961](https://github.com/IT-FoU/GikGok/actions/runs/34026129961) on `2474719`
 
 ## Validation snapshot
 - `npm run lint` / `typecheck` / `test` / `build` / `security:check` / `npm audit --omit=dev` — run at tip

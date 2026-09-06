@@ -126,7 +126,20 @@
     "language": "Language",
     "soundPack": "Sound pack",
     "graphics": "Graphics",
-    "quality": "Quality"
+    "quality": "Quality",
+    "nickname": "Nickname",
+    "presetAvatar": "Preset avatar",
+    "saveProfile": "Save profile",
+    "saveSettings": "Save settings",
+    "shadows": "Shadows",
+    "effects": "Effects",
+    "reduceMotion": "Reduce motion",
+    "deletionBody": "Request account deletion. Ledger and audit records are preserved. This cannot cash out or transfer demo credits.",
+    "deletionReason": "Reason (optional)",
+    "deletionConfirm": "I understand this requests account deletion",
+    "requestDeletion": "Request deletion",
+    "volume": "Volume",
+    "fpsCap": "FPS cap"
   },
   "support": {
     "title": "Support",
@@ -213,7 +226,24 @@
     "submitRequest": "Submit request",
     "yourRequests": "Your credit requests",
     "noRequests": "No requests yet.",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "grossGik": "Gross GIK",
+    "bonusGik": "Bonus GIK",
+    "feeMode": "Simulation fee mode",
+    "feeNone": "None",
+    "feePercent": "Percent",
+    "feeAmountOption": "Amount (converted to %)",
+    "feeAmountGik": "Fee amount (GIK)",
+    "feePercentLabel": "Fee percent",
+    "feeNetSimulated": "Fee {fee} · Net {net} GIK (simulated)",
+    "approve": "Approve",
+    "reject": "Reject",
+    "secondApprove": "Second approve",
+    "secondApproveSummary": "Confirm second approval · gross {gross} · fee {feePercent}% · bonus {bonus}",
+    "filtersAria": "Ledger filters",
+    "filterAll": "All",
+    "filterCredits": "Credits",
+    "filterDebits": "Debits"
   },
   "engagement": {
     "dismiss": "Dismiss",
@@ -341,7 +371,32 @@
       "statusClosed": "Closed",
       "replyPlaceholder": "Staff reply (optional)",
       "updateCta": "Update ticket"
-    }
+    },
+    "createAdmin": {
+      "title": "Create admin",
+      "userIdPlaceholder": "Auth user UUID",
+      "displayNamePlaceholder": "Display name",
+      "ownerLabel": "Owner (owner-only)",
+      "submit": "Create"
+    },
+    "placeholderReason": "Reason",
+    "placeholderReasonRequired": "Reason (required)",
+    "placeholderTitleEn": "Title (EN)",
+    "placeholderTitleLo": "Title (LO)",
+    "placeholderBodyEn": "Body (EN)",
+    "placeholderBodyLo": "Body (LO)",
+    "placeholderCode": "code",
+    "placeholderTitle": "Title",
+    "placeholderDescription": "Description",
+    "placeholderBadgeAssetKey": "Badge asset key",
+    "placeholderJsonPayload": "Optional JSON payload e.g. {}",
+    "placeholderJsonValue": "JSON value e.g. 5000 or \"green\"",
+    "placeholderMaintenanceMessage": "Maintenance message",
+    "placeholderAssetKey": "Asset key",
+    "placeholderStoragePath": "Storage path",
+    "placeholderPlayerId": "Player UUID",
+    "placeholderOtp": "6-digit code",
+    "placeholderPinLength": "4–12"
   },
   "status": {
     "suspendedTitle": "Account suspended",
@@ -369,7 +424,13 @@
     "previous": "Previous",
     "search": "Search",
     "filter": "Filter",
-    "noResults": "No results found"
+    "noResults": "No results found",
+    "saving": "Saving…",
+    "submitting": "Submitting…",
+    "approving": "Approving…",
+    "create": "Create",
+    "reason": "Reason",
+    "reasonRequired": "Reason (required)"
   },
   "validation": {
     "required": "This field is required",
