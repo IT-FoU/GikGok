@@ -43,6 +43,7 @@
 - Harden shared staging fixtures: advisory lock + aggressive admin perm restore; profiles-first lock order; deadlock retry on `mark_contact_verified`; restore perms before `has_permission` self-assert
 - Tip Actions green on `bd220c9` after fixture/deadlock hardenings (Static + DB)
 - Residual chrome i18n: profile settings/deletion, ledger admin review / second approve / filters, create-admin form — EN/LO parity
+- Admin form placeholders wired to EN/LO (`admin.placeholder*` + QA label/notes)
 
 ## Next actions
 1. Recount Advisors via dashboard when Management API allows (do not claim “fully clean”)
@@ -51,7 +52,7 @@
 4. Owner: SMS provider → Phone OTP
 5. Owner: hosted preview deploy
 6. Do **not** merge to `main` or production without Owner approval
-7. Optional follow-up: style CSP nonce (`style-src` still `unsafe-inline`); deeper DEFINER COMMENT coverage; remaining admin placeholder chrome i18n
+7. Optional follow-up: style CSP nonce (`style-src` still `unsafe-inline`); deeper DEFINER COMMENT coverage
 
 ## Tip Actions
 - Latest tip green: [https://github.com/IT-FoU/GikGok/actions/runs/34032016542](https://github.com/IT-FoU/GikGok/actions/runs/34032016542) — Static PASS + DB PASS on `75ec7b3` (residual chrome i18n)

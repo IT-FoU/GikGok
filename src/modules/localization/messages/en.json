@@ -396,7 +396,9 @@
     "placeholderStoragePath": "Storage path",
     "placeholderPlayerId": "Player UUID",
     "placeholderOtp": "6-digit code",
-    "placeholderPinLength": "4–12"
+    "placeholderPinLength": "4–12",
+    "placeholderQaLabel": "QA label",
+    "placeholderNotes": "Notes"
   },
   "status": {
     "suspendedTitle": "Account suspended",

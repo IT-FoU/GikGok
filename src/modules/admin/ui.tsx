@@ -116,7 +116,7 @@ export function AdminSecurityForms() {
       <form className="space-y-3" onSubmit={pin.onSubmit}>
         <h3 className="font-medium">{t("admin.mfa.setPinTitle")}</h3>
         <p className="text-xs text-[var(--brand-muted)]">{t("admin.mfa.setPinHint")}</p>
-        <Input name="pin" type="password" inputMode="numeric" placeholder="4–12" required />
+        <Input name="pin" type="password" inputMode="numeric" placeholder={t("admin.placeholderPinLength")} required />
         <Button type="submit" disabled={pin.pending}>
           {t("admin.mfa.savePin")}
         </Button>
@@ -149,7 +149,7 @@ export function AdminSecurityForms() {
         {factorId ? (
           <form className="space-y-3" onSubmit={confirmEnroll.onSubmit}>
             <input type="hidden" name="factorId" value={factorId} />
-            <Input name="otp" placeholder="6-digit code" required autoComplete="one-time-code" />
+            <Input name="otp" placeholder={t("admin.placeholderOtp")} required autoComplete="one-time-code" />
             <Button type="submit" disabled={confirmEnroll.pending}>
               {t("admin.mfa.confirmEnroll")}
             </Button>
@@ -216,6 +216,8 @@ export function AdminRoleOverrideForms({
   admins: Array<{ user_id: string; display_name: string }>;
   roles: Array<{ code: string; name: string }>;
 }) {
+  const t = useTranslations();
+
   const assign = useActionForm(assignAdminRoleAction);
   const override = useActionForm(setPermissionOverrideAction);
   const status = useActionForm(setAdminStatusAction);
@@ -265,7 +267,7 @@ export function AdminRoleOverrideForms({
           <option value="true">Grant</option>
           <option value="false">Deny</option>
         </select>
-        <Input name="reason" placeholder="Reason" />
+        <Input name="reason" placeholder={t("admin.placeholderReason")} />
         <SensitiveFields />
         <Button type="submit" disabled={override.pending}>
           Save override
@@ -301,6 +303,8 @@ export function PlayerStatusForm({
 }: {
   players: Array<{ id: string; nickname: string; status: string }>;
 }) {
+  const t = useTranslations();
+
   const { pending, result, onSubmit } = useActionForm(setPlayerStatusAction);
   return (
     <form className="space-y-3" onSubmit={onSubmit}>
@@ -317,7 +321,7 @@ export function PlayerStatusForm({
         <option value="suspended">Suspended</option>
         <option value="banned">Banned</option>
       </select>
-      <Input name="reason" placeholder="Reason (required)" required />
+      <Input name="reason" placeholder={t("admin.placeholderReasonRequired")} required />
       <SensitiveFields />
       <Button type="submit" disabled={pending}>
         Update status
@@ -328,13 +332,15 @@ export function PlayerStatusForm({
 }
 
 export function AnnouncementForm() {
+  const t = useTranslations();
+
   const { pending, result, onSubmit } = useActionForm(upsertAnnouncementAction);
   return (
     <form className="space-y-3" onSubmit={onSubmit}>
-      <Input name="titleEn" placeholder="Title (EN)" required />
-      <Input name="titleLo" placeholder="Title (LO)" />
-      <Input name="bodyEn" placeholder="Body (EN)" required />
-      <Input name="bodyLo" placeholder="Body (LO)" />
+      <Input name="titleEn" placeholder={t("admin.placeholderTitleEn")} required />
+      <Input name="titleLo" placeholder={t("admin.placeholderTitleLo")} />
+      <Input name="bodyEn" placeholder={t("admin.placeholderBodyEn")} required />
+      <Input name="bodyLo" placeholder={t("admin.placeholderBodyLo")} />
       <select name="status" className="w-full rounded-md border border-[var(--brand-border)] bg-[var(--brand-surface)] px-3 py-2 text-sm" defaultValue="draft">
         <option value="draft">Draft</option>
         <option value="scheduled">Scheduled</option>
@@ -408,15 +414,17 @@ export function StorageOrphanRetryForm() {
 }
 
 export function MissionBadgeForms() {
+  const t = useTranslations();
+
   const mission = useActionForm(upsertMissionAction);
   const achievement = useActionForm(upsertAchievementAction);
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       <form className="space-y-3" onSubmit={mission.onSubmit}>
         <h3 className="font-medium">Mission</h3>
-        <Input name="code" placeholder="code" required />
-        <Input name="title" placeholder="Title" required />
-        <Input name="description" placeholder="Description" required />
+        <Input name="code" placeholder={t("admin.placeholderCode")} required />
+        <Input name="title" placeholder={t("admin.placeholderTitle")} required />
+        <Input name="description" placeholder={t("admin.placeholderDescription")} required />
         <Input name="targetCount" type="number" defaultValue={1} min={1} />
         <Input name="rewardAmount" type="number" defaultValue={1000} min={0} />
         <input type="hidden" name="isEnabled" value="true" />
@@ -427,10 +435,10 @@ export function MissionBadgeForms() {
       </form>
       <form className="space-y-3" onSubmit={achievement.onSubmit}>
         <h3 className="font-medium">Achievement / badge</h3>
-        <Input name="code" placeholder="code" required />
-        <Input name="title" placeholder="Title" required />
-        <Input name="description" placeholder="Description" required />
-        <Input name="badgeAssetKey" placeholder="Badge asset key" />
+        <Input name="code" placeholder={t("admin.placeholderCode")} required />
+        <Input name="title" placeholder={t("admin.placeholderTitle")} required />
+        <Input name="description" placeholder={t("admin.placeholderDescription")} required />
+        <Input name="badgeAssetKey" placeholder={t("admin.placeholderBadgeAssetKey")} />
         <input type="hidden" name="isEnabled" value="true" />
         <Button type="submit" disabled={achievement.pending}>
           Save achievement
@@ -446,6 +454,8 @@ export function FeatureFlagForm({
 }: {
   flags: Array<{ key: string; enabled: boolean }>;
 }) {
+  const t = useTranslations();
+
   const { pending, result, onSubmit } = useActionForm(setFeatureFlagAction);
   return (
     <form className="space-y-3" onSubmit={onSubmit}>
@@ -460,7 +470,7 @@ export function FeatureFlagForm({
         <option value="true">Enable</option>
         <option value="false">Disable</option>
       </select>
-      <Input name="payload" placeholder='Optional JSON payload e.g. {}' />
+      <Input name="payload" placeholder={t("admin.placeholderJsonPayload")} />
       <Button type="submit" disabled={pending}>
         Update flag
       </Button>
@@ -474,6 +484,8 @@ export function SettingsForms({
 }: {
   settings: Array<{ key: string; value: unknown }>;
 }) {
+  const t = useTranslations();
+
   const setting = useActionForm(setSystemSettingAction);
   const maintenance = useActionForm(setMaintenanceAction);
   return (
@@ -487,7 +499,7 @@ export function SettingsForms({
             </option>
           ))}
         </select>
-        <Input name="value" placeholder='JSON value e.g. 5000 or "green"' required />
+        <Input name="value" placeholder={t("admin.placeholderJsonValue")} required />
         <Button type="submit" disabled={setting.pending}>
           Save setting
         </Button>
@@ -499,7 +511,7 @@ export function SettingsForms({
           <option value="true">Activate</option>
           <option value="false">Deactivate</option>
         </select>
-        <Input name="message" placeholder="Maintenance message" />
+        <Input name="message" placeholder={t("admin.placeholderMaintenanceMessage")} />
         <SensitiveFields />
         <Button type="submit" disabled={maintenance.pending}>
           Apply
@@ -572,10 +584,12 @@ export function ReleaseAdvanceForm({
 }
 
 export function AssetForm() {
+  const t = useTranslations();
+
   const { pending, result, onSubmit } = useActionForm(upsertAssetAction);
   return (
     <form className="space-y-3" onSubmit={onSubmit}>
-      <Input name="key" placeholder="Asset key" required />
+      <Input name="key" placeholder={t("admin.placeholderAssetKey")} required />
       <select name="kind" className="w-full rounded-md border border-[var(--brand-border)] bg-[var(--brand-surface)] px-3 py-2 text-sm" defaultValue="game_icon">
         <option value="avatar_preset">Avatar preset</option>
         <option value="game_icon">Game icon</option>
@@ -584,7 +598,7 @@ export function AssetForm() {
         <option value="sound">Sound</option>
         <option value="other">Other</option>
       </select>
-      <Input name="storagePath" placeholder="Storage path" />
+      <Input name="storagePath" placeholder={t("admin.placeholderStoragePath")} />
       <label className="flex items-center gap-2 text-sm">
         <input type="checkbox" name="rightsCleared" value="true" />
         Rights cleared
@@ -598,12 +612,14 @@ export function AssetForm() {
 }
 
 export function QaAccountForm() {
+  const t = useTranslations();
+
   const { pending, result, onSubmit } = useActionForm(registerQaAccountAction);
   return (
     <form className="space-y-3" onSubmit={onSubmit}>
-      <Input name="playerId" placeholder="Player UUID" required />
-      <Input name="label" placeholder="QA label" required />
-      <Input name="notes" placeholder="Notes" />
+      <Input name="playerId" placeholder={t("admin.placeholderPlayerId")} required />
+      <Input name="label" placeholder={t("admin.placeholderQaLabel")} required />
+      <Input name="notes" placeholder={t("admin.placeholderNotes")} />
       <SensitiveFields />
       <Button type="submit" disabled={pending}>
         Register QA account

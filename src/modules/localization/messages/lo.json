@@ -396,7 +396,9 @@
     "placeholderStoragePath": "ເສັ້ນທາງ Storage",
     "placeholderPlayerId": "UUID ຜູ້ຫຼິ້ນ",
     "placeholderOtp": "ລະຫັດ 6 ຕົວ",
-    "placeholderPinLength": "4–12"
+    "placeholderPinLength": "4–12",
+    "placeholderQaLabel": "ປ້າຍ QA",
+    "placeholderNotes": "ບັນທຶກ"
   },
   "status": {
     "suspendedTitle": "ບັນຊີຖືກລະງັບ",

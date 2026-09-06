@@ -42,7 +42,7 @@ Identify the tested implementation commit with `git rev-parse HEAD` on the branc
 ## Remaining (by severity)
 | ID | Severity | Status | Dependency |
 |----|----------|--------|------------|
-| I18N-002 | Medium | Admin tickets/home/MFA + profile settings/deletion + ledger review/filters + create-admin chrome wired (EN/LO) | Unit parity + manual spot |
+| I18N-002 | Medium | Admin tickets/home/MFA + profile/ledger chrome + admin form placeholders wired (EN/LO) | Unit parity + manual spot |
 | ADV-001 | Medium | Advisor Management API 403; exact live WARN/INFO not re-fetched this tip | Owner/API access |
 | CSP-002 | Low–Med | `style-src 'unsafe-inline'` retained | Next/Tailwind style nonce follow-up |
 | E2E-AUTH | High (release) | Authenticated Playwright not run | Staging test credentials |
