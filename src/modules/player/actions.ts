@@ -23,6 +23,20 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export type { ActionResult };
 
+function fail(
+  code: string,
+  message: string,
+  fieldErrors?: Record<string, string[]>,
+): ActionResult {
+  return fieldErrors
+    ? { ok: false, code, message, fieldErrors }
+    : { ok: false, code, message };
+}
+
+function ok(code: string, message: string): ActionResult {
+  return { ok: true, code, message };
+}
+
 function fieldErrorsFromZod(error: {
   flatten: () => { fieldErrors: Record<string, string[] | undefined> };
 }): Record<string, string[]> {
@@ -48,11 +62,11 @@ export async function registerAction(
   });
 
   if (!parsed.success) {
-    return {
-      ok: false,
-      message: "Please fix the highlighted fields.",
-      fieldErrors: fieldErrorsFromZod(parsed.error),
-    };
+    return fail(
+      "VALIDATION_FAILED",
+      "Please fix the highlighted fields.",
+      fieldErrorsFromZod(parsed.error),
+    );
   }
 
   const input = parsed.data;
@@ -87,11 +101,11 @@ export async function registerAction(
         });
 
   if (error) {
-    return { ok: false, message: mapAuthConflictMessage(error.message) };
+    return fail("AUTH_CONFLICT", mapAuthConflictMessage(error.message));
   }
 
   if (!data.user) {
-    return { ok: false, message: "Registration failed. Please try again." };
+    return fail("AUTH_REGISTRATION_FAILED", "Registration failed. Please try again.");
   }
 
   const { error: profileError } = await supabase.rpc(
@@ -105,7 +119,7 @@ export async function registerAction(
   );
 
   if (profileError) {
-    return { ok: false, message: mapAuthConflictMessage(profileError.message) };
+    return fail("AUTH_CONFLICT", mapAuthConflictMessage(profileError.message));
   }
 
   redirect(
@@ -127,11 +141,11 @@ export async function loginAction(
   });
 
   if (!parsed.success) {
-    return {
-      ok: false,
-      message: "Please fix the highlighted fields.",
-      fieldErrors: fieldErrorsFromZod(parsed.error),
-    };
+    return fail(
+      "VALIDATION_FAILED",
+      "Please fix the highlighted fields.",
+      fieldErrorsFromZod(parsed.error),
+    );
   }
 
   const input = parsed.data;
@@ -149,7 +163,7 @@ export async function loginAction(
         });
 
   if (error) {
-    return { ok: false, message: "Invalid credentials. Please try again." };
+    return fail("AUTH_INVALID_CREDENTIALS", "Invalid credentials. Please try again.");
   }
 
   const {
@@ -169,17 +183,11 @@ export async function loginAction(
 
     if (state.status === "banned") {
       await supabase.auth.signOut();
-      return {
-        ok: false,
-        message: "This account is banned and cannot sign in.",
-      };
+      return fail("AUTH_ACCOUNT_BANNED", "This account is banned and cannot sign in.");
     }
 
     if (state.deletion_requested || state.status === "deletion_requested") {
-      return {
-        ok: false,
-        message: "This account has a pending deletion request.",
-      };
+      return fail("AUTH_DELETION_PENDING", "This account has a pending deletion request.");
     }
 
     if (!state.verified) {
@@ -212,22 +220,18 @@ export async function verifyOtpAction(
   });
 
   if (!parsed.success) {
-    return {
-      ok: false,
-      message: "Enter a valid 6-digit code.",
-      fieldErrors: fieldErrorsFromZod(parsed.error),
-    };
+    return fail(
+      "VALIDATION_FAILED",
+      "Enter a valid 6-digit code.",
+      fieldErrorsFromZod(parsed.error),
+    );
   }
 
   const input = parsed.data;
   const supabase = await createServerSupabaseClient();
 
   if (input.contactType === "phone") {
-    return {
-      ok: false,
-      message:
-        "Phone OTP is prepared but waiting for an Owner-selected SMS provider. Use email verification for now.",
-    };
+    return fail("AUTH_PHONE_OTP_WAITING", "Phone OTP awaits Owner SMS provider configuration. Use email verification for now.");
   }
 
   const { error } = await supabase.auth.verifyOtp({
@@ -237,7 +241,7 @@ export async function verifyOtpAction(
   });
 
   if (error) {
-    return { ok: false, message: "Invalid or expired verification code." };
+    return fail("AUTH_OTP_INVALID", "Invalid or expired verification code.");
   }
 
   const { error: markError } = await supabase.rpc("mark_contact_verified", {
@@ -245,13 +249,13 @@ export async function verifyOtpAction(
   });
 
   if (markError) {
-    return { ok: false, message: mapAuthConflictMessage(markError.message) };
+    return fail("AUTH_CONFLICT", mapAuthConflictMessage(markError.message));
   }
 
   const { error: grantError } = await supabase.rpc("grant_welcome_credit");
 
   if (grantError) {
-    return { ok: false, message: mapAuthConflictMessage(grantError.message) };
+    return fail("AUTH_CONFLICT", mapAuthConflictMessage(grantError.message));
   }
 
   revalidatePath("/home");
@@ -270,11 +274,11 @@ export async function requestPasswordResetAction(
   });
 
   if (!parsed.success) {
-    return {
-      ok: false,
-      message: "Enter a valid email.",
-      fieldErrors: fieldErrorsFromZod(parsed.error),
-    };
+    return fail(
+      "VALIDATION_FAILED",
+      "Enter a valid email.",
+      fieldErrorsFromZod(parsed.error),
+    );
   }
 
   const supabase = await createServerSupabaseClient();
@@ -286,7 +290,7 @@ export async function requestPasswordResetAction(
     { redirectTo: `${origin}/reset-password` },
   );
 
-  return { ok: true, message: genericMessage };
+  return ok("AUTH_RESET_SENT", genericMessage);
 }
 
 export async function updatePasswordAction(
@@ -299,11 +303,11 @@ export async function updatePasswordAction(
   });
 
   if (!parsed.success) {
-    return {
-      ok: false,
-      message: "Please fix the highlighted fields.",
-      fieldErrors: fieldErrorsFromZod(parsed.error),
-    };
+    return fail(
+      "VALIDATION_FAILED",
+      "Please fix the highlighted fields.",
+      fieldErrorsFromZod(parsed.error),
+    );
   }
 
   const supabase = await createServerSupabaseClient();
@@ -312,7 +316,7 @@ export async function updatePasswordAction(
   });
 
   if (error) {
-    return { ok: false, message: error.message };
+    return fail("AUTH_GENERIC", error.message);
   }
 
   redirect("/login?reset=1");
@@ -328,11 +332,11 @@ export async function updateProfileAction(
   });
 
   if (!parsed.success) {
-    return {
-      ok: false,
-      message: "Please fix the highlighted fields.",
-      fieldErrors: fieldErrorsFromZod(parsed.error),
-    };
+    return fail(
+      "VALIDATION_FAILED",
+      "Please fix the highlighted fields.",
+      fieldErrorsFromZod(parsed.error),
+    );
   }
 
   const supabase = await createServerSupabaseClient();
@@ -341,7 +345,7 @@ export async function updateProfileAction(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { ok: false, message: "Sign in required." };
+    return fail("AUTH_SIGN_IN_REQUIRED", "Sign in required.");
   }
 
   const { error } = await supabase
@@ -359,11 +363,11 @@ export async function updateProfileAction(
     .eq("id", user.id);
 
   if (error) {
-    return { ok: false, message: mapAuthConflictMessage(error.message) };
+    return fail("AUTH_CONFLICT", mapAuthConflictMessage(error.message));
   }
 
   revalidatePath("/profile");
-  return { ok: true, message: "Profile updated." };
+  return ok("PROFILE_UPDATED", "Profile updated.");
 }
 
 export async function updateSettingsAction(
@@ -383,11 +387,11 @@ export async function updateSettingsAction(
   });
 
   if (!parsed.success) {
-    return {
-      ok: false,
-      message: "Please fix the highlighted fields.",
-      fieldErrors: fieldErrorsFromZod(parsed.error),
-    };
+    return fail(
+      "VALIDATION_FAILED",
+      "Please fix the highlighted fields.",
+      fieldErrorsFromZod(parsed.error),
+    );
   }
 
   const supabase = await createServerSupabaseClient();
@@ -396,7 +400,7 @@ export async function updateSettingsAction(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { ok: false, message: "Sign in required." };
+    return fail("AUTH_SIGN_IN_REQUIRED", "Sign in required.");
   }
 
   const { error } = await supabase.from("player_settings").upsert({
@@ -413,11 +417,11 @@ export async function updateSettingsAction(
   });
 
   if (error) {
-    return { ok: false, message: error.message };
+    return fail("AUTH_GENERIC", error.message);
   }
 
   revalidatePath("/profile");
-  return { ok: true, message: "Settings saved." };
+  return ok("SETTINGS_SAVED", "Settings saved.");
 }
 
 export async function uploadAvatarAction(
@@ -426,7 +430,7 @@ export async function uploadAvatarAction(
 ): Promise<ActionResult> {
   const file = formData.get("avatar");
   if (!(file instanceof File)) {
-    return { ok: false, message: "Choose an image file." };
+    return fail("VALIDATION_FAILED", "Choose an image file.");
   }
 
   const bytes = await file.arrayBuffer();
@@ -437,7 +441,7 @@ export async function uploadAvatarAction(
     maxBytes: UPLOAD_MAX_BYTES.avatar,
   });
   if (!validation.ok) {
-    return { ok: false, message: validation.message };
+    return fail("VALIDATION_FAILED", validation.message);
   }
 
   const supabase = await createServerSupabaseClient();
@@ -446,7 +450,7 @@ export async function uploadAvatarAction(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { ok: false, message: "Sign in required." };
+    return fail("AUTH_SIGN_IN_REQUIRED", "Sign in required.");
   }
 
   const extension =
@@ -462,7 +466,7 @@ export async function uploadAvatarAction(
     .upload(path, bytes, { upsert: true, contentType: validation.mime });
 
   if (uploadError) {
-    return { ok: false, message: uploadError.message };
+    return fail("AUTH_GENERIC", uploadError.message);
   }
 
   const {
@@ -479,11 +483,11 @@ export async function uploadAvatarAction(
     .eq("id", user.id);
 
   if (error) {
-    return { ok: false, message: error.message };
+    return fail("AUTH_GENERIC", error.message);
   }
 
   revalidatePath("/profile");
-  return { ok: true, message: "Avatar uploaded." };
+  return ok("PROFILE_UPDATED", "Avatar uploaded.");
 }
 
 export async function requestDeletionAction(
@@ -496,11 +500,11 @@ export async function requestDeletionAction(
   });
 
   if (!parsed.success) {
-    return {
-      ok: false,
-      message: "Confirm deletion to continue.",
-      fieldErrors: fieldErrorsFromZod(parsed.error),
-    };
+    return fail(
+      "VALIDATION_FAILED",
+      "Confirm deletion to continue.",
+      fieldErrorsFromZod(parsed.error),
+    );
   }
 
   const supabase = await createServerSupabaseClient();
@@ -509,7 +513,7 @@ export async function requestDeletionAction(
   });
 
   if (error) {
-    return { ok: false, message: error.message };
+    return fail("AUTH_GENERIC", error.message);
   }
 
   await supabase.auth.signOut();

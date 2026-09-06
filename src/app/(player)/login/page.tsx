@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { DEFAULT_LOCALE, translate } from "@/modules/localization";
 import { LoginForm } from "@/modules/player/auth-forms";
 import { loginAction } from "@/modules/player/actions";
 
@@ -9,6 +10,7 @@ export default async function LoginPage({
   searchParams: Promise<{ reset?: string }>;
 }) {
   const params = await searchParams;
+  const locale = DEFAULT_LOCALE;
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-6 px-6 py-12">
@@ -19,15 +21,15 @@ export default async function LoginPage({
           </Link>
         </p>
         <h1 className="text-3xl font-semibold text-[var(--brand-accent)]">
-          Sign in
+          {translate(locale, "auth.signIn")}
         </h1>
         {params.reset ? (
           <p className="text-sm text-[var(--brand-accent)]">
-            Password updated. You can sign in now.
+            {translate(locale, "auth.passwordUpdated")}
           </p>
         ) : (
           <p className="text-sm text-[var(--brand-muted)]">
-            Use your verified email or phone.
+            {translate(locale, "auth.useVerifiedContact")}
           </p>
         )}
       </div>
@@ -37,15 +39,15 @@ export default async function LoginPage({
           href="/forgot-password"
           className="text-[var(--brand-accent)] underline-offset-4 hover:underline"
         >
-          Forgot password?
+          {translate(locale, "auth.forgotPassword")}
         </Link>
         <p>
-          New here?{" "}
+          {translate(locale, "auth.newHere")}{" "}
           <Link
             href="/register"
             className="text-[var(--brand-accent)] underline-offset-4 hover:underline"
           >
-            Create an account
+            {translate(locale, "auth.createAnAccount")}
           </Link>
         </p>
       </div>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { DEFAULT_LOCALE, translate } from "@/modules/localization";
 import { VerifyForm } from "@/modules/player/auth-forms";
 import { verifyOtpAction } from "@/modules/player/actions";
 
@@ -10,6 +11,11 @@ export default async function VerifyPage({
 }) {
   const params = await searchParams;
   const contactType = params.channel === "phone" ? "phone" : "email";
+  const locale = DEFAULT_LOCALE;
+  const channelLabel = translate(
+    locale,
+    contactType === "phone" ? "auth.channelPhone" : "auth.channelEmail",
+  );
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-6 px-6 py-12">
@@ -20,12 +26,10 @@ export default async function VerifyPage({
           </Link>
         </p>
         <h1 className="text-3xl font-semibold text-[var(--brand-accent)]">
-          Verify contact
+          {translate(locale, "auth.verifyTitle")}
         </h1>
         <p className="text-sm text-[var(--brand-muted)]">
-          Enter the OTP sent to your {contactType}. At least one verified
-          contact is required before playing. Welcome credit is granted once
-          after verification.
+          {translate(locale, "auth.otpSentTo", { channel: channelLabel })}
         </p>
       </div>
       <VerifyForm
