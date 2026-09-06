@@ -40,6 +40,7 @@ export async function loadAdminSession(): Promise<{
 
 export async function requireAdminSession(
   permission?: string | null,
+  options?: { allowMfaEnrollment?: boolean },
 ): Promise<{ userId: string; session: AdminSessionState }> {
   const { userId, session } = await loadAdminSession();
 
@@ -51,6 +52,18 @@ export async function requireAdminSession(
   }
   if (permission && !hasPermission(session, permission)) {
     redirect("/admin/access-denied");
+  }
+
+  const needs2fa = Boolean(session.require_2fa || session.is_owner);
+  if (needs2fa && !options?.allowMfaEnrollment) {
+    const supabase = await createServerSupabaseClient();
+    const aal = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    const current = aal.data?.currentLevel ?? "aal1";
+    const enrolled = Boolean(session.totp_enrolled ?? session.totp_enabled);
+    const enabled = Boolean(session.totp_enabled);
+    if (!enrolled || !enabled || current !== "aal2") {
+      redirect("/admin/mfa");
+    }
   }
 
   return { userId, session };

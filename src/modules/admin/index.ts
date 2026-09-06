@@ -110,7 +110,11 @@ export type AdminSessionState = {
   display_name?: string;
   pin_set?: boolean;
   require_2fa?: boolean;
+  requires_pin?: boolean;
   totp_enabled?: boolean;
+  totp_enrolled?: boolean;
+  aal?: string;
+  mfa_ok?: boolean;
   permissions?: string[];
   large_adjustment_limit?: number;
   requires_second_approver_above?: number;

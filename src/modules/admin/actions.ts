@@ -8,13 +8,25 @@ import { pinSchemaValid, REPORT_TYPES, type ReportType } from "@/modules/admin";
 import type { ActionResult } from "@/modules/player/auth-shared";
 
 function asMessage(error: { message: string } | null): string {
-  return error?.message ?? "Unexpected error";
+  const raw = error?.message ?? "Unexpected error";
+  const lower = raw.toLowerCase();
+  if (lower.includes("pin")) return "Admin PIN verification failed.";
+  if (lower.includes("2fa") || lower.includes("mfa") || lower.includes("aal")) {
+    return "Admin MFA verification failed.";
+  }
+  if (lower.includes("permission") || lower.includes("access required")) {
+    return "You do not have permission for this action.";
+  }
+  if (lower.includes("otp") && lower.includes("aal2")) {
+    return "Use authenticator MFA for 2FA; do not submit OTP codes to admin actions.";
+  }
+  return "Request could not be completed.";
 }
 
 function sensitiveFields(formData: FormData) {
   const pin = String(formData.get("pin") ?? "").trim() || null;
-  const otp = String(formData.get("otp") ?? "").trim() || null;
-  return { pin, otp };
+  // OTP codes are verified only via Supabase Auth MFA (aal2), never as RPC args.
+  return { pin, otp: null as string | null };
 }
 
 function revalidateAdmin(...paths: string[]) {
@@ -76,6 +88,53 @@ export async function setAdmin2faAction(formData: FormData): Promise<ActionResul
   };
 }
 
+export async function startAdminMfaEnrollAction(): Promise<
+  ActionResult & { factorId?: string; qr?: string; secret?: string }
+> {
+  const supabase = await createServerSupabaseClient();
+  const enrolled = await supabase.auth.mfa.enroll({
+    factorType: "totp",
+    friendlyName: "GIKGOK Admin",
+  });
+  if (enrolled.error) return { ok: false, message: asMessage(enrolled.error) };
+  return {
+    ok: true,
+    message: "Scan the QR code with your authenticator app, then confirm with a code.",
+    factorId: enrolled.data.id,
+    qr: enrolled.data.totp.qr_code,
+    secret: enrolled.data.totp.secret,
+  };
+}
+
+export async function confirmAdminMfaEnrollAction(
+  formData: FormData,
+): Promise<ActionResult> {
+  const factorId = String(formData.get("factorId") ?? "").trim();
+  const code = String(formData.get("otp") ?? "").trim();
+  if (!factorId || !/^\d{6}$/.test(code) || code === "000000") {
+    return { ok: false, message: "Invalid enrollment code." };
+  }
+
+  const supabase = await createServerSupabaseClient();
+  const challenge = await supabase.auth.mfa.challenge({ factorId });
+  if (challenge.error) return { ok: false, message: asMessage(challenge.error) };
+
+  const verified = await supabase.auth.mfa.verify({
+    factorId,
+    challengeId: challenge.data.id,
+    code,
+  });
+  if (verified.error) return { ok: false, message: asMessage(verified.error) };
+
+  const { error } = await supabase.rpc("set_admin_2fa", {
+    p_enabled: true,
+    p_secret: null,
+  });
+  if (error) return { ok: false, message: asMessage(error) };
+  revalidateAdmin("/admin/settings", "/admin/mfa");
+  return { ok: true, message: "Authenticator enrolled. Admin 2FA is enabled." };
+}
+
 export async function verifyAdmin2faAction(formData: FormData): Promise<ActionResult> {
   const code = String(formData.get("otp") ?? "").trim();
   if (!/^\d{6}$/.test(code) || code === "000000") {
@@ -85,6 +144,7 @@ export async function verifyAdmin2faAction(formData: FormData): Promise<ActionRe
   const supabase = await createServerSupabaseClient();
 
   // Challenge + verify against Supabase Auth MFA so the JWT reaches aal2.
+  // Do not call verify_admin_2fa — that RPC no longer mints confirmation stamps.
   const factors = await supabase.auth.mfa.listFactors();
   if (factors.error) return { ok: false, message: asMessage(factors.error) };
   const totp = (factors.data?.totp ?? []).find((f) => f.status === "verified");
@@ -102,12 +162,8 @@ export async function verifyAdmin2faAction(formData: FormData): Promise<ActionRe
   });
   if (verified.error) return { ok: false, message: asMessage(verified.error) };
 
-  // Record a short-lived sensitive-action confirmation for this session.
-  const { data, error } = await supabase.rpc("verify_admin_2fa", { p_code: code });
-  if (error) return { ok: false, message: asMessage(error) };
-  return data
-    ? { ok: true, message: "2FA verified for 5 minutes." }
-    : { ok: false, message: "Invalid 2FA code." };
+  revalidateAdmin("/admin", "/admin/mfa", "/admin/settings");
+  return { ok: true, message: "Authenticator verified. Session upgraded to aal2." };
 }
 
 export async function createAdminAccountAction(formData: FormData): Promise<ActionResult> {
