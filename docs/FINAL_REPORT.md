@@ -66,17 +66,18 @@ Identify the tested implementation commit with `git rev-parse HEAD` on the branc
 | `git diff --check` | PASS |
 | Advisors (Management API) | NOT RUN this tip (403) — last documented Security WARN ~60 intentional DEFINER; INFO remain; Performance WARN ×0 |
 | DEFINER inventory | ~81 public DEFINER; ~63 authenticated EXECUTE; anon EXECUTE 0; COMMENT coverage complete on public DEFINER (missing_comment 0) |
-| GitHub Actions tip | **PASS** (Static + DB) — [https://github.com/IT-FoU/GikGok/actions/runs/34032807704](https://github.com/IT-FoU/GikGok/actions/runs/34032807704) on tip `4f97eb7` (admin placeholder i18n). Prior: [34032267921](https://github.com/IT-FoU/GikGok/actions/runs/34032267921) on `59409e3`; [34032016542](https://github.com/IT-FoU/GikGok/actions/runs/34032016542) on `75ec7b3`. |
+| GitHub Actions tip | **PASS** (Static + DB) — [https://github.com/IT-FoU/GikGok/actions/runs/34033116845](https://github.com/IT-FoU/GikGok/actions/runs/34033116845) on tip `6c76d69` (DEFINER COMMENT coverage). Prior: [34032807704](https://github.com/IT-FoU/GikGok/actions/runs/34032807704) on `4f97eb7`. |
 | Playwright public | PASS (10/10 smoke) |
 | Playwright authenticated | SKIPPED — no credentials |
 | Physical QA | SKIPPED — no devices |
 
 ### Tip Actions
-- Latest green PR Actions (admin placeholder i18n): [https://github.com/IT-FoU/GikGok/actions/runs/34032807704](https://github.com/IT-FoU/GikGok/actions/runs/34032807704)
+- Latest green PR Actions (DEFINER COMMENT coverage): [https://github.com/IT-FoU/GikGok/actions/runs/34033116845](https://github.com/IT-FoU/GikGok/actions/runs/34033116845)
 - Conclusion: **success** — Static job PASS + DB · RLS/RPC security suite PASS
-- Head SHA at that run: `4f97eb79e37e0b11d3e81407fe5f13da51c283e9`
-- Prior greens: [34032267921](https://github.com/IT-FoU/GikGok/actions/runs/34032267921) (`59409e3`), [34032016542](https://github.com/IT-FoU/GikGok/actions/runs/34032016542) (`75ec7b3`), [34031542121](https://github.com/IT-FoU/GikGok/actions/runs/34031542121) (`bd220c9`)
+- Head SHA at that run: `6c76d690decccc84eefb2a7d10d9ce9fb8c18657`
+- Prior green (admin placeholders): [34032807704](https://github.com/IT-FoU/GikGok/actions/runs/34032807704) on `4f97eb7`
 - Later tip commits may supersede; re-check Actions on the current tip after push.
+
 
 
 ## Honesty rules applied

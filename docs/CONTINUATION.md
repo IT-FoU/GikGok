@@ -56,16 +56,17 @@
 7. Optional follow-up: style CSP nonce (`style-src` still `unsafe-inline`); Advisor Management API recount when unblocked
 
 ## Tip Actions
-- Latest tip green: [https://github.com/IT-FoU/GikGok/actions/runs/34032807704](https://github.com/IT-FoU/GikGok/actions/runs/34032807704) — Static PASS + DB PASS on `4f97eb7` (admin placeholder i18n)
-- Prior green: [https://github.com/IT-FoU/GikGok/actions/runs/34032267921](https://github.com/IT-FoU/GikGok/actions/runs/34032267921) on `59409e3`; [34032016542](https://github.com/IT-FoU/GikGok/actions/runs/34032016542) on `75ec7b3`; [34031542121](https://github.com/IT-FoU/GikGok/actions/runs/34031542121) on `bd220c9`
+- Latest tip green: [https://github.com/IT-FoU/GikGok/actions/runs/34033116845](https://github.com/IT-FoU/GikGok/actions/runs/34033116845) — Static PASS + DB PASS on `6c76d69` (DEFINER COMMENT coverage)
+- Prior green: [34032807704](https://github.com/IT-FoU/GikGok/actions/runs/34032807704) on `4f97eb7` (admin placeholders); [34032267921](https://github.com/IT-FoU/GikGok/actions/runs/34032267921) on `59409e3`; [34032016542](https://github.com/IT-FoU/GikGok/actions/runs/34032016542) on `75ec7b3`
 - Prior green (Owner-corrected secret): [https://github.com/IT-FoU/GikGok/actions/runs/34026129961](https://github.com/IT-FoU/GikGok/actions/runs/34026129961) on `2474719`
+
 
 
 ## Validation snapshot
 - `npm run lint` / `typecheck` / `test` / `build` / `security:check` / `npm audit --omit=dev` — run at tip
 - `npm run db:test` against staging — run at tip
 - Static CI green ≠ live DB security PASS
-- DEFINER inventory (staging): ~81 public SECURITY DEFINER; ~63 EXECUTE for `authenticated`; `anon` EXECUTE = 0
+- DEFINER inventory (staging): ~81 public SECURITY DEFINER; ~63 EXECUTE for `authenticated`; `anon` EXECUTE = 0; COMMENT missing = 0
 - Security Advisor WARN: treat ~60 intentional authenticated DEFINER RPCs as WARN (last documented); INFO remains (RLS-enabled tables without policies, etc.)
 - Performance Advisor WARN ×0 last documented; INFO remain
 
