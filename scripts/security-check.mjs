@@ -78,20 +78,52 @@ const DB_URL =
 
 let dbChecksRan = false;
 
+function describeDbTarget(connectionString) {
+  try {
+    const u = new URL(connectionString);
+    const user = u.username ?? "";
+    const projectFromUser = user.includes(".")
+      ? user.slice(user.lastIndexOf(".") + 1)
+      : null;
+    return {
+      host: u.hostname,
+      port: u.port || "5432",
+      database: (u.pathname || "/").replace(/^\//, "") || "postgres",
+      projectRef: projectFromUser,
+    };
+  } catch {
+    return { host: null, port: null, database: null, projectRef: null };
+  }
+}
+
 async function dbChecks() {
-  const client = new pg.Client({ connectionString: DB_URL, connectionTimeoutMillis: 3000 });
+  const target = describeDbTarget(DB_URL);
+  notes.push(
+    `DB target host=${target.host ?? "?"} port=${target.port ?? "?"} db=${target.database ?? "?"} projectRef=${target.projectRef ?? "?"}`,
+  );
+  // Remote staging (GitHub runners → Supabase pooler) often needs >3s.
+  const client = new pg.Client({
+    connectionString: DB_URL,
+    connectionTimeoutMillis: 20_000,
+  });
   try {
     await client.connect();
-  } catch {
+  } catch (err) {
+    const detail = err instanceof Error ? err.message : String(err);
     notes.push(
-      "Database unreachable — DB security checks SKIPPED (not a release PASS).",
+      `Database unreachable — DB security checks SKIPPED (not a release PASS). detail=${detail}`,
     );
     if (process.env.SECURITY_CHECK_ALLOW_SKIP_DB === "1") {
       notes.push("SECURITY_CHECK_ALLOW_SKIP_DB=1 — skip tolerated for local/dev.");
       return;
     }
+    const urlPresent = Boolean(
+      process.env.SUPABASE_DB_URL || process.env.DATABASE_URL,
+    );
     failures.push(
-      "DB security checks did not run. Set SUPABASE_DB_URL/DATABASE_URL, or SECURITY_CHECK_ALLOW_SKIP_DB=1 for local-only runs.",
+      urlPresent
+        ? `DB security checks did not run: connection failed (${detail}). Verify SUPABASE_DB_URL points at staging and is reachable from GitHub Actions.`
+        : "DB security checks did not run. Set SUPABASE_DB_URL/DATABASE_URL, or SECURITY_CHECK_ALLOW_SKIP_DB=1 for local-only runs.",
     );
     return;
   }

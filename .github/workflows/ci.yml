@@ -88,6 +88,22 @@ jobs:
             exit 1
           fi
           echo "SUPABASE_DB_URL is configured for trusted same-repo context."
+          # Non-secret target hint only (never print the full URL / password).
+          node -e '
+            const raw = process.env.SUPABASE_DB_URL || process.env.DATABASE_URL || "";
+            try {
+              const u = new URL(raw);
+              const user = u.username || "";
+              const projectRef = user.includes(".") ? user.slice(user.lastIndexOf(".") + 1) : "(unknown)";
+              console.log("DB target host=" + u.hostname + " projectRef=" + projectRef);
+              if (projectRef !== "jlpcfatcpymjnjbxmclo") {
+                console.warn("WARNING: projectRef is not the allowed staging project jlpcfatcpymjnjbxmclo");
+              }
+            } catch {
+              console.error("SUPABASE_DB_URL is set but is not a parseable URL");
+              process.exit(1);
+            }
+          '
 
       - name: Checkout
         uses: actions/checkout@v4
