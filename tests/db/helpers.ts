@@ -24,6 +24,9 @@ export const ADMIN_CREDIT = "00000000-0000-0000-0000-0000000000c3";
 /** Second credits.adjust admin for dual-approval / concurrency tests. */
 export const ADMIN_CREDIT_B = "00000000-0000-0000-0000-0000000000c4";
 
+/** Fixed advisory-lock key for serializing fixture setup across processes. */
+const ENSURE_FIXTURES_LOCK_KEY = 881_402_017;
+
 let pool: Pool | undefined;
 
 export function getPool(): Pool {
@@ -130,11 +133,42 @@ export async function commitAsPostgres<T>(
   }
 }
 
+/** Force-restore credit-admin permissions (throws on failure; never swallows). */
+export async function restoreAdminCreditPermissions(
+  client: PoolClient,
+  adminId: string = ADMIN_CREDIT,
+): Promise<void> {
+  await client.query(
+    `insert into public.admin_users (id, is_owner, is_active, requires_2fa, requires_pin)
+     values ($1, false, true, false, false)
+     on conflict (id) do update
+     set is_active = true,
+         requires_2fa = excluded.requires_2fa,
+         requires_pin = excluded.requires_pin`,
+    [adminId],
+  );
+  await client.query(
+    `insert into public.admin_user_permissions (admin_id, permission, granted)
+     values
+       ($1,'credits.view',true),
+       ($1,'credits.adjust',true),
+       ($1,'players.view',true),
+       ($1,'tickets.manage',true)
+     on conflict (admin_id, permission) do update set granted = excluded.granted`,
+    [adminId],
+  );
+}
+
 /** Idempotently create fixture users, admin, verified contacts, and seed ledger. */
 export async function ensureFixtures(): Promise<void> {
   const client = await getPool().connect();
   try {
     await client.query("begin");
+    // Serialize fixture setup across concurrent CI/local processes on staging.
+    await client.query("select pg_advisory_xact_lock($1)", [
+      ENSURE_FIXTURES_LOCK_KEY,
+    ]);
+
     for (const [id, email, nickname] of [
       [PLAYER_A, "rls_player_a@example.test", "rls_player_a"],
       [PLAYER_B, "rls_player_b@example.test", "rls_player_b"],
@@ -161,30 +195,16 @@ export async function ensureFixtures(): Promise<void> {
     }
 
     for (const adminId of [ADMIN_CREDIT, ADMIN_CREDIT_B]) {
-      await client.query(
-        `insert into public.admin_users (id, is_owner, is_active, requires_2fa, requires_pin)
-         values ($1, false, true, false, false)
-         on conflict (id) do update set is_active = true`,
-        [adminId],
-      );
-
-      try {
-        await client.query(
-          `insert into public.admin_user_permissions (admin_id, permission, granted)
-           values
-             ($1,'credits.view',true),
-             ($1,'credits.adjust',true),
-             ($1,'players.view',true),
-             ($1,'tickets.manage',true)
-           on conflict (admin_id, permission) do update set granted = excluded.granted`,
-          [adminId],
-        );
-      } catch {
-        // optional on some schema revisions
-      }
+      await restoreAdminCreditPermissions(client, adminId);
     }
 
     for (const id of [PLAYER_A, PLAYER_B]) {
+      // Match mark_contact_verified lock order: profiles before player_contacts.
+      await client.query(
+        `select id from public.profiles where id = $1 for update`,
+        [id],
+      );
+
       const existing = await client.query(
         `select 1 from public.gik_ledger where player_id = $1 and entry_type = 'welcome_credit' limit 1`,
         [id],

@@ -29,6 +29,7 @@ Identify the tested implementation commit with `git rev-parse HEAD` on the branc
 |----|----------|-----|--------------|
 | CI-001 | High | Stopped invalid secrets-in-job-`if`; static always runs; DB only trusted+configured | Workflow + Actions |
 | CI-002 | High | Serialize DB Vitest workers; queue staging DB job across workflows (push+PR / branches) | `vitest.db.config.ts` + `ci.yml` concurrency |
+| CI-003 | High | Fixture pollution + deadlock hardenings for shared staging (`has_permission` restore; profiles-first locks; deadlock retry) | `tests/db/helpers.ts` + `security-rpc.test.ts` |
 | ORPHAN-001 | High | Revoke direct writes; session RPC with ownership/bounds/dedupe; admin claim/validate/resolve | `tests/db/storage-orphan.test.ts` |
 | ORPHAN-002 | High | Manual admin retry only; orphan row never authorizes delete | Admin action + DB RPCs |
 | ATTACH-001 | Medium | Collision-resistant filenames; honest failure messaging | Engagement actions |
@@ -59,7 +60,7 @@ Identify the tested implementation commit with `git rev-parse HEAD` on the branc
 | `npm test` | PASS (95) |
 | `npm run build` | PASS |
 | `npm run security:check` | PASS (static + staging DB) |
-| `npm run db:test` | PASS when serialized (`fileParallelism: false`); prior parallel-file races fixed |
+| `npm run db:test` | PASS when serialized + fixture hardenings (`fileParallelism: false`; advisory lock; perm restore; deadlock retry) |
 | `npm audit --omit=dev` | 0 vulnerabilities |
 | `git diff --check` | PASS |
 | Advisors (Management API) | NOT RUN this tip (403) — last documented Security WARN ~60 intentional DEFINER; INFO remain; Performance WARN ×0 |

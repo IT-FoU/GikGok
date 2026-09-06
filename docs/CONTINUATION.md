@@ -40,9 +40,10 @@
 - Proxy nonce CSP for scripts; static CSP removed from `next.config.ts`
 - Serialize Vitest DB workers (`fileParallelism: false`, `maxWorkers: 1`) to stop shared-fixture races
 - CI concurrency: group by branch name (push+PR); DB job queues on `gikgok-staging-db-rls-suite` so parallel workflows cannot race staging fixtures
+- Harden shared staging fixtures: advisory lock + aggressive admin perm restore; profiles-first lock order; deadlock retry on `mark_contact_verified`; restore perms before `has_permission` self-assert
 
 ## Next actions
-1. Confirm tip Actions green after concurrency serialization (Static + DB)
+1. Confirm tip Actions green after fixture/deadlock hardenings (Static + DB)
 2. Recount Advisors via dashboard when Management API allows (do not claim “fully clean”)
 3. Owner: staging auth credentials → Playwright critical journeys
 4. Owner: physical iOS/Android/tablet Light/Dark Lao/English QA

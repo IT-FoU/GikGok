@@ -9,10 +9,17 @@ import {
   asPlayer,
   asPostgres,
   closePool,
+  commitAsPostgres,
   ensureFixtures,
   getPool,
   isDbReachable,
+  restoreAdminCreditPermissions,
 } from "./helpers";
+
+function isDeadlockError(err: unknown): boolean {
+  const msg = String(err instanceof Error ? err.message : err);
+  return /deadlock detected/i.test(msg);
+}
 
 const dbUp = await isDbReachable();
 
@@ -101,6 +108,12 @@ describe.runIf(dbUp)("SECURITY DEFINER RPC hardening", () => {
       return r.rows[0].ok;
     });
     expect(spoofed).toBe(false);
+
+    // Re-ensure immediately before the self=true assert: concurrent suites
+    // (permission-matrix) may COMMIT-delete ADMIN_CREDIT perms between tests.
+    await commitAsPostgres(async (c) => {
+      await restoreAdminCreditPermissions(c, ADMIN_CREDIT);
+    });
 
     const self = await asPlayer(ADMIN_CREDIT, async (c) => {
       const r = await c.query(`select public.has_permission('credits.view') as ok`);
@@ -386,7 +399,8 @@ describe.runIf(dbUp)("SECURITY DEFINER RPC hardening", () => {
   });
 
   it("P0: admin_prepare_sensitive rejects p_otp and requires PIN when configured", async () => {
-    await asPostgres(async (c) => {
+    // Must COMMIT: subsequent asPlayer calls use separate connections.
+    await commitAsPostgres(async (c) => {
       await c.query(
         `insert into public.admin_users (id, is_owner, is_active, requires_2fa, requires_pin)
          values ($1, false, true, false, true)
@@ -407,31 +421,37 @@ describe.runIf(dbUp)("SECURITY DEFINER RPC hardening", () => {
       );
     });
 
-    await expect(
-      asPlayer(ADMIN_CREDIT, async (c) => {
+    try {
+      await expect(
+        asPlayer(ADMIN_CREDIT, async (c) => {
+          await c.query(
+            `select public.admin_prepare_sensitive(null, '424242')`,
+          );
+        }),
+      ).rejects.toThrow(/otp|aal2|mfa|do not pass/i);
+
+      await expect(
+        asPlayer(ADMIN_CREDIT, async (c) => {
+          await c.query(`select public.admin_prepare_sensitive(null, null)`);
+        }),
+      ).rejects.toThrow(/pin/i);
+
+      // Expired PIN confirmation seed (best-effort leftover for follow-up paths).
+      await commitAsPostgres(async (c) => {
         await c.query(
-          `select public.admin_prepare_sensitive(null, '424242')`,
+          `insert into public.admin_sensitive_challenges
+             (admin_id, session_id, pin_verified_at, updated_at)
+           values ($1, 'test-session', now() - interval '20 minutes', now())
+           on conflict (admin_id, session_id) do update
+           set pin_verified_at = excluded.pin_verified_at`,
+          [ADMIN_CREDIT],
         );
-      }),
-    ).rejects.toThrow(/otp|aal2|mfa|do not pass/i);
-
-    await expect(
-      asPlayer(ADMIN_CREDIT, async (c) => {
-        await c.query(`select public.admin_prepare_sensitive(null, null)`);
-      }),
-    ).rejects.toThrow(/pin/i);
-
-    // Expired PIN confirmation must fail.
-    await asPostgres(async (c) => {
-      await c.query(
-        `insert into public.admin_sensitive_challenges
-           (admin_id, session_id, pin_verified_at, updated_at)
-         values ($1, 'test-session', now() - interval '20 minutes', now())
-         on conflict (admin_id, session_id) do update
-         set pin_verified_at = excluded.pin_verified_at`,
-        [ADMIN_CREDIT],
-      );
-    });
+      });
+    } finally {
+      await commitAsPostgres(async (c) => {
+        await restoreAdminCreditPermissions(c, ADMIN_CREDIT);
+      });
+    }
   });
 
   it("P0: disabled admin cannot call assert_admin_sensitive", async () => {
@@ -540,60 +560,90 @@ describe.runIf(dbUp)("SECURITY DEFINER RPC hardening", () => {
   });
 
   it("P0: mark_contact_verified requires Auth confirmation evidence", async () => {
-    await asPostgres(async (c) => {
-      await c.query(
-        `update auth.users
-            set email = 'rls_player_a@example.test',
-                email_confirmed_at = null,
-                phone = null,
-                phone_confirmed_at = null
-          where id = $1`,
-        [PLAYER_A],
-      );
-      await c.query(
-        `insert into public.player_contacts
-           (player_id, contact_type, value, is_primary, is_verified)
-         values ($1, 'email', 'rls_player_a@example.test', true, false)
-         on conflict do nothing`,
-        [PLAYER_A],
-      );
-      await c.query(
-        `update public.player_contacts
-            set value = 'rls_player_a@example.test',
-                is_verified = false,
-                verified_at = null
-          where player_id = $1 and contact_type = 'email' and is_primary`,
-        [PLAYER_A],
-      );
+    // Profiles-first lock order matches mark_contact_verified / ensureFixtures.
+    // Retry transient deadlocks from concurrent staging CI (security behavior OK).
+    const maxAttempts = 3;
+    let lastErr: unknown;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        await asPostgres(async (c) => {
+          await c.query(
+            `update auth.users
+                set email = 'rls_player_a@example.test',
+                    email_confirmed_at = null,
+                    phone = null,
+                    phone_confirmed_at = null
+              where id = $1`,
+            [PLAYER_A],
+          );
+          // Lock profiles before contacts (same order as mark_contact_verified).
+          await c.query(
+            `select id from public.profiles where id = $1 for update`,
+            [PLAYER_A],
+          );
+          await c.query(
+            `insert into public.player_contacts
+               (player_id, contact_type, value, is_primary, is_verified)
+             values ($1, 'email', 'rls_player_a@example.test', true, false)
+             on conflict do nothing`,
+            [PLAYER_A],
+          );
+          await c.query(
+            `update public.player_contacts
+                set value = 'rls_player_a@example.test',
+                    is_verified = false,
+                    verified_at = null
+              where player_id = $1 and contact_type = 'email' and is_primary`,
+            [PLAYER_A],
+          );
 
-      await c.query("select set_config('request.jwt.claims', $1, true)", [
-        JSON.stringify({ sub: PLAYER_A, role: "authenticated", aal: "aal1" }),
-      ]);
-      await c.query("set local role authenticated");
-      await c.query("savepoint sp_unconfirmed");
-      await expect(
-        c.query(`select public.mark_contact_verified('email')`),
-      ).rejects.toThrow(/not confirmed/i);
-      await c.query("rollback to savepoint sp_unconfirmed");
+          await c.query("select set_config('request.jwt.claims', $1, true)", [
+            JSON.stringify({
+              sub: PLAYER_A,
+              role: "authenticated",
+              aal: "aal1",
+            }),
+          ]);
+          await c.query("set local role authenticated");
+          await c.query("savepoint sp_unconfirmed");
+          await expect(
+            c.query(`select public.mark_contact_verified('email')`),
+          ).rejects.toThrow(/not confirmed/i);
+          await c.query("rollback to savepoint sp_unconfirmed");
 
-      await c.query("set local role postgres");
-      await c.query(
-        `update auth.users set email_confirmed_at = now() where id = $1`,
-        [PLAYER_A],
-      );
-      await c.query("select set_config('request.jwt.claims', $1, true)", [
-        JSON.stringify({ sub: PLAYER_A, role: "authenticated", aal: "aal1" }),
-      ]);
-      await c.query("set local role authenticated");
-      const ok = await c.query(`select public.mark_contact_verified('email') as r`);
-      expect(ok.rowCount).toBe(1);
+          await c.query("set local role postgres");
+          await c.query(
+            `update auth.users set email_confirmed_at = now() where id = $1`,
+            [PLAYER_A],
+          );
+          await c.query("select set_config('request.jwt.claims', $1, true)", [
+            JSON.stringify({
+              sub: PLAYER_A,
+              role: "authenticated",
+              aal: "aal1",
+            }),
+          ]);
+          await c.query("set local role authenticated");
+          const ok = await c.query(
+            `select public.mark_contact_verified('email') as r`,
+          );
+          expect(ok.rowCount).toBe(1);
 
-      await c.query("savepoint sp_phone");
-      await expect(
-        c.query(`select public.mark_contact_verified('phone')`),
-      ).rejects.toThrow(/no phone|not confirmed|channel must be/i);
-      await c.query("rollback to savepoint sp_phone");
-    });
+          await c.query("savepoint sp_phone");
+          await expect(
+            c.query(`select public.mark_contact_verified('phone')`),
+          ).rejects.toThrow(/no phone|not confirmed|channel must be/i);
+          await c.query("rollback to savepoint sp_phone");
+        });
+        return;
+      } catch (err) {
+        lastErr = err;
+        if (!isDeadlockError(err) || attempt === maxAttempts) throw err;
+        const backoffMs = 40 * attempt;
+        await new Promise((r) => setTimeout(r, backoffMs));
+      }
+    }
+    throw lastErr;
   });
 
 
