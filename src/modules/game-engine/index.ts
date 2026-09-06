@@ -1,16 +1,8 @@
-/**
- * Game engine: definitions, bet validation, idempotency, settlement contracts.
- * Browser renderers reveal server-authoritative results only — never compute outcomes.
- */
-export type GameId = "fish-prawn-crab" | "high-low" | "spinning-plate";
+export * from "./types";
+export * from "./definitions";
+export * from "./validation";
+export * from "./settlement";
+export * from "./rate-limit";
 
-export type SettlementMode = "random" | "controlled_demo";
-
-export interface GameDefinition {
-  id: GameId;
-  version: string;
-  displayNameKey: string;
-  enabled: boolean;
-}
-
-export const GAME_ENGINE_MODULE = "game-engine" as const;
+// Server actions live in ./actions (do not re-export from the barrel —
+// keeps domain imports free of "use server" boundaries).

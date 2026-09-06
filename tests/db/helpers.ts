@@ -1,23 +1,43 @@
 import { Pool, type PoolClient } from "pg";
 
 /**
- * Local Supabase Postgres connection for RLS/database tests.
- * Uses the standard local dev connection string unless overridden.
+ * Postgres connection for RLS/database tests.
+ * Prefers SUPABASE_DB_URL / DATABASE_URL; otherwise builds a staging pooler
+ * URL when SUPABASE_DB_PASSWORD is present; else local Supabase.
  */
-export const LOCAL_DB_URL =
-  process.env.SUPABASE_DB_URL ??
-  process.env.DATABASE_URL ??
-  "postgresql://postgres:postgres@127.0.0.1:54322/postgres";
+function resolveDbUrl(): string {
+  if (process.env.SUPABASE_DB_URL) return process.env.SUPABASE_DB_URL;
+  if (process.env.DATABASE_URL) return process.env.DATABASE_URL;
+  if (process.env.SUPABASE_DB_PASSWORD) {
+    const ref = process.env.SUPABASE_PROJECT_REF ?? "jlpcfatcpymjnjbxmclo";
+    const pw = encodeURIComponent(process.env.SUPABASE_DB_PASSWORD);
+    return `postgresql://postgres.${ref}:${pw}@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres`;
+  }
+  return "postgresql://postgres:postgres@127.0.0.1:54322/postgres";
+}
+
+export const LOCAL_DB_URL = resolveDbUrl();
 
 export const PLAYER_A = "00000000-0000-0000-0000-0000000000a1";
 export const PLAYER_B = "00000000-0000-0000-0000-0000000000b2";
 export const ADMIN_CREDIT = "00000000-0000-0000-0000-0000000000c3";
+/** Second credits.adjust admin for dual-approval / concurrency tests. */
+export const ADMIN_CREDIT_B = "00000000-0000-0000-0000-0000000000c4";
+
+/** Fixed advisory-lock key for serializing fixture setup across processes. */
+const ENSURE_FIXTURES_LOCK_KEY = 881_402_017;
 
 let pool: Pool | undefined;
 
 export function getPool(): Pool {
   if (!pool) {
-    pool = new Pool({ connectionString: LOCAL_DB_URL, max: 4 });
+    pool = new Pool({
+      connectionString: LOCAL_DB_URL,
+      max: 8,
+      ssl: LOCAL_DB_URL.includes("supabase.com")
+        ? { rejectUnauthorized: false }
+        : undefined,
+    });
   }
   return pool;
 }
@@ -29,7 +49,7 @@ export async function closePool(): Promise<void> {
   }
 }
 
-/** True when the local database is reachable. */
+/** True when the database is reachable. */
 export async function isDbReachable(): Promise<boolean> {
   try {
     const client = await getPool().connect();
@@ -42,19 +62,19 @@ export async function isDbReachable(): Promise<boolean> {
 }
 
 /**
- * Run `fn` inside a transaction impersonating the `authenticated` role with the
- * given JWT subject, then ROLLBACK. This is how Supabase evaluates RLS:
- * `auth.uid()` reads `request.jwt.claims.sub`.
+ * Run `fn` inside a transaction impersonating `authenticated` with the given
+ * JWT subject, then ROLLBACK.
  */
 export async function asPlayer<T>(
   sub: string,
   fn: (client: PoolClient) => Promise<T>,
+  claims: Record<string, unknown> = {},
 ): Promise<T> {
   const client = await getPool().connect();
   try {
     await client.query("begin");
     await client.query("select set_config('request.jwt.claims', $1, true)", [
-      JSON.stringify({ sub, role: "authenticated" }),
+      JSON.stringify({ sub, role: "authenticated", aal: "aal1", ...claims }),
     ]);
     await client.query("set local role authenticated");
     return await fn(client);
@@ -64,7 +84,7 @@ export async function asPlayer<T>(
   }
 }
 
-/** Run `fn` as the privileged `postgres` role (bypasses RLS), then ROLLBACK. */
+/** Run `fn` as privileged postgres (bypasses RLS), then ROLLBACK. */
 export async function asPostgres<T>(
   fn: (client: PoolClient) => Promise<T>,
 ): Promise<T> {
@@ -78,15 +98,82 @@ export async function asPostgres<T>(
   }
 }
 
-/** Idempotently create the fixture users, an admin, and some ledger/notifications. */
+/**
+ * Open a dedicated authenticated connection (caller owns begin/commit/rollback).
+ * Used for true multi-connection concurrency tests.
+ */
+export async function openAuthenticatedClient(
+  sub: string,
+  claims: Record<string, unknown> = {},
+): Promise<PoolClient> {
+  const client = await getPool().connect();
+  await client.query("begin");
+  await client.query("select set_config('request.jwt.claims', $1, true)", [
+    JSON.stringify({ sub, role: "authenticated", aal: "aal1", ...claims }),
+  ]);
+  await client.query("set local role authenticated");
+  return client;
+}
+
+/** Privileged setup that COMMITs (for concurrency fixtures that must be visible). */
+export async function commitAsPostgres<T>(
+  fn: (client: PoolClient) => Promise<T>,
+): Promise<T> {
+  const client = await getPool().connect();
+  try {
+    await client.query("begin");
+    const result = await fn(client);
+    await client.query("commit");
+    return result;
+  } catch (error) {
+    await client.query("rollback").catch(() => undefined);
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
+/** Force-restore credit-admin permissions (throws on failure; never swallows). */
+export async function restoreAdminCreditPermissions(
+  client: PoolClient,
+  adminId: string = ADMIN_CREDIT,
+): Promise<void> {
+  await client.query(
+    `insert into public.admin_users (id, is_owner, is_active, requires_2fa, requires_pin)
+     values ($1, false, true, false, false)
+     on conflict (id) do update
+     set is_active = true,
+         requires_2fa = excluded.requires_2fa,
+         requires_pin = excluded.requires_pin`,
+    [adminId],
+  );
+  await client.query(
+    `insert into public.admin_user_permissions (admin_id, permission, granted)
+     values
+       ($1,'credits.view',true),
+       ($1,'credits.adjust',true),
+       ($1,'players.view',true),
+       ($1,'tickets.manage',true)
+     on conflict (admin_id, permission) do update set granted = excluded.granted`,
+    [adminId],
+  );
+}
+
+/** Idempotently create fixture users, admin, verified contacts, and seed ledger. */
 export async function ensureFixtures(): Promise<void> {
   const client = await getPool().connect();
   try {
     await client.query("begin");
+    // Serialize fixture setup across concurrent CI/local processes on staging.
+    await client.query("select pg_advisory_xact_lock($1)", [
+      ENSURE_FIXTURES_LOCK_KEY,
+    ]);
+
     for (const [id, email, nickname] of [
       [PLAYER_A, "rls_player_a@example.test", "rls_player_a"],
       [PLAYER_B, "rls_player_b@example.test", "rls_player_b"],
       [ADMIN_CREDIT, "rls_admin_credit@example.test", "rls_admin_credit"],
+      [ADMIN_CREDIT_B, "rls_admin_credit_b@example.test", "rls_admin_credit_b"],
     ] as const) {
       await client.query(
         `insert into auth.users (id, aud, role, email, encrypted_password,
@@ -96,36 +183,66 @@ export async function ensureFixtures(): Promise<void> {
          on conflict (id) do nothing`,
         [id, email, nickname],
       );
+
+      await client.query(
+        `insert into public.profiles (id, nickname, status)
+         values ($1, $2, 'active'::public.player_status)
+         on conflict (id) do update
+         set nickname = excluded.nickname,
+             status = 'active'::public.player_status`,
+        [id, nickname],
+      );
     }
 
-    // Promote the admin and grant a couple of granular permissions (no owner).
-    await client.query(
-      `insert into public.admin_users (id, is_owner, is_active)
-       values ($1, false, true)
-       on conflict (id) do update set is_active = true`,
-      [ADMIN_CREDIT],
-    );
-    await client.query(
-      `insert into public.admin_user_permissions (admin_id, permission, granted)
-       values ($1,'credits.view',true), ($1,'players.view',true)
-       on conflict (admin_id, permission) do update set granted = excluded.granted`,
-      [ADMIN_CREDIT],
-    );
+    for (const adminId of [ADMIN_CREDIT, ADMIN_CREDIT_B]) {
+      await restoreAdminCreditPermissions(client, adminId);
+    }
 
-    // Give each player a welcome-credit ledger entry (balance via trigger).
     for (const id of [PLAYER_A, PLAYER_B]) {
-      const existing = await client.query(
-        `select 1 from public.gik_ledger where player_id = $1 and entry_type = 'welcome_credit'`,
+      // Match mark_contact_verified lock order: profiles before player_contacts.
+      await client.query(
+        `select id from public.profiles where id = $1 for update`,
         [id],
       );
-      if (existing.rowCount === 0) {
+
+      const existing = await client.query(
+        `select 1 from public.gik_ledger where player_id = $1 and entry_type = 'welcome_credit' limit 1`,
+        [id],
+      );
+      if ((existing.rowCount ?? 0) === 0) {
         await client.query(
-          `insert into public.gik_ledger
-             (player_id, entry_type, amount, balance_after, source, reason)
-           values ($1,'welcome_credit',50000,0,'seed','fixture')`,
+          `select public.append_ledger_entry(
+             $1,
+             'welcome_credit'::public.ledger_entry_type,
+             50000,
+             'seed',
+             null,
+             $1,
+             'fixture welcome credit',
+             '{}'::jsonb
+           )`,
           [id],
         );
       }
+
+      const email =
+        id === PLAYER_A ? "rls_player_a@example.test" : "rls_player_b@example.test";
+      await client.query(
+        `insert into public.player_contacts
+           (player_id, contact_type, value, is_primary, is_verified, verified_at)
+         select $1, 'email'::public.contact_type, $2, true, true, now()
+         where not exists (
+           select 1 from public.player_contacts where player_id = $1 and is_primary
+         )`,
+        [id, email],
+      );
+      await client.query(
+        `update public.player_contacts
+         set is_verified = true, verified_at = coalesce(verified_at, now()), value = $2
+         where player_id = $1 and is_primary`,
+        [id, email],
+      );
+
       await client.query(
         `insert into public.notifications (player_id, type, title, body)
          select $1,'system','fixture','hello'

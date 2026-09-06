@@ -282,16 +282,19 @@ export type Database = {
       announcement_reads: {
         Row: {
           announcement_id: string
+          dismissed_at: string | null
           player_id: string
           read_at: string
         }
         Insert: {
           announcement_id: string
+          dismissed_at?: string | null
           player_id: string
           read_at?: string
         }
         Update: {
           announcement_id?: string
+          dismissed_at?: string | null
           player_id?: string
           read_at?: string
         }
@@ -935,6 +938,35 @@ export type Database = {
           },
         ]
       }
+      game_rate_limits: {
+        Row: {
+          bucket: string
+          created_at: string
+          id: string
+          player_id: string
+        }
+        Insert: {
+          bucket: string
+          created_at?: string
+          id?: string
+          player_id: string
+        }
+        Update: {
+          bucket?: string
+          created_at?: string
+          id?: string
+          player_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_rate_limits_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       games: {
         Row: {
           active_version_id: string | null
@@ -1525,7 +1557,10 @@ export type Database = {
           is_qa_account: boolean
           last_active_at: string | null
           nickname: string
+          play_paused_until: string | null
+          session_started_at: string | null
           status: Database["public"]["Enums"]["player_status"]
+          welcome_credit_granted_at: string | null
           suspended_at: string | null
           suspended_reason: string | null
           updated_at: string
@@ -1539,7 +1574,10 @@ export type Database = {
           is_qa_account?: boolean
           last_active_at?: string | null
           nickname: string
+          play_paused_until?: string | null
+          session_started_at?: string | null
           status?: Database["public"]["Enums"]["player_status"]
+          welcome_credit_granted_at?: string | null
           suspended_at?: string | null
           suspended_reason?: string | null
           updated_at?: string
@@ -1553,7 +1591,10 @@ export type Database = {
           is_qa_account?: boolean
           last_active_at?: string | null
           nickname?: string
+          play_paused_until?: string | null
+          session_started_at?: string | null
           status?: Database["public"]["Enums"]["player_status"]
+          welcome_credit_granted_at?: string | null
           suspended_at?: string | null
           suspended_reason?: string | null
           updated_at?: string
@@ -1991,6 +2032,90 @@ export type Database = {
           isSetofReturn: false
         }
       }
+
+      assert_game_playable: {
+        Args: { p_game_key: string }
+        Returns: Database["public"]["Tables"]["games"]["Row"]
+      }
+      ensure_player_round: {
+        Args: { p_game_key: string }
+        Returns: Database["public"]["Tables"]["game_rounds"]["Row"]
+      }
+      enforce_game_rate_limit: {
+        Args: {
+          p_bucket: string
+          p_limit?: number
+          p_player_id: string
+          p_window?: number
+        }
+        Returns: undefined
+      }
+      get_active_game_version: {
+        Args: { p_game_key: string }
+        Returns: Database["public"]["Tables"]["game_versions"]["Row"]
+      }
+      open_game_round: {
+        Args: {
+          p_controlled_result?: Json | null
+          p_game_key: string
+          p_mode?: Database["public"]["Enums"]["game_mode"]
+        }
+        Returns: Database["public"]["Tables"]["game_rounds"]["Row"]
+      }
+      place_and_settle_bet: {
+        Args: {
+          p_controlled_result?: Json | null
+          p_game_key: string
+          p_idempotency_key: string
+          p_mode?: Database["public"]["Enums"]["game_mode"]
+          p_selection: Json
+          p_stake: number
+        }
+        Returns: Json
+      }
+      set_game_availability: {
+        Args: {
+          p_enabled: boolean
+          p_game_key: string
+          p_message?: string | null
+        }
+        Returns: Database["public"]["Tables"]["games"]["Row"]
+      }
+      settle_game_outcome: {
+        Args: {
+          p_controlled: Json
+          p_game_key: string
+          p_mode: Database["public"]["Enums"]["game_mode"]
+          p_selection: Json
+          p_stake: number
+        }
+        Returns: Json
+      }
+      start_smooth_maintenance_close: {
+        Args: { p_game_key: string; p_message?: string }
+        Returns: Database["public"]["Tables"]["games"]["Row"]
+      }
+
+      complete_player_onboarding: {
+        Args: {
+          p_avatar_preset?: string
+          p_contact_type: Database["public"]["Enums"]["contact_type"]
+          p_contact_value: string
+          p_nickname: string
+        }
+        Returns: Database["public"]["Tables"]["profiles"]["Row"]
+      }
+      get_player_access_state: { Args: { p_user_id?: string }; Returns: Json }
+      get_welcome_credit_amount: { Args: never; Returns: number }
+      grant_welcome_credit: { Args: { p_user_id?: string }; Returns: Json }
+      mark_contact_verified: {
+        Args: { p_channel: string; p_user_id?: string }
+        Returns: Database["public"]["Tables"]["profiles"]["Row"]
+      }
+      request_account_deletion: {
+        Args: { p_reason?: string; p_user_id?: string }
+        Returns: Database["public"]["Tables"]["profiles"]["Row"]
+      }
       claim_daily_reward: { Args: never; Returns: Json }
       get_setting: { Args: { p_default?: Json; p_key: string }; Returns: Json }
       has_permission: {
@@ -2013,6 +2138,205 @@ export type Database = {
         }
         Returns: Json
       }
+
+
+      advance_game_release: {
+        Args: { p_game_id: string; p_otp?: string | null; p_pin?: string | null; p_to_status: string }
+        Returns: Database["public"]["Tables"]["games"]["Row"]
+      }
+      assign_admin_role: {
+        Args: { p_otp?: string | null; p_pin?: string | null; p_role_code: string; p_target_admin_id: string }
+        Returns: undefined
+      }
+      assert_admin_sensitive: { Args: never; Returns: undefined }
+      create_admin_account: {
+        Args: {
+          p_display_name: string
+          p_is_owner?: boolean
+          p_otp?: string | null
+          p_pin?: string | null
+          p_role_code?: string
+          p_user_id: string
+        }
+        Returns: Database["public"]["Tables"]["admin_users"]["Row"]
+      }
+      create_game_version_admin: {
+        Args: { p_activate?: boolean; p_config: Json; p_game_id: string }
+        Returns: Database["public"]["Tables"]["game_versions"]["Row"]
+      }
+      export_admin_report: { Args: { p_report_type: string }; Returns: Json }
+      get_admin_dashboard: { Args: never; Returns: Json }
+      get_admin_session_state: { Args: never; Returns: Json }
+      register_qa_account: {
+        Args: {
+          p_label: string
+          p_notes?: string | null
+          p_otp?: string | null
+          p_pin?: string | null
+          p_player_id: string
+        }
+        Returns: Database["public"]["Tables"]["qa_demo_accounts"]["Row"]
+      }
+      search_players_admin: {
+        Args: { p_limit?: number; p_query?: string }
+        Returns: Database["public"]["Tables"]["profiles"]["Row"][]
+        SetofOptions: { from: "*"; to: "profiles"; isOneToOne: false; isSetofReturn: true }
+      }
+      set_admin_2fa: {
+        Args: { p_enabled: boolean; p_secret?: string | null }
+        Returns: Json
+      }
+      set_admin_permission_override: {
+        Args: {
+          p_granted: boolean
+          p_otp?: string | null
+          p_permission: string
+          p_pin?: string | null
+          p_reason?: string | null
+          p_target_admin_id: string
+        }
+        Returns: undefined
+      }
+      set_admin_pin: { Args: { p_pin: string }; Returns: Json }
+      set_admin_status: {
+        Args: {
+          p_otp?: string | null
+          p_pin?: string | null
+          p_status: string
+          p_target_admin_id: string
+        }
+        Returns: Database["public"]["Tables"]["admin_users"]["Row"]
+      }
+      set_feature_flag_admin: {
+        Args: { p_enabled: boolean; p_key: string; p_payload?: Json }
+        Returns: Database["public"]["Tables"]["feature_flags"]["Row"]
+      }
+      set_maintenance_admin: {
+        Args: {
+          p_is_active: boolean
+          p_message_i18n?: Json
+          p_otp?: string | null
+          p_pin?: string | null
+        }
+        Returns: Database["public"]["Tables"]["maintenance_state"]["Row"]
+      }
+      set_player_status_admin: {
+        Args: {
+          p_otp?: string | null
+          p_pin?: string | null
+          p_player_id: string
+          p_reason: string
+          p_status: string
+        }
+        Returns: Database["public"]["Tables"]["profiles"]["Row"]
+      }
+      set_system_setting_admin: {
+        Args: { p_key: string; p_value: Json }
+        Returns: Database["public"]["Tables"]["system_settings"]["Row"]
+      }
+      touch_admin_login: { Args: never; Returns: undefined }
+      update_ticket_status_admin: {
+        Args: { p_reply?: string | null; p_status: string; p_ticket_id: string }
+        Returns: Database["public"]["Tables"]["support_tickets"]["Row"]
+      }
+      upsert_achievement_admin: {
+        Args: {
+          p_badge_asset_key?: string | null
+          p_code: string
+          p_description_i18n: Json
+          p_is_enabled?: boolean
+          p_title_i18n: Json
+        }
+        Returns: Database["public"]["Tables"]["achievements"]["Row"]
+      }
+      upsert_announcement_admin: {
+        Args: {
+          p_body_i18n: Json
+          p_id?: string | null
+          p_status?: string
+          p_title_i18n: Json
+        }
+        Returns: Database["public"]["Tables"]["announcements"]["Row"]
+      }
+      upsert_asset_metadata_admin: {
+        Args: {
+          p_key: string
+          p_kind: string
+          p_rights_cleared?: boolean
+          p_storage_path?: string | null
+        }
+        Returns: Database["public"]["Tables"]["asset_metadata"]["Row"]
+      }
+      upsert_mission_admin: {
+        Args: {
+          p_code: string
+          p_description_i18n: Json
+          p_is_enabled?: boolean
+          p_reward_amount: number
+          p_target_count: number
+          p_title_i18n: Json
+        }
+        Returns: Database["public"]["Tables"]["missions"]["Row"]
+      }
+      verify_admin_2fa: { Args: { p_code: string }; Returns: boolean }
+      verify_admin_pin: { Args: { p_pin: string }; Returns: boolean }
+
+      assert_play_allowed: { Args: never; Returns: undefined }
+      claim_mission_reward: {
+        Args: { p_mission_id: string }
+        Returns: Json
+      }
+      create_invite_code: {
+        Args: never
+        Returns: Database["public"]["Tables"]["invites"]["Row"]
+      }
+      create_support_ticket: {
+        Args: {
+          p_category: Database["public"]["Enums"]["ticket_category"]
+          p_message: string
+          p_subject: string
+        }
+        Returns: Database["public"]["Tables"]["support_tickets"]["Row"]
+      }
+      feature_flag_enabled: { Args: { p_key: string }; Returns: boolean }
+      get_responsible_play_config: { Args: never; Returns: Json }
+      mark_all_notifications_read: { Args: never; Returns: number }
+      mark_announcement_read: {
+        Args: { p_announcement_id: string; p_dismiss?: boolean }
+        Returns: undefined
+      }
+      mark_notification_read: {
+        Args: { p_notification_id: string }
+        Returns: undefined
+      }
+      record_mission_progress: {
+        Args: { p_game_key: string }
+        Returns: undefined
+      }
+      refresh_leaderboard_entries: { Args: never; Returns: undefined }
+      reply_support_ticket: {
+        Args: { p_message: string; p_ticket_id: string }
+        Returns: Database["public"]["Tables"]["ticket_messages"]["Row"]
+      }
+      request_friend: {
+        Args: { p_nickname: string }
+        Returns: Database["public"]["Tables"]["friendships"]["Row"]
+      }
+      respond_friendship: {
+        Args: { p_action: string; p_friendship_id: string }
+        Returns: Database["public"]["Tables"]["friendships"]["Row"]
+      }
+      set_play_pause: {
+        Args: { p_days: number }
+        Returns: Database["public"]["Tables"]["profiles"]["Row"]
+      }
+      submit_ticket_satisfaction: {
+        Args: { p_comment?: string | null; p_score: number; p_ticket_id: string }
+        Returns: Database["public"]["Tables"]["support_tickets"]["Row"]
+      }
+      touch_play_session: { Args: never; Returns: string }
+      unlock_achievement: { Args: { p_key: string }; Returns: boolean }
+
       write_audit: {
         Args: {
           p_action: string

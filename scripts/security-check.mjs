@@ -35,6 +35,8 @@ function walk(dir) {
 const SERVER_ONLY_ALLOWED = [
   join("src", "lib", "env", "server.ts"),
   join("src", "lib", "supabase", "admin.ts"),
+  join("src", "lib", "security", "index.ts"),
+  join("src", "lib", "observability", "logger.ts"),
 ];
 
 const srcFiles = walk(join(ROOT, "src")).filter((f) => /\.(ts|tsx|js|jsx|mjs)$/.test(f));
@@ -74,14 +76,58 @@ const DB_URL =
   process.env.DATABASE_URL ??
   "postgresql://postgres:postgres@127.0.0.1:54322/postgres";
 
+let dbChecksRan = false;
+
+function describeDbTarget(connectionString) {
+  try {
+    const u = new URL(connectionString);
+    const user = u.username ?? "";
+    const projectFromUser = user.includes(".")
+      ? user.slice(user.lastIndexOf(".") + 1)
+      : null;
+    return {
+      host: u.hostname,
+      port: u.port || "5432",
+      database: (u.pathname || "/").replace(/^\//, "") || "postgres",
+      projectRef: projectFromUser,
+    };
+  } catch {
+    return { host: null, port: null, database: null, projectRef: null };
+  }
+}
+
 async function dbChecks() {
-  const client = new pg.Client({ connectionString: DB_URL, connectionTimeoutMillis: 3000 });
+  const target = describeDbTarget(DB_URL);
+  notes.push(
+    `DB target host=${target.host ?? "?"} port=${target.port ?? "?"} db=${target.database ?? "?"} projectRef=${target.projectRef ?? "?"}`,
+  );
+  // Remote staging (GitHub runners → Supabase pooler) often needs >3s.
+  const client = new pg.Client({
+    connectionString: DB_URL,
+    connectionTimeoutMillis: 20_000,
+  });
   try {
     await client.connect();
-  } catch {
-    notes.push("Local database unreachable — skipped DB security checks (run `supabase start`).");
+  } catch (err) {
+    const detail = err instanceof Error ? err.message : String(err);
+    notes.push(
+      `Database unreachable — DB security checks SKIPPED (not a release PASS). detail=${detail}`,
+    );
+    if (process.env.SECURITY_CHECK_ALLOW_SKIP_DB === "1") {
+      notes.push("SECURITY_CHECK_ALLOW_SKIP_DB=1 — skip tolerated for local/dev.");
+      return;
+    }
+    const urlPresent = Boolean(
+      process.env.SUPABASE_DB_URL || process.env.DATABASE_URL,
+    );
+    failures.push(
+      urlPresent
+        ? `DB security checks did not run: connection failed (${detail}). Verify SUPABASE_DB_URL points at staging and is reachable from GitHub Actions.`
+        : "DB security checks did not run. Set SUPABASE_DB_URL/DATABASE_URL, or SECURITY_CHECK_ALLOW_SKIP_DB=1 for local-only runs.",
+    );
     return;
   }
+  dbChecksRan = true;
   try {
     const noRls = await client.query(`
       select c.relname
@@ -145,7 +191,11 @@ async function dbChecks() {
   }
 }
 
-await dbChecks();
+if (process.env.SECURITY_CHECK_STATIC_ONLY === "1") {
+  notes.push("SECURITY_CHECK_STATIC_ONLY=1 — DB checks intentionally not run in this job.");
+} else {
+  await dbChecks();
+}
 
 // --------------------------------------------------------------------------
 console.log("GIKGOK security:check");
@@ -155,4 +205,20 @@ if (failures.length) {
   for (const f of failures) console.error(`  ✗ ${f}`);
   process.exit(1);
 }
-console.log("\n✓ security:check passed");
+if (!dbChecksRan) {
+  if (process.env.SECURITY_CHECK_STATIC_ONLY === "1") {
+    console.log(
+      "\n⚠ security:check STATIC ONLY — DB suite not executed (neutral; not a DB PASS)",
+    );
+    process.exit(0);
+  }
+  if (process.env.SECURITY_CHECK_ALLOW_SKIP_DB === "1") {
+    console.log(
+      "\n⚠ security:check static-only (DB skipped; SECURITY_CHECK_ALLOW_SKIP_DB=1)",
+    );
+    process.exit(0);
+  }
+  console.log("\n⚠ security:check static-only (DB skipped) — not a release PASS");
+  process.exit(2);
+}
+console.log("\n✓ security:check passed (static + DB)");
