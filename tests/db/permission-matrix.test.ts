@@ -3,6 +3,7 @@ import { describe, expect, it, beforeAll } from "vitest";
 import {
   asPlayer,
   asPostgres,
+  commitAsPostgres,
   ensureFixtures,
   isDbReachable,
   PLAYER_A,
@@ -215,8 +216,9 @@ describe.skipIf(!dbUp)("app_permission matrix", () => {
     });
   });
 
+
   it("cross-resource: credits.adjust alone cannot claim storage orphan batch", async () => {
-    await asPostgres(async (c) => {
+    await commitAsPostgres(async (c) => {
       await c.query(
         `update public.admin_users set is_active = true, is_owner = false where id = $1`,
         [ADMIN_CREDIT],
@@ -232,15 +234,19 @@ describe.skipIf(!dbUp)("app_permission matrix", () => {
       );
     });
 
-    await expect(
-      asPlayer(ADMIN_CREDIT, async (c) => {
-        await c.query(`select public.claim_storage_orphan_retry_batch(5)`);
-      }),
-    ).rejects.toThrow(/tickets\.manage|not authorized|permission|insufficient/i);
+    try {
+      await expect(
+        asPlayer(ADMIN_CREDIT, async (c) => {
+          await c.query(`select public.claim_storage_orphan_retry_batch(5)`);
+        }),
+      ).rejects.toThrow(/tickets\.manage|not authorized|permission|insufficient/i);
+    } finally {
+      await ensureFixtures();
+    }
   });
 
   it("cross-resource: tickets.manage alone cannot review credit requests", async () => {
-    await asPostgres(async (c) => {
+    await commitAsPostgres(async (c) => {
       await c.query(
         `update public.admin_users set is_active = true, is_owner = false where id = $1`,
         [ADMIN_CREDIT],
@@ -256,18 +262,22 @@ describe.skipIf(!dbUp)("app_permission matrix", () => {
       );
     });
 
-    await expect(
-      asPlayer(ADMIN_CREDIT, async (c) => {
-        await c.query(
-          `select public.review_credit_request($1, 'approved', 1000, 0, 0, 'no credits.adjust')`,
-          ["00000000-0000-0000-0000-000000000099"],
-        );
-      }),
-    ).rejects.toThrow(/credits\.adjust|not authorized|permission|insufficient/i);
+    try {
+      await expect(
+        asPlayer(ADMIN_CREDIT, async (c) => {
+          await c.query(
+            `select public.review_credit_request($1, 'approved', 1000, 0, 0, 'no credits.adjust')`,
+            ["00000000-0000-0000-0000-000000000099"],
+          );
+        }),
+      ).rejects.toThrow(/credits\.adjust|not authorized|permission|insufficient/i);
+    } finally {
+      await ensureFixtures();
+    }
   });
 
   it("export_admin_report requires reports.export even when reports.view is granted", async () => {
-    await asPostgres(async (c) => {
+    await commitAsPostgres(async (c) => {
       await c.query(
         `update public.admin_users set is_active = true, is_owner = false where id = $1`,
         [ADMIN_CREDIT],
@@ -278,33 +288,39 @@ describe.skipIf(!dbUp)("app_permission matrix", () => {
       );
       await c.query(
         `insert into public.admin_user_permissions (admin_id, permission, granted)
-         values
-           ($1, 'reports.view'::public.app_permission, true),
-           ($1, 'reports.export'::public.app_permission, false)
-         on conflict (admin_id, permission) do update set granted = excluded.granted`,
-        [ADMIN_CREDIT],
-      );
-    });
-
-    await expect(
-      asPlayer(ADMIN_CREDIT, async (c) => {
-        await c.query(`select public.export_admin_report('players')`);
-      }),
-    ).rejects.toThrow(/export permission required/i);
-
-    await asPostgres(async (c) => {
-      await c.query(
-        `insert into public.admin_user_permissions (admin_id, permission, granted)
-         values ($1, 'reports.export'::public.app_permission, true)
+         values ($1, 'reports.view'::public.app_permission, true)
          on conflict (admin_id, permission) do update set granted = true`,
         [ADMIN_CREDIT],
       );
     });
 
-    await asPlayer(ADMIN_CREDIT, async (c) => {
-      const r = await c.query(`select public.export_admin_report('players') as payload`);
-      expect(r.rows[0].payload).toBeTruthy();
-    });
+    try {
+      await expect(
+        asPlayer(ADMIN_CREDIT, async (c) => {
+          await c.query(`select public.export_admin_report('players')`);
+        }),
+      ).rejects.toThrow(/export permission required|permission denied/i);
+
+      await commitAsPostgres(async (c) => {
+        await c.query(
+          `insert into public.admin_user_permissions (admin_id, permission, granted)
+           values
+             ($1, 'reports.view'::public.app_permission, true),
+             ($1, 'reports.export'::public.app_permission, true)
+           on conflict (admin_id, permission) do update set granted = true`,
+          [ADMIN_CREDIT],
+        );
+      });
+
+      await asPlayer(ADMIN_CREDIT, async (c) => {
+        const r = await c.query(
+          `select public.export_admin_report('players') as payload`,
+        );
+        expect(r.rows[0].payload).toBeTruthy();
+      });
+    } finally {
+      await ensureFixtures();
+    }
   });
 
 

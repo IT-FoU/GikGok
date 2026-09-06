@@ -59,6 +59,13 @@ describe.skipIf(!dbUp)("dual approval + true concurrency", () => {
          values ('credits.second_approval_threshold', '500000'::jsonb)
          on conflict (key) do update set value = excluded.value`,
       );
+      // cancel all non-terminal requests for the fixture player so seeds are deterministic
+      await c.query(
+        `update public.credit_requests
+         set status = 'cancelled'
+         where player_id = $1 and status = 'pending'`,
+        [PLAYER_A],
+      );
     });
   }, 60_000);
 

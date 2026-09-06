@@ -10,9 +10,29 @@ import {
   commitAsPostgres,
   ensureFixtures,
   isDbReachable,
+  openAuthenticatedClient,
 } from "./helpers";
 
 const dbUp = await isDbReachable();
+
+
+async function authCommit<T>(
+  sub: string,
+  fn: (client: Awaited<ReturnType<typeof openAuthenticatedClient>>) => Promise<T>,
+): Promise<T> {
+  const client = await openAuthenticatedClient(sub);
+  try {
+    const result = await fn(client);
+    await client.query("commit");
+    return result;
+  } catch (error) {
+    await client.query("rollback").catch(() => undefined);
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
 
 describe.skipIf(!dbUp)("storage_orphan_objects authorization", () => {
   beforeAll(async () => {
@@ -259,6 +279,7 @@ describe.skipIf(!dbUp)("storage_orphan_objects authorization", () => {
 
 
 
+
   it("happy-path: record → claim → validate → resolve", async () => {
     const ticketId = randomUUID();
     const path = `${ticketId}/${PLAYER_A}/happy.jpg`;
@@ -271,7 +292,7 @@ describe.skipIf(!dbUp)("storage_orphan_objects authorization", () => {
       );
     });
 
-    const orphanId = await asPlayer(PLAYER_A, async (c) => {
+    const orphanId = await authCommit(PLAYER_A, async (c) => {
       const r = await c.query(
         `select public.record_storage_orphan(
            'ticket-attachments', $1, 'ticket_attachment_delete', null, 'happy') as id`,
@@ -280,7 +301,7 @@ describe.skipIf(!dbUp)("storage_orphan_objects authorization", () => {
       return r.rows[0].id as string;
     });
 
-    const claimed = await asPlayer(ADMIN_CREDIT, async (c) => {
+    const claimed = await authCommit(ADMIN_CREDIT, async (c) => {
       const r = await c.query(
         `select public.claim_storage_orphan_retry_batch(25) as row`,
       );
@@ -291,8 +312,7 @@ describe.skipIf(!dbUp)("storage_orphan_objects authorization", () => {
     });
     expect(claimed).toEqual(expect.arrayContaining([orphanId]));
 
-    await asPlayer(ADMIN_CREDIT, async (c) => {
-      // claim already validated; resolve explicitly
+    await authCommit(ADMIN_CREDIT, async (c) => {
       await c.query(
         `select public.mark_storage_orphan_resolved($1, 'manual cleanup ok')`,
         [orphanId],
@@ -317,6 +337,7 @@ describe.skipIf(!dbUp)("storage_orphan_objects authorization", () => {
       ]);
     });
   });
+
 
 
 });
