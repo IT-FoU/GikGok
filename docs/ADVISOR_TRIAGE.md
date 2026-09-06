@@ -79,4 +79,3 @@ Applied to staging `jlpcfatcpymjnjbxmclo` only.
 Always report **WARN** and **INFO** counts separately. Never claim Advisors are
 "fully clean" while INFO items remain. Intentional authenticated DEFINER RPCs are
 expected Security WARNs until product architecture changes.
-

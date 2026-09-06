@@ -74,4 +74,3 @@ Untouched. Do not merge PR #14 without Owner approval.
 - Project: `jlpcfatcpymjnjbxmclo`
 - Tip migration: `20260906034500_comment_authenticated_definer_surface.sql`
 - Untouched: `main`, production, other Supabase projects, real-money scope
-

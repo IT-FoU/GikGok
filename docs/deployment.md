@@ -12,7 +12,7 @@
 
 Copy `.env.example` → `.env.local` / platform secrets.
 
-**Public:** `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_APP_URL`  
+**Public:** `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_APP_URL`
 **Server-only:** `SUPABASE_SERVICE_ROLE_KEY` (ops only), `SUPABASE_JWT_SECRET`, `ADMIN_SESSION_SECRET`
 
 Never expose service-role keys to the browser or `NEXT_PUBLIC_*`.

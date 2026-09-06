@@ -31,7 +31,7 @@ export default async function LeaderboardPage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  // Leaderboard snapshots are rebuilt by service_role / system.settings admins.
+  // Leaderboard snapshots are rebuilt by privileged admin/system.settings jobs.
   // Ordinary player sessions only read the cached board.
   const { data: rows } = await supabase
     .from("leaderboard_entries")

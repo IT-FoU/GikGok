@@ -1,8 +1,8 @@
 # GIKGOK — Full Audit and Repair Plan
 
-**Baseline (start of this loop):** `38342c9702e4c31cc92f9eabf8bbba54aedfece8` on `cursor/gikgok-continuous-implementation`  
-**PR:** [#14](https://github.com/IT-FoU/GikGok/pull/14) (Draft) → `cursor/supabase-staging-integration-455c`  
-**Staging project:** `jlpcfatcpymjnjbxmclo` only  
+**Baseline (start of this loop):** `38342c9702e4c31cc92f9eabf8bbba54aedfece8` on `cursor/gikgok-continuous-implementation`
+**PR:** [#14](https://github.com/IT-FoU/GikGok/pull/14) (Draft) → `cursor/supabase-staging-integration-455c`
+**Staging project:** `jlpcfatcpymjnjbxmclo` only
 **Migrations applied through:** `20260905210000` (new fixes are forward-only)
 
 ## Completeness concepts (do not conflate)
@@ -214,4 +214,3 @@
 | E-TEST | HIGH | 404-as-security; regex-only contact verify; weak daily isolation | Honest smoke; behavioral RPC; A/B snapshots; matrix scaffold | PARTIAL |
 | F-NEXT | MED | middleware deprecation; CSP unsafe-inline; origin spoof | `proxy.ts`; exact origin match; CSP limitation documented | PARTIAL |
 | G-DOCS | MED | Over-checked tasks / stale PR body | Reopen honesty; docs authoritative | IN PROGRESS |
-
