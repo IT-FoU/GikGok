@@ -63,12 +63,13 @@ export async function isDbReachable(): Promise<boolean> {
 export async function asPlayer<T>(
   sub: string,
   fn: (client: PoolClient) => Promise<T>,
+  claims: Record<string, unknown> = {},
 ): Promise<T> {
   const client = await getPool().connect();
   try {
     await client.query("begin");
     await client.query("select set_config('request.jwt.claims', $1, true)", [
-      JSON.stringify({ sub, role: "authenticated" }),
+      JSON.stringify({ sub, role: "authenticated", aal: "aal1", ...claims }),
     ]);
     await client.query("set local role authenticated");
     return await fn(client);

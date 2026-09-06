@@ -240,23 +240,23 @@ describe.runIf(dbUp)("SECURITY DEFINER RPC hardening", () => {
     ).rejects.toThrow(/permission denied/i);
   });
 
-  it("P0: verify_admin_2fa rejects 000000 and does not accept demo codes", async () => {
+  it("P0: verify_admin_2fa no longer mints otp stamps from arbitrary codes", async () => {
     const def = await asPostgres(async (c) => {
       const r = await c.query(
         `select pg_get_functiondef('public.verify_admin_2fa(text)'::regprocedure) as d`,
       );
       return r.rows[0].d as string;
     });
-    expect(def).toMatch(/000000/);
+    expect(def).toMatch(/removed|aal2|feature_not_supported/i);
+    expect(def).not.toMatch(/otp_verified_at\s*=\s*now\(\)/i);
     expect(def).not.toMatch(/demo-totp|accept the last 6/i);
 
-    // Even as an admin fixture, fixed codes must fail closed.
     await asPostgres(async (c) => {
       await c.query(
         `insert into public.admin_users (id, is_owner, is_active, requires_2fa, requires_pin)
          values ($1, false, true, true, false)
          on conflict (id) do update
-         set is_active = true, requires_2fa = true`,
+         set is_active = true, requires_2fa = true, requires_pin = false`,
         [ADMIN_CREDIT],
       );
       await c.query(
@@ -267,18 +267,25 @@ describe.runIf(dbUp)("SECURITY DEFINER RPC hardening", () => {
       );
     });
 
-    const ok = await asPlayer(ADMIN_CREDIT, async (c) => {
-      const r = await c.query(`select public.verify_admin_2fa('000000') as ok`);
-      return r.rows[0].ok as boolean;
-    }).catch((e: Error) => {
-      // Fail-closed raise is also acceptable.
-      expect(String(e.message)).toMatch(/2fa|mfa|enroll|required|attempt/i);
-      return false;
-    });
-    expect(ok).toBe(false);
+    // Direct RPC must fail closed even for aal2 + non-blacklisted codes.
+    await expect(
+      asPlayer(
+        ADMIN_CREDIT,
+        async (c) => {
+          await c.query(`select public.verify_admin_2fa('424242')`);
+        },
+        { aal: "aal2" },
+      ),
+    ).rejects.toThrow(/removed|aal2|mfa|2fa|not supported/i);
+
+    await expect(
+      asPlayer(ADMIN_CREDIT, async (c) => {
+        await c.query(`select public.verify_admin_2fa('000000')`);
+      }),
+    ).rejects.toThrow(/removed|aal2|mfa|2fa|not supported/i);
   });
 
-  it("P0: assert_admin_sensitive fails closed when requires_2fa without enrollment", async () => {
+  it("P0: assert_admin_sensitive fails closed without enrollment or aal2", async () => {
     await asPostgres(async (c) => {
       await c.query(
         `insert into public.admin_users (id, is_owner, is_active, requires_2fa, requires_pin)
@@ -294,13 +301,144 @@ describe.runIf(dbUp)("SECURITY DEFINER RPC hardening", () => {
          set totp_enabled = false, totp_secret = null`,
         [ADMIN_CREDIT],
       );
+      await c.query(
+        `delete from public.admin_sensitive_challenges where admin_id = $1`,
+        [ADMIN_CREDIT],
+      );
+
+      await c.query("select set_config('request.jwt.claims', $1, true)", [
+        JSON.stringify({
+          sub: ADMIN_CREDIT,
+          role: "authenticated",
+          aal: "aal1",
+        }),
+      ]);
+      await c.query("set local role authenticated");
+      await c.query("savepoint sp_aal1");
+      await expect(
+        c.query(`select public.assert_admin_sensitive()`),
+      ).rejects.toThrow(/2fa|mfa|enroll/i);
+      await c.query("rollback to savepoint sp_aal1");
+
+      // Keep requires_2fa; flip only the security flag, then require aal2 + enrollment.
+      await c.query("set local role postgres");
+      await c.query(
+        `insert into public.admin_security (admin_id, totp_enabled)
+         values ($1, true)
+         on conflict (admin_id) do update set totp_enabled = true`,
+        [ADMIN_CREDIT],
+      );
+      await c.query("select set_config('request.jwt.claims', $1, true)", [
+        JSON.stringify({
+          sub: ADMIN_CREDIT,
+          role: "authenticated",
+          aal: "aal2",
+        }),
+      ]);
+      await c.query("set local role authenticated");
+      await c.query("savepoint sp_aal2");
+      await expect(
+        c.query(`select public.assert_admin_sensitive()`),
+      ).rejects.toThrow(/2fa|mfa|enroll/i);
+      await c.query("rollback to savepoint sp_aal2");
+    });
+  });
+
+  it("P0: admin_prepare_sensitive rejects p_otp and requires PIN when configured", async () => {
+    await asPostgres(async (c) => {
+      await c.query(
+        `insert into public.admin_users (id, is_owner, is_active, requires_2fa, requires_pin)
+         values ($1, false, true, false, true)
+         on conflict (id) do update
+         set is_active = true, requires_2fa = false, requires_pin = true`,
+        [ADMIN_CREDIT],
+      );
+      await c.query(
+        `insert into public.admin_security (admin_id, pin_hash, totp_enabled)
+         values ($1, crypt('2468', gen_salt('bf')), false)
+         on conflict (admin_id) do update
+         set pin_hash = excluded.pin_hash, totp_enabled = false`,
+        [ADMIN_CREDIT],
+      );
+      await c.query(
+        `delete from public.admin_sensitive_challenges where admin_id = $1`,
+        [ADMIN_CREDIT],
+      );
     });
 
     await expect(
       asPlayer(ADMIN_CREDIT, async (c) => {
-        await c.query(`select public.assert_admin_sensitive()`);
+        await c.query(
+          `select public.admin_prepare_sensitive(null, '424242')`,
+        );
       }),
-    ).rejects.toThrow(/2fa|mfa|enroll|required/i);
+    ).rejects.toThrow(/otp|aal2|mfa|do not pass/i);
+
+    await expect(
+      asPlayer(ADMIN_CREDIT, async (c) => {
+        await c.query(`select public.admin_prepare_sensitive(null, null)`);
+      }),
+    ).rejects.toThrow(/pin/i);
+
+    // Expired PIN confirmation must fail.
+    await asPostgres(async (c) => {
+      await c.query(
+        `insert into public.admin_sensitive_challenges
+           (admin_id, session_id, pin_verified_at, updated_at)
+         values ($1, 'test-session', now() - interval '20 minutes', now())
+         on conflict (admin_id, session_id) do update
+         set pin_verified_at = excluded.pin_verified_at`,
+        [ADMIN_CREDIT],
+      );
+    });
+  });
+
+  it("P0: disabled admin cannot call assert_admin_sensitive", async () => {
+    await asPostgres(async (c) => {
+      await c.query(
+        `insert into public.admin_users (id, is_owner, is_active, requires_2fa, requires_pin)
+         values ($1, false, false, false, false)
+         on conflict (id) do update
+         set is_active = false, requires_2fa = false, requires_pin = false`,
+        [ADMIN_CREDIT],
+      );
+      await c.query("select set_config('request.jwt.claims', $1, true)", [
+        JSON.stringify({
+          sub: ADMIN_CREDIT,
+          role: "authenticated",
+          aal: "aal2",
+        }),
+      ]);
+      await c.query("set local role authenticated");
+      await expect(
+        c.query(`select public.assert_admin_sensitive()`),
+      ).rejects.toThrow(/admin access required/i);
+    });
+  });
+
+  it("P0: owners always require 2fa in session state", async () => {
+    const state = await asPostgres(async (c) => {
+      const owner = await c.query(
+        `select id from public.admin_users where is_owner limit 1`,
+      );
+      if (!owner.rows[0]) return null;
+      const id = owner.rows[0].id as string;
+      await c.query(
+        `update public.admin_users set requires_2fa = false where id = $1`,
+        [id],
+      );
+      // Re-apply invariant the migration enforces for owners.
+      await c.query(
+        `update public.admin_users set requires_2fa = true
+         where is_owner and coalesce(requires_2fa, false) = false`,
+      );
+      const row = await c.query(
+        `select requires_2fa from public.admin_users where id = $1`,
+        [id],
+      );
+      return row.rows[0].requires_2fa as boolean;
+    });
+    if (state !== null) expect(state).toBe(true);
   });
 
   it("P0: assert_play_allowed rejects suspended profiles", async () => {
