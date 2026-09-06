@@ -5,7 +5,6 @@ import {
   ADMIN_CREDIT,
   ADMIN_CREDIT_B,
   PLAYER_A,
-  asPlayer,
   asPostgres,
   closePool,
   commitAsPostgres,

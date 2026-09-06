@@ -151,7 +151,7 @@
 - [x] Build QA/Demo Account tools isolated from ordinary player analytics and ledger reporting.
 - [x] Build audit log search/filter/export with actor, action, target, before/after, reason, approval chain, and timestamp.
 - [x] Build reports for players, games, credits, activity, support, and system operations; permission-check every export.
-- [ ] Test every permission boundary, approval rule, audit event, maintenance transition, and concurrent admin action.
+- [ ] Test every permission boundary, approval rule, audit event, maintenance transition, and concurrent admin action. _(representative DB behavioral coverage added; not exhaustive of every admin surface)_
 
 ## Phase 11 — Security, performance, QA, and release
 
@@ -164,8 +164,8 @@
 - [x] Run Vitest suites for ledger, rewards, permissions, every game rule, config versions, and concurrency/idempotency.
 - [ ] Run Playwright end-to-end suites for register/verify, daily reward, request approval, three games, history, admin operations, and security boundaries. _(smoke present; authenticated journeys WAITING credentials)_
 - [ ] Perform manual QA on current iOS Safari, Android Chrome, tablet, and desktop browsers in Light/Dark modes and Lao/English. _(WAITING physical devices)_
-- [x] Add PWA manifest, icons, service worker strategy, offline-shell behavior, and install QA after responsive web passes.
-- [x] Configure staging deployment, production environment variables, migration release process, and rollback procedure.
-- [x] Run final lint, typecheck, tests, build, migration verification, security review, and deployment smoke tests. _(local Docker DB checks BLOCKED)_
+- [ ] Add PWA manifest, icons, service worker strategy, offline-shell behavior, and install QA after responsive web passes. _(manifest/SW present; install QA WAITING devices)_
+- [ ] Configure staging deployment, production environment variables, migration release process, and rollback procedure. _(docs/process present; hosted preview WAITING Owner)_
+- [ ] Run final lint, typecheck, tests, build, migration verification, security review, and deployment smoke tests. _(local gates PASS at tip; deployment smoke WAITING; local Docker BLOCKED)_
 - [x] Update README/runbook with architecture, setup, deployment, backup/recovery, admin onboarding, and known limitations.
-- [x] Deliver final report: commits, changed files, validation commands/results, deployed URL, and remaining follow-ups.
+- [ ] Deliver final report: commits, changed files, validation commands/results, deployed URL, and remaining follow-ups. _(report updated; deployed URL WAITING)_

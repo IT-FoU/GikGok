@@ -58,9 +58,6 @@ function failFromError(error: { message: string } | null): ActionResult {
   };
 }
 
-function asMessage(error: { message: string } | null): string {
-  return failFromError(error).message ?? "Request could not be completed.";
-}
 
 function sensitiveFields(formData: FormData) {
   const pin = String(formData.get("pin") ?? "").trim() || null;

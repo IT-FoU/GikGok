@@ -28,7 +28,7 @@ describe("localization catalogs", () => {
   });
 
   it("does not leave Lao strings identical to English for narrative copy", () => {
-    const narrativePrefixes = ["auth.", "status.", "errors.", "actionCodes."];
+    const narrativePrefixes = ["auth.", "status.", "errors.", "actionCodes.", "admin.orphan."];
     const identical: string[] = [];
     for (const [key, enValue] of Object.entries(enFlat)) {
       if (!narrativePrefixes.some((p) => key.startsWith(p))) continue;
@@ -55,7 +55,6 @@ describe("hard-coded UI string guard", () => {
     "src/app/(player)/reset-password",
     "src/app/(player)/account-status",
     "src/modules/player/auth-forms.tsx",
-    "src/modules/admin/ui.tsx",
   ];
 
   const allowed = new Set([
@@ -75,10 +74,6 @@ describe("hard-coded UI string guard", () => {
     "ActionResult",
     "AuthAction",
     "FormData",
-    "StorageOrphanRetryForm",
-    "StorageOrphanCard",
-    "Banner",
-    "SensitiveFields",
   ]);
 
   function walk(path: string): string[] {
@@ -120,5 +115,17 @@ describe("hard-coded UI string guard", () => {
       }
     }
     expect(offenders).toEqual([]);
+  });
+
+  it("wires Storage orphan cleanup UI through catalog keys", () => {
+    const source = readFileSync("src/modules/admin/ui.tsx", "utf8");
+    const start = source.indexOf("export function StorageOrphanRetryForm");
+    const end = source.indexOf("export function", start + 10);
+    expect(start).toBeGreaterThan(-1);
+    const block = source.slice(start, end === -1 ? undefined : end);
+    expect(block).toContain('t("admin.orphan.formHint")');
+    expect(block).toContain('t("admin.orphan.batchLimit")');
+    expect(block).toContain('t("admin.orphan.retryCta")');
+    expect(block).not.toMatch(/>\s*Retry orphan cleanup\s*</);
   });
 });

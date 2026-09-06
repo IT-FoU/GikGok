@@ -91,3 +91,13 @@ Staging project `jlpcfatcpymjnjbxmclo` via Management API:
 | Performance | **0** | **71** | No WARN. INFO includes unused indexes / unindexed FKs — not claimed "fully clean". |
 
 Never report Advisors as fully clean while INFO items remain.
+
+
+## 2026-09-06 tip watermark `20260906080000`
+
+- Staging project `jlpcfatcpymjnjbxmclo`.
+- Additional revoke: `get_active_game_version` EXECUTE removed from `authenticated`/`anon`.
+- Storage INSERT for `ticket-attachments` now requires owned ticket path.
+- Management Advisors API returned **403** during this tip — do not invent new WARN totals.
+- Last documented: Security WARN ~60 intentional authenticated DEFINER RPCs; Security INFO remain; Performance WARN ×0; Performance INFO remain.
+- Live inventory this tip: ~81 public SECURITY DEFINER; ~63 authenticated EXECUTE; anon EXECUTE 0.

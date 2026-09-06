@@ -6,7 +6,6 @@ import {
   PLAYER_A,
   PLAYER_B,
   asPlayer,
-  asPostgres,
   closePool,
   commitAsPostgres,
   ensureFixtures,
@@ -173,8 +172,7 @@ describe.skipIf(!dbUp)("storage_orphan_objects authorization", () => {
       return {
         first: a.rows[0].id as string,
         second: b.rows[0].id as string,
-        count: 1,
-      };
+        count: 1 };
     });
 
     expect(second).toBe(first);

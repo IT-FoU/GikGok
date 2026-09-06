@@ -167,6 +167,7 @@ describe.runIf(dbUp)("SECURITY DEFINER RPC hardening", () => {
       );
 
       let claimed = false;
+      await c.query("savepoint before_daily_claim");
       try {
         const r = await c.query(`select public.claim_daily_reward() as r`);
         expect(
@@ -178,8 +179,13 @@ describe.runIf(dbUp)("SECURITY DEFINER RPC hardening", () => {
           ),
         ).toBeGreaterThan(0);
         claimed = true;
+        await c.query("release savepoint before_daily_claim");
       } catch (err) {
-        expect(String(err)).toMatch(/already claimed/i);
+        await c.query("rollback to savepoint before_daily_claim");
+        // Already claimed today, or balance above the configurable daily-reward cap.
+        expect(String(err)).toMatch(
+          /already claimed|balance exceeds|unavailable while balance/i,
+        );
       }
 
       const afterA = Number(
