@@ -19,20 +19,47 @@ async function assertMutatingOrigin() {
   );
 }
 
-function asMessage(error: { message: string } | null): string {
+function failFromError(error: { message: string } | null): ActionResult {
   const raw = error?.message ?? "Unexpected error";
   const lower = raw.toLowerCase();
-  if (lower.includes("pin")) return "Admin PIN verification failed.";
+  if (lower.includes("pin")) {
+    return {
+      ok: false,
+      code: "ADMIN_PIN_FAILED",
+      message: "Admin PIN verification failed.",
+    };
+  }
   if (lower.includes("2fa") || lower.includes("mfa") || lower.includes("aal")) {
-    return "Admin MFA verification failed.";
+    return {
+      ok: false,
+      code: "ADMIN_MFA_FAILED",
+      message: "Admin MFA verification failed.",
+    };
   }
   if (lower.includes("permission") || lower.includes("access required")) {
-    return "You do not have permission for this action.";
+    return {
+      ok: false,
+      code: "PERMISSION_DENIED",
+      message: "You do not have permission for this action.",
+    };
   }
   if (lower.includes("otp") && lower.includes("aal2")) {
-    return "Use authenticator MFA for 2FA; do not submit OTP codes to admin actions.";
+    return {
+      ok: false,
+      code: "ADMIN_OTP_MISUSE",
+      message:
+        "Use authenticator MFA for 2FA; do not submit OTP codes to admin actions.",
+    };
   }
-  return "Request could not be completed.";
+  return {
+    ok: false,
+    code: "AUTH_GENERIC",
+    message: "Request could not be completed.",
+  };
+}
+
+function asMessage(error: { message: string } | null): string {
+  return failFromError(error).message ?? "Request could not be completed.";
 }
 
 function sensitiveFields(formData: FormData) {
@@ -46,28 +73,31 @@ function revalidateAdmin(...paths: string[]) {
 }
 
 export async function setAdminPinAction(formData: FormData): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const pin = String(formData.get("pin") ?? "");
   if (!pinSchemaValid(pin)) {
     return { ok: false, message: "PIN must be 4–12 digits." };
   }
   const supabase = await createServerSupabaseClient();
   const { error } = await supabase.rpc("set_admin_pin", { p_pin: pin });
-  if (error) return { ok: false, message: asMessage(error) };
+  if (error) return failFromError(error);
   revalidateAdmin("/admin", "/admin/settings");
   return { ok: true, message: "Admin PIN saved." };
 }
 
 export async function verifyAdminPinAction(formData: FormData): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const pin = String(formData.get("pin") ?? "");
   const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase.rpc("verify_admin_pin", { p_pin: pin });
-  if (error) return { ok: false, message: asMessage(error) };
+  if (error) return failFromError(error);
   return data
     ? { ok: true, message: "PIN verified for 5 minutes." }
     : { ok: false, message: "Invalid PIN." };
 }
 
 export async function setAdmin2faAction(formData: FormData): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const enabled = String(formData.get("enabled") ?? "") === "true";
   const supabase = await createServerSupabaseClient();
 
@@ -75,7 +105,7 @@ export async function setAdmin2faAction(formData: FormData): Promise<ActionResul
     // Enrollment / verification of the TOTP factor must use Supabase Auth MFA.
     // This RPC only flips the admin_security flag after a verified factor exists.
     const factors = await supabase.auth.mfa.listFactors();
-    if (factors.error) return { ok: false, message: asMessage(factors.error) };
+    if (factors.error) return failFromError(factors.error);
     const verified = (factors.data?.totp ?? []).some((f) => f.status === "verified");
     if (!verified) {
       return {
@@ -90,7 +120,7 @@ export async function setAdmin2faAction(formData: FormData): Promise<ActionResul
     p_enabled: enabled,
     p_secret: null,
   });
-  if (error) return { ok: false, message: asMessage(error) };
+  if (error) return failFromError(error);
   revalidateAdmin("/admin/settings");
   return {
     ok: true,
@@ -103,14 +133,16 @@ export async function setAdmin2faAction(formData: FormData): Promise<ActionResul
 export async function startAdminMfaEnrollAction(): Promise<
   ActionResult & { factorId?: string; qr?: string; secret?: string }
 > {
+  await assertMutatingOrigin();
   const supabase = await createServerSupabaseClient();
   const enrolled = await supabase.auth.mfa.enroll({
     factorType: "totp",
     friendlyName: "GIKGOK Admin",
   });
-  if (enrolled.error) return { ok: false, message: asMessage(enrolled.error) };
+  if (enrolled.error) return failFromError(enrolled.error);
   return {
     ok: true,
+    code: "ADMIN_MFA_ENROLL_STARTED",
     message: "Scan the QR code with your authenticator app, then confirm with a code.",
     factorId: enrolled.data.id,
     qr: enrolled.data.totp.qr_code,
@@ -121,6 +153,7 @@ export async function startAdminMfaEnrollAction(): Promise<
 export async function confirmAdminMfaEnrollAction(
   formData: FormData,
 ): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const factorId = String(formData.get("factorId") ?? "").trim();
   const code = String(formData.get("otp") ?? "").trim();
   if (!factorId || !/^\d{6}$/.test(code) || code === "000000") {
@@ -129,25 +162,26 @@ export async function confirmAdminMfaEnrollAction(
 
   const supabase = await createServerSupabaseClient();
   const challenge = await supabase.auth.mfa.challenge({ factorId });
-  if (challenge.error) return { ok: false, message: asMessage(challenge.error) };
+  if (challenge.error) return failFromError(challenge.error);
 
   const verified = await supabase.auth.mfa.verify({
     factorId,
     challengeId: challenge.data.id,
     code,
   });
-  if (verified.error) return { ok: false, message: asMessage(verified.error) };
+  if (verified.error) return failFromError(verified.error);
 
   const { error } = await supabase.rpc("set_admin_2fa", {
     p_enabled: true,
     p_secret: null,
   });
-  if (error) return { ok: false, message: asMessage(error) };
+  if (error) return failFromError(error);
   revalidateAdmin("/admin/settings", "/admin/mfa");
   return { ok: true, message: "Authenticator enrolled. Admin 2FA is enabled." };
 }
 
 export async function verifyAdmin2faAction(formData: FormData): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const code = String(formData.get("otp") ?? "").trim();
   if (!/^\d{6}$/.test(code) || code === "000000") {
     return { ok: false, message: "Invalid 2FA code." };
@@ -158,27 +192,28 @@ export async function verifyAdmin2faAction(formData: FormData): Promise<ActionRe
   // Challenge + verify against Supabase Auth MFA so the JWT reaches aal2.
   // Do not call verify_admin_2fa — that RPC no longer mints confirmation stamps.
   const factors = await supabase.auth.mfa.listFactors();
-  if (factors.error) return { ok: false, message: asMessage(factors.error) };
+  if (factors.error) return failFromError(factors.error);
   const totp = (factors.data?.totp ?? []).find((f) => f.status === "verified");
   if (!totp) {
     return { ok: false, message: "No verified TOTP factor enrolled." };
   }
 
   const challenge = await supabase.auth.mfa.challenge({ factorId: totp.id });
-  if (challenge.error) return { ok: false, message: asMessage(challenge.error) };
+  if (challenge.error) return failFromError(challenge.error);
 
   const verified = await supabase.auth.mfa.verify({
     factorId: totp.id,
     challengeId: challenge.data.id,
     code,
   });
-  if (verified.error) return { ok: false, message: asMessage(verified.error) };
+  if (verified.error) return failFromError(verified.error);
 
   revalidateAdmin("/admin", "/admin/mfa", "/admin/settings");
   return { ok: true, message: "Authenticator verified. Session upgraded to aal2." };
 }
 
 export async function createAdminAccountAction(formData: FormData): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const userId = String(formData.get("userId") ?? "").trim();
   const displayName = String(formData.get("displayName") ?? "").trim();
   const roleCode = String(formData.get("roleCode") ?? "support_viewer").trim();
@@ -198,12 +233,13 @@ export async function createAdminAccountAction(formData: FormData): Promise<Acti
     p_pin: pin,
     p_otp: otp,
   });
-  if (error) return { ok: false, message: asMessage(error) };
+  if (error) return failFromError(error);
   revalidateAdmin("/admin/admins", "/admin/audit");
   return { ok: true, message: "Admin account created." };
 }
 
 export async function setAdminStatusAction(formData: FormData): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const targetId = String(formData.get("targetAdminId") ?? "").trim();
   const status = String(formData.get("status") ?? "") as "active" | "disabled";
   const { pin, otp } = sensitiveFields(formData);
@@ -217,12 +253,13 @@ export async function setAdminStatusAction(formData: FormData): Promise<ActionRe
     p_pin: pin,
     p_otp: otp,
   });
-  if (error) return { ok: false, message: asMessage(error) };
+  if (error) return failFromError(error);
   revalidateAdmin("/admin/admins", "/admin/audit");
   return { ok: true, message: `Admin marked ${status}.` };
 }
 
 export async function assignAdminRoleAction(formData: FormData): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const targetId = String(formData.get("targetAdminId") ?? "").trim();
   const roleCode = String(formData.get("roleCode") ?? "").trim();
   const { pin, otp } = sensitiveFields(formData);
@@ -233,12 +270,13 @@ export async function assignAdminRoleAction(formData: FormData): Promise<ActionR
     p_pin: pin,
     p_otp: otp,
   });
-  if (error) return { ok: false, message: asMessage(error) };
+  if (error) return failFromError(error);
   revalidateAdmin("/admin/admins", "/admin/audit");
   return { ok: true, message: "Role assigned." };
 }
 
 export async function setPermissionOverrideAction(formData: FormData): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const targetId = String(formData.get("targetAdminId") ?? "").trim();
   const permission = String(formData.get("permission") ?? "").trim();
   const granted = String(formData.get("granted") ?? "") === "true";
@@ -253,12 +291,13 @@ export async function setPermissionOverrideAction(formData: FormData): Promise<A
     p_pin: pin,
     p_otp: otp,
   });
-  if (error) return { ok: false, message: asMessage(error) };
+  if (error) return failFromError(error);
   revalidateAdmin("/admin/admins", "/admin/audit");
   return { ok: true, message: "Permission override saved." };
 }
 
 export async function setPlayerStatusAction(formData: FormData): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const playerId = String(formData.get("playerId") ?? "").trim();
   const status = String(formData.get("status") ?? "") as
     | "active"
@@ -277,12 +316,13 @@ export async function setPlayerStatusAction(formData: FormData): Promise<ActionR
     p_pin: pin,
     p_otp: otp,
   });
-  if (error) return { ok: false, message: asMessage(error) };
+  if (error) return failFromError(error);
   revalidateAdmin("/admin/players", "/admin/audit");
   return { ok: true, message: `Player status → ${status}.` };
 }
 
 export async function upsertAnnouncementAction(formData: FormData): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const titleEn = String(formData.get("titleEn") ?? "").trim();
   const titleLo = String(formData.get("titleLo") ?? "").trim();
   const bodyEn = String(formData.get("bodyEn") ?? "").trim();
@@ -296,12 +336,13 @@ export async function upsertAnnouncementAction(formData: FormData): Promise<Acti
     p_status: status,
     p_id: id,
   });
-  if (error) return { ok: false, message: asMessage(error) };
+  if (error) return failFromError(error);
   revalidateAdmin("/admin/announcements", "/home");
   return { ok: true, message: "Announcement saved." };
 }
 
 export async function updateTicketStatusAction(formData: FormData): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const ticketId = String(formData.get("ticketId") ?? "").trim();
   const status = String(formData.get("status") ?? "");
   const reply = String(formData.get("reply") ?? "").trim() || null;
@@ -311,12 +352,13 @@ export async function updateTicketStatusAction(formData: FormData): Promise<Acti
     p_status: status,
     p_reply: reply,
   });
-  if (error) return { ok: false, message: asMessage(error) };
+  if (error) return failFromError(error);
   revalidateAdmin("/admin/tickets");
   return { ok: true, message: "Ticket updated." };
 }
 
 export async function upsertMissionAction(formData: FormData): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const code = String(formData.get("code") ?? "").trim();
   const title = String(formData.get("title") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
@@ -332,12 +374,13 @@ export async function upsertMissionAction(formData: FormData): Promise<ActionRes
     p_reward_amount: rewardAmount,
     p_is_enabled: isEnabled,
   });
-  if (error) return { ok: false, message: asMessage(error) };
+  if (error) return failFromError(error);
   revalidateAdmin("/admin/missions", "/missions");
   return { ok: true, message: "Mission saved." };
 }
 
 export async function upsertAchievementAction(formData: FormData): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const code = String(formData.get("code") ?? "").trim();
   const title = String(formData.get("title") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
@@ -351,12 +394,13 @@ export async function upsertAchievementAction(formData: FormData): Promise<Actio
     p_is_enabled: isEnabled,
     p_badge_asset_key: badge,
   });
-  if (error) return { ok: false, message: asMessage(error) };
+  if (error) return failFromError(error);
   revalidateAdmin("/admin/missions", "/achievements");
   return { ok: true, message: "Achievement / badge saved." };
 }
 
 export async function setFeatureFlagAction(formData: FormData): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const key = String(formData.get("key") ?? "").trim();
   const enabled = String(formData.get("enabled") ?? "") === "true";
   const payloadRaw = String(formData.get("payload") ?? "").trim();
@@ -374,12 +418,13 @@ export async function setFeatureFlagAction(formData: FormData): Promise<ActionRe
     p_enabled: enabled,
     p_payload: payload,
   });
-  if (error) return { ok: false, message: asMessage(error) };
+  if (error) return failFromError(error);
   revalidateAdmin("/admin/flags");
   return { ok: true, message: `Flag ${key} → ${enabled ? "on" : "off"}.` };
 }
 
 export async function setSystemSettingAction(formData: FormData): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const key = String(formData.get("key") ?? "").trim();
   const valueRaw = String(formData.get("value") ?? "").trim();
   let value: Json;
@@ -393,12 +438,13 @@ export async function setSystemSettingAction(formData: FormData): Promise<Action
     p_key: key,
     p_value: value,
   });
-  if (error) return { ok: false, message: asMessage(error) };
+  if (error) return failFromError(error);
   revalidateAdmin("/admin/settings");
   return { ok: true, message: `Setting ${key} saved.` };
 }
 
 export async function setMaintenanceAction(formData: FormData): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const isActive = String(formData.get("isActive") ?? "") === "true";
   const message = String(formData.get("message") ?? "").trim();
   const { pin, otp } = sensitiveFields(formData);
@@ -409,7 +455,7 @@ export async function setMaintenanceAction(formData: FormData): Promise<ActionRe
     p_pin: pin,
     p_otp: otp,
   });
-  if (error) return { ok: false, message: asMessage(error) };
+  if (error) return failFromError(error);
   revalidateAdmin("/admin", "/admin/settings", "/home");
   return {
     ok: true,
@@ -418,6 +464,7 @@ export async function setMaintenanceAction(formData: FormData): Promise<ActionRe
 }
 
 export async function createGameVersionAction(formData: FormData): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const gameId = String(formData.get("gameId") ?? "").trim();
   const configRaw = String(formData.get("config") ?? "").trim();
   const activate = String(formData.get("activate") ?? "") === "true";
@@ -433,12 +480,13 @@ export async function createGameVersionAction(formData: FormData): Promise<Actio
     p_config: config,
     p_activate: activate,
   });
-  if (error) return { ok: false, message: asMessage(error) };
+  if (error) return failFromError(error);
   revalidateAdmin("/admin/games/config", "/admin/audit");
   return { ok: true, message: "Game version created." };
 }
 
 export async function advanceGameReleaseAction(formData: FormData): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const gameId = String(formData.get("gameId") ?? "").trim();
   const toStatus = String(formData.get("toStatus") ?? "").trim();
   const { pin, otp } = sensitiveFields(formData);
@@ -449,12 +497,13 @@ export async function advanceGameReleaseAction(formData: FormData): Promise<Acti
     p_pin: pin,
     p_otp: otp,
   });
-  if (error) return { ok: false, message: asMessage(error) };
+  if (error) return failFromError(error);
   revalidateAdmin("/admin/games", "/admin/games/releases", "/home");
   return { ok: true, message: `${gameId} → ${toStatus}.` };
 }
 
 export async function upsertAssetAction(formData: FormData): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const key = String(formData.get("key") ?? "").trim();
   const kind = String(formData.get("kind") ?? "other").trim();
   const storagePath = String(formData.get("storagePath") ?? "").trim() || null;
@@ -466,12 +515,13 @@ export async function upsertAssetAction(formData: FormData): Promise<ActionResul
     p_storage_path: storagePath,
     p_rights_cleared: rightsCleared,
   });
-  if (error) return { ok: false, message: asMessage(error) };
+  if (error) return failFromError(error);
   revalidateAdmin("/admin/assets");
   return { ok: true, message: "Asset metadata saved." };
 }
 
 export async function registerQaAccountAction(formData: FormData): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const playerId = String(formData.get("playerId") ?? "").trim();
   const label = String(formData.get("label") ?? "").trim();
   const notes = String(formData.get("notes") ?? "").trim() || null;
@@ -484,12 +534,13 @@ export async function registerQaAccountAction(formData: FormData): Promise<Actio
     p_pin: pin,
     p_otp: otp,
   });
-  if (error) return { ok: false, message: asMessage(error) };
+  if (error) return failFromError(error);
   revalidateAdmin("/admin/qa", "/admin/audit");
   return { ok: true, message: "QA account registered (analytics-isolated)." };
 }
 
 export async function exportReportAction(formData: FormData): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const reportType = String(formData.get("reportType") ?? "") as ReportType;
   if (!REPORT_TYPES.includes(reportType)) {
     return { ok: false, message: "Unknown report type." };
@@ -498,7 +549,7 @@ export async function exportReportAction(formData: FormData): Promise<ActionResu
   const { data, error } = await supabase.rpc("export_admin_report", {
     p_report_type: reportType,
   });
-  if (error) return { ok: false, message: asMessage(error) };
+  if (error) return failFromError(error);
   revalidateAdmin("/admin/reports", "/admin/audit");
   return {
     ok: true,
@@ -534,7 +585,7 @@ export async function retryStorageOrphanCleanupAction(
   const { data, error } = await rpc("claim_storage_orphan_retry_batch", {
     p_limit: limit,
   });
-  if (error) return { ok: false, message: asMessage(error) };
+  if (error) return failFromError(error);
 
   const batch = (Array.isArray(data) ? data : []) as Array<{
     id: string;
@@ -599,12 +650,18 @@ export async function retryStorageOrphanCleanupAction(
   }
 
   revalidateAdmin("/admin/tickets", "/admin/audit");
+  if (batch.length === 0) {
+    return {
+      ok: true,
+      code: "ADMIN_ORPHAN_NONE",
+      message: "No eligible storage orphans ready for manual retry.",
+      data: { claimed: 0, resolved: 0, failed: 0 },
+    };
+  }
   return {
     ok: failed === 0,
-    message:
-      batch.length === 0
-        ? "No eligible storage orphans ready for manual retry."
-        : `Manual orphan cleanup: ${resolved} resolved, ${failed} failed, ${batch.length} claimed.`,
+    code: "ADMIN_ORPHAN_RESULT",
+    message: `Manual orphan cleanup: ${resolved} resolved, ${failed} failed, ${batch.length} claimed.`,
     data: { claimed: batch.length, resolved, failed },
   };
 }

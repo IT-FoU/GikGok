@@ -114,6 +114,7 @@ export async function markAnnouncementReadAction(
   id: string,
   dismiss = false,
 ): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const supabase = await createServerSupabaseClient();
   const { error } = await supabase.rpc("mark_announcement_read", {
     p_announcement_id: id,
@@ -134,6 +135,7 @@ export async function markAnnouncementReadAction(
 export async function markNotificationReadAction(
   id: string,
 ): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const supabase = await createServerSupabaseClient();
   const { error } = await supabase.rpc("mark_notification_read", {
     p_notification_id: id,
@@ -148,6 +150,7 @@ export async function markNotificationReadAction(
 }
 
 export async function markAllNotificationsReadAction(): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase.rpc("mark_all_notifications_read");
 
@@ -166,6 +169,7 @@ export async function markAllNotificationsReadAction(): Promise<ActionResult> {
 export async function claimMissionRewardAction(
   missionId: string,
 ): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase.rpc("claim_mission_reward", {
     p_mission_id: missionId,
@@ -187,6 +191,7 @@ export async function claimMissionRewardAction(
 export async function requestFriendAction(
   nickname: string,
 ): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const trimmed = nickname.trim();
   if (trimmed.length < 2) {
     return { ok: false, message: "Enter a nickname." };
@@ -213,6 +218,7 @@ export async function respondFriendshipAction(
   id: string,
   action: "accept" | "block" | "remove",
 ): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const supabase = await createServerSupabaseClient();
   const { error } = await supabase.rpc("respond_friendship", {
     p_friendship_id: id,
@@ -228,6 +234,7 @@ export async function respondFriendshipAction(
 }
 
 export async function createInviteAction(): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase.rpc("create_invite_code");
 
@@ -247,6 +254,7 @@ export async function createInviteAction(): Promise<ActionResult> {
 export async function createSupportTicketAction(
   formData: FormData,
 ): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const category = String(formData.get("category") ?? "") as TicketCategory;
   const subject = String(formData.get("subject") ?? "").trim();
   const message = String(formData.get("message") ?? "").trim();
@@ -308,6 +316,7 @@ export async function replySupportTicketAction(
   ticketId: string,
   message: string,
 ): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const trimmed = message.trim();
   if (trimmed.length < 1) {
     return { ok: false, message: "Message is required." };
@@ -617,6 +626,7 @@ export async function submitTicketSatisfactionAction(
   score: number,
   comment?: string,
 ): Promise<ActionResult> {
+  await assertMutatingOrigin();
   if (!Number.isInteger(score) || score < 1 || score > 5) {
     return { ok: false, message: "Score must be between 1 and 5." };
   }
@@ -639,6 +649,7 @@ export async function submitTicketSatisfactionAction(
 export async function setPlayPauseAction(
   days: number | 0,
 ): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const supabase = await createServerSupabaseClient();
   const { error } = await supabase.rpc("set_play_pause", {
     p_days: days,
@@ -657,6 +668,7 @@ export async function setPlayPauseAction(
 }
 
 export async function touchPlaySessionAction(): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const supabase = await createServerSupabaseClient();
   const { error } = await supabase.rpc("touch_play_session");
 
@@ -669,6 +681,7 @@ export async function touchPlaySessionAction(): Promise<ActionResult> {
 }
 
 export async function refreshLeaderboardAction(): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const supabase = await createServerSupabaseClient();
   // Requires system.settings permission. Ordinary players are rejected by RPC.
   const { error } = await supabase.rpc("refresh_leaderboard_entries");

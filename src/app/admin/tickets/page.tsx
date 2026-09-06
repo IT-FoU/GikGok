@@ -8,7 +8,7 @@ import {
   TR,
 } from "@/components/ui/table";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { TicketStatusForm, StorageOrphanRetryForm } from "@/modules/admin/ui";
+import { TicketStatusForm, StorageOrphanCard } from "@/modules/admin/ui";
 import { requireAdminSession } from "@/modules/admin/guards";
 import { signTicketAttachmentUrls } from "@/modules/engagement/actions";
 
@@ -48,15 +48,7 @@ export default async function AdminTicketsPage() {
           }))}
         />
       </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>Storage orphan cleanup</CardTitle>
-          <CardDescription>
-            Manual retry only — orphans are revalidated before any Storage delete.
-          </CardDescription>
-        </CardHeader>
-        <StorageOrphanRetryForm />
-      </Card>
+      <StorageOrphanCard />
       <Table>
         <THead>
           <TR>

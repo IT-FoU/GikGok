@@ -1,7 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 
+import { requireSameOrigin } from "@/lib/security";
 import type { ActionResult } from "@/modules/player/auth-shared";
 import {
   computeNetCredit,
@@ -15,7 +17,16 @@ function asMessage(error: { message: string } | null): string {
   return error?.message ?? "Unexpected error";
 }
 
+async function assertMutatingOrigin() {
+  requireSameOrigin(
+    { headers: await headers() },
+    { allowMissingInDev: true },
+  );
+}
+
+
 export async function claimDailyRewardAction(): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase.rpc("claim_daily_reward");
 
@@ -43,6 +54,7 @@ export async function createCreditRequestAction(
   _prev: ActionResult | null,
   formData: FormData,
 ): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const amount = Number(formData.get("amount"));
   const note = String(formData.get("note") ?? "").trim();
 
@@ -78,6 +90,7 @@ export async function createCreditRequestAction(
 export async function cancelCreditRequestAction(
   requestId: string,
 ): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const supabase = await createServerSupabaseClient();
   const { error } = await supabase.rpc("cancel_credit_request", {
     p_request_id: requestId,
@@ -95,6 +108,7 @@ export async function reviewCreditRequestAction(
   _prev: ActionResult | null,
   formData: FormData,
 ): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const requestId = String(formData.get("requestId") ?? "");
   const decision = String(formData.get("decision") ?? "");
   const reason = String(formData.get("reason") ?? "").trim();
@@ -188,6 +202,7 @@ export async function secondApproveCreditRequestAction(
   _prev: ActionResult | null,
   formData: FormData,
 ): Promise<ActionResult> {
+  await assertMutatingOrigin();
   // Ensure decision is approved and feeMode is percent for the shared reviewer.
   const next = new FormData();
   for (const [key, value] of formData.entries()) {

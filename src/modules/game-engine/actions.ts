@@ -22,6 +22,13 @@ function asMessage(error: { message: string } | null): string {
   return error?.message ?? "Unexpected error";
 }
 
+async function assertMutatingOrigin() {
+  requireSameOrigin(
+    { headers: await headers() },
+    { allowMissingInDev: true },
+  );
+}
+
 /**
  * Places a bet and settles it server-side via RPC.
  * Browser never computes outcomes, balances, or payouts.
@@ -35,10 +42,7 @@ export async function placeBetAction(input: {
   controlledResult?: Record<string, unknown> | null;
 }): Promise<ActionResult> {
   try {
-    requireSameOrigin(
-      { headers: await headers() },
-      { allowMissingInDev: true },
-    );
+    await assertMutatingOrigin();
   } catch (e) {
     return {
       ok: false,
@@ -135,6 +139,7 @@ export async function placeBetAction(input: {
 export async function openGameRoundAction(
   formData: FormData,
 ): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const gameKey = String(formData.get("gameId") ?? "");
   const mode = String(formData.get("settlementMode") ?? "random") as SettlementMode;
   const payloadRaw = String(formData.get("controlledPayload") ?? "").trim();
@@ -183,6 +188,7 @@ export async function openGameRoundAction(
 export async function startSmoothCloseAction(
   formData: FormData,
 ): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const gameKey = String(formData.get("gameId") ?? "");
   if (!isGameId(gameKey)) {
     return { ok: false, message: "Select a game." };
@@ -210,6 +216,7 @@ export async function startSmoothCloseAction(
 export async function setGameAvailabilityAction(
   formData: FormData,
 ): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const gameKey = String(formData.get("gameId") ?? "");
   const enabled = String(formData.get("enabled") ?? "") === "true";
   const message = String(formData.get("message") ?? "").trim();

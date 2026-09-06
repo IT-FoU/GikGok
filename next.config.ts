@@ -2,16 +2,11 @@ import type { NextConfig } from "next";
 
 /**
  * Security + caching headers for Phase 11 release hardening.
- * Production drops 'unsafe-eval'; keep it only outside production for Next tooling.
+ * Content-Security-Policy is applied per-request in src/proxy.ts with a
+ * script nonce + 'strict-dynamic'. Do not also emit a static CSP here
+ * (would conflict with the nonce policy). style-src still allows
+ * 'unsafe-inline' in proxy — documented limitation, not a full style lock.
  */
-const isProd = process.env.NODE_ENV === "production";
-// TEMPORARY LIMITATION: production still allows script-src 'unsafe-inline' because
-// Next.js App Router inline bootstrapping is not yet moved to a nonce/hash strategy
-// in this codebase. 'unsafe-eval' is already dropped in production. Track nonce CSP
-// as a follow-up before claiming a fully locked script policy.
-const scriptSrc = isProd
-  ? "script-src 'self' 'unsafe-inline'"
-  : "script-src 'self' 'unsafe-inline' 'unsafe-eval'";
 
 const securityHeaders = [
   { key: "X-DNS-Prefetch-Control", value: "on" },
@@ -21,21 +16,6 @@ const securityHeaders = [
   {
     key: "Permissions-Policy",
     value: "camera=(), microphone=(), geolocation=(), payment=()",
-  },
-  {
-    key: "Content-Security-Policy",
-    value: [
-      "default-src 'self'",
-      scriptSrc,
-      "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https:",
-      "font-src 'self' data:",
-      "connect-src 'self' https: wss:",
-      "worker-src 'self' blob:",
-      "frame-ancestors 'none'",
-      "base-uri 'self'",
-      "form-action 'self'",
-    ].join("; "),
   },
 ];
 

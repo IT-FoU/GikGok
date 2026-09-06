@@ -20,19 +20,25 @@ import {
   reviewCreditRequestAction,
   secondApproveCreditRequestAction,
 } from "@/modules/ledger/actions";
+import { resolveActionMessage } from "@/modules/localization/action-result";
 import { useTranslations } from "@/modules/localization/provider";
 import type { ActionResult } from "@/modules/player/auth-shared";
 
 function ResultMessage({ state }: { state: ActionResult | null }) {
-  if (!state?.message) return null;
+  const t = useTranslations();
+  if (!state?.message && !state?.code) return null;
+  const text = resolveActionMessage(t, state);
+  if (!text) return null;
   return (
     <p
       className={
-        state.ok ? "text-sm text-[var(--brand-accent)]" : "text-sm text-red-300"
+        state.ok
+          ? "text-sm text-[var(--brand-accent)]"
+          : "text-sm text-red-400"
       }
-      role={state.ok ? "status" : "alert"}
+      role="status"
     >
-      {state.message}
+      {text}
     </p>
   );
 }

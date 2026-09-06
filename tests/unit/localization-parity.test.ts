@@ -55,6 +55,7 @@ describe("hard-coded UI string guard", () => {
     "src/app/(player)/reset-password",
     "src/app/(player)/account-status",
     "src/modules/player/auth-forms.tsx",
+    "src/modules/admin/ui.tsx",
   ];
 
   const allowed = new Set([
@@ -74,6 +75,10 @@ describe("hard-coded UI string guard", () => {
     "ActionResult",
     "AuthAction",
     "FormData",
+    "StorageOrphanRetryForm",
+    "StorageOrphanCard",
+    "Banner",
+    "SensitiveFields",
   ]);
 
   function walk(path: string): string[] {

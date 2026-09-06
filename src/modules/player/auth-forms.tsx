@@ -5,6 +5,7 @@ import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { resolveActionMessage } from "@/modules/localization/action-result";
 import { useTranslations } from "@/modules/localization/provider";
 import {
   AVATAR_PRESETS,
@@ -18,21 +19,10 @@ type AuthAction = (
 
 export type { ActionResult };
 
-function resolveMessage(
-  t: (key: string, params?: Record<string, string | number>) => string,
-  state: ActionResult,
-): string {
-  if (state.code) {
-    const keyed = t(`actionCodes.${state.code}`);
-    if (keyed !== `actionCodes.${state.code}`) return keyed;
-  }
-  return state.message ?? "";
-}
-
 function FormMessage({ state }: { state: ActionResult | null }) {
   const t = useTranslations();
   if (!state?.message && !state?.code) return null;
-  const text = resolveMessage(t, state);
+  const text = resolveActionMessage(t, state);
   if (!text) return null;
   return (
     <p

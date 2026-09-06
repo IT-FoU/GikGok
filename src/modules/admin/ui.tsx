@@ -5,6 +5,8 @@ import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { resolveActionMessage } from "@/modules/localization/action-result";
+import { useTranslations } from "@/modules/localization/provider";
 import { ADMIN_PERMISSION_CODES } from "./index";
 import type { ActionResult } from "@/modules/player/auth-shared";
 
@@ -36,7 +38,10 @@ import {
 } from "./actions";
 
 function Banner({ result }: { result: ActionResult | null }) {
-  if (!result?.message) return null;
+  const t = useTranslations();
+  if (!result?.message && !result?.code) return null;
+  const text = resolveActionMessage(t, result);
+  if (!text) return null;
   return (
     <p
       className={
@@ -46,7 +51,7 @@ function Banner({ result }: { result: ActionResult | null }) {
       }
       role="status"
     >
-      {result.message}
+      {text}
     </p>
   );
 }
@@ -384,14 +389,14 @@ export function TicketStatusForm({
 }
 
 export function StorageOrphanRetryForm() {
+  const t = useTranslations();
   const { pending, result, onSubmit } = useActionForm(
     retryStorageOrphanCleanupAction,
   );
   return (
     <form className="space-y-3" onSubmit={onSubmit}>
       <p className="text-sm text-[var(--brand-muted)]">
-        Manual Storage orphan cleanup. There is no automatic retry consumer —
-        run this after attachment delete/upload cleanup failures.
+        {t("admin.orphan.formHint")}
       </p>
       <Input
         name="limit"
@@ -399,10 +404,10 @@ export function StorageOrphanRetryForm() {
         min={1}
         max={25}
         defaultValue={10}
-        aria-label="Batch limit"
+        aria-label={t("admin.orphan.batchLimit")}
       />
       <Button type="submit" disabled={pending} variant="secondary">
-        Retry orphan cleanup
+        {t("admin.orphan.retryCta")}
       </Button>
       <Banner result={result} />
     </form>
@@ -637,5 +642,20 @@ export function ReportExportForm() {
         </pre>
       ) : null}
     </form>
+  );
+}
+
+export function StorageOrphanCard() {
+  const t = useTranslations();
+  return (
+    <section className="space-y-3 rounded-lg border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4">
+      <div>
+        <h2 className="text-lg font-medium">{t("admin.orphan.title")}</h2>
+        <p className="text-sm text-[var(--brand-muted)]">
+          {t("admin.orphan.pageDescription")}
+        </p>
+      </div>
+      <StorageOrphanRetryForm />
+    </section>
   );
 }

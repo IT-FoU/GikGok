@@ -252,6 +252,34 @@
       "qa": "QA accounts",
       "audit": "Audit",
       "reports": "Reports"
+    },
+    "orphan": {
+      "title": "Storage orphan cleanup",
+      "pageDescription": "Manual retry only — orphans are revalidated before any Storage delete.",
+      "formHint": "Manual Storage orphan cleanup. There is no automatic retry consumer — run this after attachment delete/upload cleanup failures.",
+      "batchLimit": "Batch limit",
+      "retryCta": "Retry orphan cleanup",
+      "ticketsTitle": "Support tickets",
+      "ticketsDescription": "Queue, status transitions, and staff replies.",
+      "colSubject": "Subject",
+      "colCategory": "Category",
+      "colStatus": "Status",
+      "colCreated": "Created",
+      "colAttachments": "Attachments"
+    },
+    "mfa": {
+      "pinLabel": "Admin PIN",
+      "pinHint": "High-impact actions need a fresh admin PIN. Authenticator MFA is separate: your session must already be aal2 (complete MFA at Admin → MFA).",
+      "enrollFailed": "Enrollment failed."
+    },
+    "tickets": {
+      "title": "Support tickets",
+      "description": "Queue, status transitions, and staff replies.",
+      "subject": "Subject",
+      "category": "Category",
+      "status": "Status",
+      "created": "Created",
+      "attachments": "Attachments"
     }
   },
   "status": {
@@ -471,6 +499,12 @@
     "AUTH_PHONE_OTP_WAITING": "Phone OTP awaits Owner SMS provider configuration.",
     "PROFILE_UPDATED": "Profile updated.",
     "SETTINGS_SAVED": "Settings saved.",
-    "PERMISSION_DENIED": "You do not have permission for this action."
+    "PERMISSION_DENIED": "You do not have permission for this action.",
+    "ADMIN_PIN_FAILED": "Admin PIN verification failed.",
+    "ADMIN_MFA_FAILED": "Admin MFA verification failed.",
+    "ADMIN_OTP_MISUSE": "Use authenticator MFA for 2FA; do not submit OTP codes to admin actions.",
+    "ADMIN_MFA_ENROLL_STARTED": "Scan the QR code with your authenticator app, then confirm with a code.",
+    "ADMIN_ORPHAN_NONE": "No eligible storage orphans ready for manual retry.",
+    "ADMIN_ORPHAN_RESULT": "Manual orphan cleanup: {resolved} resolved, {failed} failed, {claimed} claimed."
   }
 }

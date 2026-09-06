@@ -252,6 +252,34 @@
       "qa": "ບັນຊີ QA",
       "audit": "ບັນທຶກ",
       "reports": "ລາຍງານ"
+    },
+    "orphan": {
+      "title": "ທຳຄວາມສະອາດ orphan Storage",
+      "pageDescription": "ລອງໃໝ່ດ້ວຍມືເທົ່ານັ້ນ — ຈະກວດ orphan ກ່ອນລຶບອອກຈາກ Storage.",
+      "formHint": "ທຳຄວາມສະອາດ orphan ດ້ວຍມື. ບໍ່ມີລະບົບລອງໃໝ່ອັດຕະໂນມັດ — ໃຊ້ຫຼັງການລຶບ/ອັບໂຫຼດໄຟລ໌ແນບລົ້ມເຫຼວ.",
+      "batchLimit": "ຈຳນວນຕໍ່ຮອບ",
+      "retryCta": "ລອງທຳຄວາມສະອາດ orphan ໃໝ່",
+      "ticketsTitle": "ຕິກເກັດສະໜັບສະໜູນ",
+      "ticketsDescription": "ຄິວ, ການປ່ຽນສະຖານະ, ແລະ ຄຳຕອບຈາກພະນັກງານ.",
+      "colSubject": "ຫົວຂໍ້",
+      "colCategory": "ໝວດ",
+      "colStatus": "ສະຖານະ",
+      "colCreated": "ສ້າງເມື່ອ",
+      "colAttachments": "ໄຟລ໌ແນບ"
+    },
+    "mfa": {
+      "pinLabel": "PIN ແອດມິນ",
+      "pinHint": "ການກະທຳສຳຄັນຕ້ອງໃຊ້ PIN ແອດມິນໃໝ່. MFA ແຍກຕ່າງຫາກ: ເຊດຊັນຕ້ອງເປັນ aal2 (ເຮັດ MFA ທີ່ Admin → MFA).",
+      "enrollFailed": "ການລົງທະບຽນບໍ່ສຳເລັດ."
+    },
+    "tickets": {
+      "title": "ຕິກເກັດສະໜັບສະໜູນ",
+      "description": "ຄິວ, ການປ່ຽນສະຖານະ, ແລະ ຄຳຕອບຈາກພະນັກງານ.",
+      "subject": "ຫົວຂໍ້",
+      "category": "ໝວດ",
+      "status": "ສະຖານະ",
+      "created": "ສ້າງເມື່ອ",
+      "attachments": "ໄຟລ໌ແນບ"
     }
   },
   "status": {
@@ -471,6 +499,12 @@
     "AUTH_PHONE_OTP_WAITING": "OTP ໂທລະສັບລໍຖ້າການຕັ້ງຄ່າຜູ້ໃຫ້ບໍລິການ SMS ຈາກເຈົ້າຂອງລະບົບ.",
     "PROFILE_UPDATED": "ອັບເດດໂປຣໄຟລ์ແລ້ວ.",
     "SETTINGS_SAVED": "ບັນທຶກການຕັ້ງຄ່າແລ້ວ.",
-    "PERMISSION_DENIED": "ທ່ານບໍ່ມີສິດສຳລັບການກະທຳນີ້."
+    "PERMISSION_DENIED": "ທ່ານບໍ່ມີສິດສຳລັບການກະທຳນີ້.",
+    "ADMIN_PIN_FAILED": "ຢືນຢັນ PIN ແອດມິນບໍ່ສຳເລັດ.",
+    "ADMIN_MFA_FAILED": "ຢືນຢັນ MFA ແອດມິນບໍ່ສຳເລັດ.",
+    "ADMIN_OTP_MISUSE": "ໃຊ້ MFA ແອັບຢືນຢັນສຳລັບ 2FA; ຢ່າສົ່ງລະຫັດ OTP ໃຫ້ການກະທຳແອດມິນ.",
+    "ADMIN_MFA_ENROLL_STARTED": "ສະແກນ QR ດ້ວຍແອັບຢືນຢັນ ແລ້ວຢືນຢັນດ້ວຍລະຫັດ.",
+    "ADMIN_ORPHAN_NONE": "ບໍ່ມີ storage orphan ທີ່ພ້ອມສຳລັບການລອງໃໝ່ດ້ວຍມື.",
+    "ADMIN_ORPHAN_RESULT": "ທຳຄວາມສະອາດ orphan: ສຳເລັດ {resolved}, ລົ້ມເຫຼວ {failed}, ດຶງມາ {claimed}."
   }
 }

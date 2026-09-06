@@ -5,8 +5,10 @@ import { redirect } from "next/navigation";
 
 import {
   UPLOAD_MAX_BYTES,
+  requireSameOrigin,
   validateImageMagicBytes,
 } from "@/lib/security";
+import { headers } from "next/headers";
 import {
   deletionRequestSchema,
   loginSchema,
@@ -22,6 +24,14 @@ import type { ActionResult } from "@/modules/player/auth-shared";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export type { ActionResult };
+
+async function assertMutatingOrigin() {
+  requireSameOrigin(
+    { headers: await headers() },
+    { allowMissingInDev: true },
+  );
+}
+
 
 function fail(
   code: string,
@@ -52,6 +62,7 @@ export async function registerAction(
   _prev: ActionResult | null,
   formData: FormData,
 ): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const parsed = registerSchema.safeParse({
     contactType: formData.get("contactType"),
     email: formData.get("email") || undefined,
@@ -133,6 +144,7 @@ export async function loginAction(
   _prev: ActionResult | null,
   formData: FormData,
 ): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const parsed = loginSchema.safeParse({
     contactType: formData.get("contactType"),
     email: formData.get("email") || undefined,
@@ -203,6 +215,7 @@ export async function loginAction(
 }
 
 export async function logoutAction(): Promise<void> {
+  await assertMutatingOrigin();
   const supabase = await createServerSupabaseClient();
   await supabase.auth.signOut();
   redirect("/");
@@ -212,6 +225,7 @@ export async function verifyOtpAction(
   _prev: ActionResult | null,
   formData: FormData,
 ): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const parsed = otpSchema.safeParse({
     contactType: formData.get("contactType"),
     email: formData.get("email") || undefined,
@@ -266,6 +280,7 @@ export async function requestPasswordResetAction(
   _prev: ActionResult | null,
   formData: FormData,
 ): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const genericMessage =
     "If an account exists for that email, a reset link was sent.";
 
@@ -297,6 +312,7 @@ export async function updatePasswordAction(
   _prev: ActionResult | null,
   formData: FormData,
 ): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const parsed = resetPasswordSchema.safeParse({
     password: formData.get("password"),
     confirmPassword: formData.get("confirmPassword"),
@@ -326,6 +342,7 @@ export async function updateProfileAction(
   _prev: ActionResult | null,
   formData: FormData,
 ): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const parsed = profileUpdateSchema.safeParse({
     nickname: formData.get("nickname"),
     avatarPresetId: formData.get("avatarPresetId") || undefined,
@@ -374,6 +391,7 @@ export async function updateSettingsAction(
   _prev: ActionResult | null,
   formData: FormData,
 ): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const parsed = settingsUpdateSchema.safeParse({
     language: formData.get("language"),
     soundPack: formData.get("soundPack"),
@@ -428,6 +446,7 @@ export async function uploadAvatarAction(
   _prev: ActionResult | null,
   formData: FormData,
 ): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const file = formData.get("avatar");
   if (!(file instanceof File)) {
     return fail("VALIDATION_FAILED", "Choose an image file.");
@@ -494,6 +513,7 @@ export async function requestDeletionAction(
   _prev: ActionResult | null,
   formData: FormData,
 ): Promise<ActionResult> {
+  await assertMutatingOrigin();
   const parsed = deletionRequestSchema.safeParse({
     reason: formData.get("reason") || undefined,
     confirm: formData.get("confirm") === "on" ? true : false,
